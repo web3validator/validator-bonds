@@ -1,0 +1,15 @@
+{
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "semi": ["error", "never"],
+    "node/no-extraneous-import": ["error", {
+      "allowModules": ["@marinade.finance/jest-utils"]
+     }]
+  },
+  "settings": {
+    "node": {
+      // Modules are used by jest dev
+      "allowModules": ["@jest/globals"]
+    }
+  }
+}
