@@ -1,0 +1,21 @@
+[[bin]]
+name = "insurance-engine-cli"
+path = "src/bin/cli.rs"
+
+[package]
+name = "insurance-engine"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+bincode = { workspace = true }
+clap = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }
+merkle-tree = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+snapshot-parser = { workspace = true }
+solana-sdk = { workspace = true }
+tokio = { workspace = true }

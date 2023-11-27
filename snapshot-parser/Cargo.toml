@@ -1,0 +1,23 @@
+[[bin]]
+name = "snapshot-parser-cli"
+path = "src/bin/cli.rs"
+
+[package]
+name = "snapshot-parser"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+solana-client = { workspace = true }
+solana-ledger = { workspace = true }
+solana-program = { workspace = true }
+solana-runtime = { workspace = true }
+solana-sdk = { workspace = true }
+log = { workspace = true }
+clap = { workspace = true }
+env_logger = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }

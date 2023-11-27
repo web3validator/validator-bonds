@@ -1,0 +1,102 @@
+agents:
+  queue: "snapshots"
+
+steps:
+  - label: ":hammer_and_wrench: :rust: Build"
+    commands:
+    - '. "$HOME/.cargo/env"'
+    - 'cargo build --release --bin snapshot-parser-cli --bin insurance-engine-cli'
+    artifact_paths:
+      - target/release/snapshot-parser-cli
+      - target/release/insurance-engine-cli
+
+  - input: "What is the snapshot directory?"
+    fields:
+      - text: "Snapshot directory"
+        key: "snapshot_dir"
+    if: "build.env('SNAPSHOT_DIR') == null"
+
+  - wait: ~
+
+  - label: ":gear: Setup"
+    commands:
+    - '. "$HOME/.cargo/env"'
+    - 'snapshot_dir=${SNAPSHOT_DIR:-$(buildkite-agent meta-data get snapshot_dir)}'
+    - 'echo "Snapshot dir: $$snapshot_dir"'
+    - 'epoch=$(<<<"$$snapshot_dir" grep -oP "(?<=snapshot-)\d+" || exit 1)'
+    - 'echo "Epoch: $$epoch"'
+    - 'buildkite-agent meta-data set snapshot_dir "$$snapshot_dir"'
+    - 'buildkite-agent meta-data set epoch "$$epoch"'
+
+  - wait: ~
+
+  - command: echo "--> Start of concurrency gate"
+    concurrency_group: 'validator-bonds/prepare-claims'
+    concurrency: 1
+
+  - wait: ~
+
+  - label: ":microscope: Parse Snapshot"
+    commands:
+    - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/snapshot-parser-cli .'
+    - 'chmod +x target/release/snapshot-parser-cli'
+    - |
+      ./target/release/snapshot-parser-cli \
+        --ledger-path "$$snapshot_dir" \
+        --output-validator-meta-collection "$$snapshot_dir/validators.json" \
+        --output-stake-meta-collection "$$snapshot_dir/stakes.json"
+
+  - wait: ~
+
+  - label: ":scales: Evaluate Marinade Insured Events"
+    env:
+      WHITELIST_STAKE_AUTHORITY: stWirqFCf2Uts1JBL1Jsd3r6VBWhgnpdPxCTe1MFjrq,4bZ6o3eUUNXhKuqjdCnCoPAoLgWiuLYixKaxoa8PpiKk,ex9CfkBZZd6Nv9XdnoDmmB45ymbu4arXVk7g5pWnt3N
+    commands:
+    - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/insurance-engine-cli .'
+    - 'chmod +x target/release/insurance-engine-cli'
+    - |
+      ./target/release/insurance-engine-cli \
+        --validator-meta-collection "$$snapshot_dir/validators.json" \
+        --stake-meta-collection "$$snapshot_dir/stakes.json" \
+        --output-insured-event-collection "$$snapshot_dir/events.json" \
+        --output-insurance-claim-collection "$$snapshot_dir/claims.json" \
+        --output-merkle-tree-collection "$$snapshot_dir/claims_merkle.json" \
+        --low-rewards-threshold-pct 0.9
+
+  - label: ":scales: Evaluate All Insured Events"
+    commands:
+    - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/insurance-engine-cli .'
+    - 'chmod +x target/release/insurance-engine-cli'
+    - |
+      ./target/release/insurance-engine-cli \
+        --validator-meta-collection "$$snapshot_dir/validators.json" \
+        --stake-meta-collection "$$snapshot_dir/stakes.json" \
+        --output-insured-event-collection "$$snapshot_dir/events_all.json" \
+        --output-insurance-claim-collection "$$snapshot_dir/claims_all.json" \
+        --output-merkle-tree-collection "$$snapshot_dir/claims_merkle_all.json" \
+        --low-rewards-threshold-pct 0.9
+
+  - block: ":rocket: Continue?"
+
+  - label: ":floppy_disk: :arrow_right: :cloud: Upload artifacts"
+    env:
+      gs_bucket: gs://marinade-validator-bonds-mainnet
+    commands:
+    - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
+    - 'epoch=$(buildkite-agent meta-data get epoch)'
+    - 'gcloud storage cp "$$snapshot_dir/validators.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/stakes.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/claims.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/claims_merkle.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/events_all.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/claims_all.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/claims_merkle_all.json" "$$gs_bucket/$$epoch/"'
+
+  - wait: ~
+
+  - command: echo "End of concurrency gate <--"
+    concurrency_group: 'validator-bonds/prepare-claims'
+    concurrency: 1

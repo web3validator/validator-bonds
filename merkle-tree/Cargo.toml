@@ -1,0 +1,9 @@
+[package]
+name = "merkle-tree"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+solana-sdk = { workspace = true }
+fast-math = { workspace = true }
+hex = { workspace = true }
