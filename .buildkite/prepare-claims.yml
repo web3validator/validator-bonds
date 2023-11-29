@@ -79,7 +79,7 @@ steps:
         --output-merkle-tree-collection "$$snapshot_dir/claims_merkle_all.json" \
         --low-rewards-threshold-pct 0.9
 
-  - block: ":rocket: Continue?"
+  - wait: ~
 
   - label: ":floppy_disk: :arrow_right: :cloud: Upload artifacts"
     env:
