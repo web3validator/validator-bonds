@@ -106,7 +106,7 @@ steps:
           {
             "title": "Claims for Validator Bonds prepared ('"$$epoch"').",
             "url": "'"$$BUILDKITE_BUILD_URL"'",
-            "color": "5661687"
+            "color": "52224"
           }
         ]
       }'
