@@ -35,16 +35,16 @@ export function installInitConfig(program: Command) {
       parsePubkeyOrKeypair
     )
     .option(
-      '--claim-settlement-after-epochs <number>',
+      '--epochs-to-claim-settlement <number>',
       'number of epochs after which claim can be settled',
       parseFloat,
-      0
+      3
     )
     .option(
       '--withdraw-lockup-epochs <number>',
       'number of epochs after which withdraw can be executed',
       parseFloat,
-      0
+      3
     )
     .action(
       async ({
@@ -52,14 +52,14 @@ export function installInitConfig(program: Command) {
         admin,
         operator,
         rentPayer,
-        claimSettlementAfterEpochs,
+        epochsToClaimSettlement,
         withdrawLockupEpochs,
       }: {
         address?: Promise<Keypair>
         admin?: Promise<PublicKey>
         operator?: Promise<PublicKey>
         rentPayer?: Promise<PublicKey | Keypair>
-        claimSettlementAfterEpochs: number
+        epochsToClaimSettlement: number
         withdrawLockupEpochs: number
       }) => {
         await manageInitConfig({
@@ -67,7 +67,7 @@ export function installInitConfig(program: Command) {
           adminAuthority: await admin,
           operatorAuthority: await operator,
           rentPayer: await rentPayer,
-          claimSettlementAfterEpochs,
+          epochsToClaimSettlement,
           withdrawLockupEpochs,
         })
       }
@@ -79,14 +79,14 @@ async function manageInitConfig({
   adminAuthority,
   operatorAuthority,
   rentPayer,
-  claimSettlementAfterEpochs,
+  epochsToClaimSettlement,
   withdrawLockupEpochs,
 }: {
   address?: Keypair
   adminAuthority?: PublicKey
   operatorAuthority?: PublicKey
   rentPayer?: PublicKey | Keypair
-  claimSettlementAfterEpochs: number
+  epochsToClaimSettlement: number
   withdrawLockupEpochs: number
 }) {
   const { program, provider, logger, simulate, printOnly, wallet } =
@@ -109,7 +109,7 @@ async function manageInitConfig({
     program,
     adminAuthority,
     operatorAuthority,
-    claimSettlementAfterEpochs,
+    epochsToClaimSettlement,
     withdrawLockupEpochs,
     rentPayer,
   })
