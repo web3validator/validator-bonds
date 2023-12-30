@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git@github.com:marinade-finance/validator-bonds.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "validator-bonds": "./src/index.js"
   },
@@ -20,7 +23,7 @@
   ],
   "main": "src/index",
   "dependencies": {
-    "@marinade.finance/validator-bonds-sdk": "workspace:*",
+    "@marinade.finance/validator-bonds-sdk": "^1.0.0",
     "@coral-xyz/anchor": "^0.29.0",
     "@solana/web3.js": "^1.87.6",
     "@marinade.finance/cli-common": "^2.0.20",
