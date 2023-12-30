@@ -8,20 +8,20 @@ import {
   initConfigInstruction,
 } from '../../src'
 import { AnchorProvider } from '@coral-xyz/anchor'
-import { initTest } from './utils'
+import { initTest } from './testValidator'
 import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
   executeTxSimple,
   splitAndExecuteTx,
 } from '@marinade.finance/web3js-common'
+import { signer, signerWithPubkey } from '../utils/helpers'
 
-describe('Validator Bonds config account tests', () => {
+describe('Validator Bonds init config', () => {
   let provider: AnchorProvider
   let program: ValidatorBondsProgram
 
   beforeAll(async () => {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;({ provider, program } = await initTest())
   })
 
@@ -53,18 +53,22 @@ describe('Validator Bonds config account tests', () => {
 
     const tx = await transaction(provider)
 
-    const { keypair, instruction } = await initConfigInstruction({
+    const { configAccount, instruction } = await initConfigInstruction({
       program,
-      adminAuthority,
-      operatorAuthority,
+      admin: adminAuthority,
+      operator: operatorAuthority,
       epochsToClaimSettlement: 1,
       withdrawLockupEpochs: 2,
     })
     tx.add(instruction)
-    await executeTxSimple(provider.connection, tx, [provider.wallet, keypair!])
+    const [configSigner, configAddress] = signerWithPubkey(configAccount)
+    await executeTxSimple(provider.connection, tx, [
+      provider.wallet,
+      configSigner,
+    ])
 
     // Ensure the account was created
-    const configAccountAddress = keypair!.publicKey
+    const configAccountAddress = configAddress
     const configData = await getConfig(program, configAccountAddress)
 
     const configDataFromList = await findConfigs({ program, adminAuthority })
@@ -93,15 +97,15 @@ describe('Validator Bonds config account tests', () => {
 
     const numberOfConfigs = 17
     for (let i = 1; i <= numberOfConfigs; i++) {
-      const { keypair, instruction } = await initConfigInstruction({
+      const { configAccount, instruction } = await initConfigInstruction({
         program,
-        adminAuthority,
-        operatorAuthority,
+        admin: adminAuthority,
+        operator: operatorAuthority,
         epochsToClaimSettlement: i,
         withdrawLockupEpochs: i + 1,
       })
       tx.add(instruction)
-      signers.push(keypair!)
+      signers.push(signer(configAccount))
     }
     await splitAndExecuteTx({
       connection: provider.connection,

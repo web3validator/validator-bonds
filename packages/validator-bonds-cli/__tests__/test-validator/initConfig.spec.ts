@@ -11,16 +11,11 @@ import {
   ValidatorBondsProgram,
   getConfig,
 } from '@marinade.finance/validator-bonds-sdk'
-import { initTest } from './utils'
-
-beforeAll(() => {
-  shellMatchers()
-})
+import { initTest } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
 
 describe('Init config account using CLI', () => {
   let provider: AnchorProvider
   let program: ValidatorBondsProgram
-
   let configPath: string
   let configKeypair: Keypair
   let configCleanup: () => Promise<void>
@@ -31,7 +26,6 @@ describe('Init config account using CLI', () => {
   })
 
   beforeEach(async () => {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;({
       path: configPath,
       keypair: configKeypair,
@@ -110,8 +104,8 @@ describe('Init config account using CLI', () => {
     ).resolves.toBeLessThan(rentPayerFunds)
   })
 
+  // this is a "mock test" that just checks that print only command works
   it('creates config in print-only mode', async () => {
-    // this is a "mock test" that just checks that print only command works
     await (
       expect([
         'pnpm',

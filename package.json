@@ -5,10 +5,10 @@
         "compile": "pnpm anchor:build && tsc --project tsconfig.build.json",
         "build": "pnpm compile",
         "_test": "pnpm jest --config jest.config.test-validator.js -- \"$FILE\"",
-        "test:test-validator": "BROWSER= anchor test",
+        "test:validator": "anchor test",
         "test:bankrun": "pnpm jest --config jest.config.bankrun.js --runInBand true -- \"$FILE\"",
         "test:cargo": "cargo test --features no-entrypoint",
-        "test": "pnpm test:cargo && pnpm test:bankrun && pnpm test:test-validator",
+        "test": "pnpm test:cargo && pnpm test:bankrun && pnpm test:validator",
         "cli": "ts-node ./packages/validator-bonds-cli/src/",
         "lint:cargo": "cargo fmt -- --check && cargo clippy",
         "lint:cargo-fix": "cargo fmt --all && cargo clippy --fix --allow-staged --allow-dirty",
@@ -17,7 +17,9 @@
         "lint:ts-clean": "gts clean",
         "lint:fix": "pnpm lint:ts-fix && pnpm lint:cargo-fix",
         "lint": "pnpm lint:cargo && pnpm lint:ts",
-        "publish-sdk": "pnpm build && pnpm publish build/packages/validator-bonds-sdk"
+        "publish-sdk": "pnpm build && pnpm publish build/packages/validator-bonds-sdk",
+        "publish-cli": "pnpm build && pnpm publish build/packages/validator-bonds-cli",
+        "publish": "pnpm publish-sdk && pnpm publish-cli"
     },
     "devDependencies": {
         "@jest/globals": "^29.7.0",
@@ -29,7 +31,7 @@
         "ts-jest": "^29.1.1",
         "ts-node": "^10.9.1",
         "typescript": "4.9.5",
-        "@marinade.finance/jest-utils": "^2.0.18"
+        "@marinade.finance/jest-utils": "^2.0.20"
     },
     "pnpm": {
         "peerDependencyRules": {
