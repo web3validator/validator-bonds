@@ -3,7 +3,8 @@
     "scripts": {
         "anchor:build": "anchor build",
         "compile": "pnpm anchor:build && tsc --project tsconfig.build.json",
-        "build": "pnpm compile",
+        "_copy-readme": "cp packages/validator-bonds-sdk/README.md build/packages/validator-bonds-sdk/ && cp packages/validator-bonds-cli/README.md build/packages/validator-bonds-cli/",
+        "build": "pnpm compile && pnpm _copy-readme",
         "_test": "pnpm jest --config jest.config.test-validator.js -- \"$FILE\"",
         "test:validator": "anchor test",
         "test:bankrun": "pnpm jest --config jest.config.bankrun.js --runInBand true -- \"$FILE\"",
