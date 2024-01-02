@@ -19,6 +19,9 @@ describe('Init config account using CLI', () => {
   let configPath: string
   let configKeypair: Keypair
   let configCleanup: () => Promise<void>
+  let keypairFeePayerPath: string
+  let keypairFeePayerKeypair: Keypair
+  let keypairFeePayerCleanup: () => Promise<void>
 
   beforeAll(async () => {
     shellMatchers()
@@ -31,10 +34,16 @@ describe('Init config account using CLI', () => {
       keypair: configKeypair,
       cleanup: configCleanup,
     } = await createTempFileKeypair())
+    ;({
+      path: keypairFeePayerPath,
+      keypair: keypairFeePayerKeypair,
+      cleanup: keypairFeePayerCleanup,
+    } = await createTempFileKeypair())
   })
 
   afterEach(async () => {
     await configCleanup()
+    await keypairFeePayerCleanup()
   })
 
   it('inits config account', async () => {
@@ -44,17 +53,30 @@ describe('Init config account using CLI', () => {
       cleanup: cleanupRentPayer,
     } = await createTempFileKeypair()
     const rentPayerFunds = 10 * LAMPORTS_PER_SOL
-    const tx = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: provider.wallet.publicKey,
-        toPubkey: rentPayerKeypair.publicKey,
-        lamports: rentPayerFunds,
-      })
+    await provider.sendAndConfirm(
+      new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: provider.wallet.publicKey,
+          toPubkey: rentPayerKeypair.publicKey,
+          lamports: rentPayerFunds,
+        })
+      )
     )
-    await provider.sendAndConfirm!(tx)
     await expect(
       provider.connection.getBalance(rentPayerKeypair.publicKey)
     ).resolves.toStrictEqual(rentPayerFunds)
+    await provider.sendAndConfirm(
+      new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: provider.wallet.publicKey,
+          toPubkey: keypairFeePayerKeypair.publicKey,
+          lamports: LAMPORTS_PER_SOL,
+        })
+      )
+    )
+    await expect(
+      provider.connection.getBalance(keypairFeePayerKeypair.publicKey)
+    ).resolves.toStrictEqual(LAMPORTS_PER_SOL)
 
     const admin = Keypair.generate().publicKey
     const operator = Keypair.generate().publicKey
@@ -66,6 +88,8 @@ describe('Init config account using CLI', () => {
             'cli',
             '-u',
             provider.connection.rpcEndpoint,
+            '-k',
+            keypairFeePayerPath,
             '--program-id',
             program.programId.toBase58(),
             'init-config',
@@ -113,6 +137,8 @@ describe('Init config account using CLI', () => {
           'cli',
           '-u',
           provider.connection.rpcEndpoint,
+          '-k',
+          keypairFeePayerPath,
           '--program-id',
           program.programId.toBase58(),
           'init-config',

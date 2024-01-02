@@ -49,13 +49,11 @@ Options:
   -u, --cluster <cluster>                              solana cluster URL, accepts shortcuts (d/devnet, m/mainnet) (default: "http://127.0.0.1:8899")
   -c <cluster>                                         alias for "-u, --cluster"
   --commitment <commitment>                            Commitment (default: "confirmed")
-  -k, --keypair <keypair-or-ledger>                    Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>])  (default: ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>                    Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default: ~/.config/solana/id.json)
   --program-id <pubkey>                                Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                       Simulate (default: false)
-  -p, --print-only                                     Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL
-                                                       Governance UI by hand. (default: false)
-  --skip-preflight                                     transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight
-                                                       (default: false)
+  -p, --print-only                                     Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
+  --skip-preflight                                     transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   -d, --debug                                          printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                        alias for --debug (default: false)
   -h, --help                                           display help for command

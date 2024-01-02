@@ -7,7 +7,6 @@ import {
   parseKeypair,
   parsePubkey,
 } from '@marinade.finance/cli-common'
-import { Keypair } from '@solana/web3.js'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
@@ -29,8 +28,9 @@ program
   .option('--commitment <commitment>', 'Commitment', 'confirmed')
   .option(
     '-k, --keypair <keypair-or-ledger>',
-    'Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]) ' +
-      ` (default: ${DEFAULT_KEYPAIR_PATH})`
+    'Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). ' +
+      'Wallet keypair is used to pay for the transaction fees and as default value for signers. ' +
+      `(default: ${DEFAULT_KEYPAIR_PATH})`
   )
   .option(
     '--program-id <pubkey>',
@@ -58,8 +58,8 @@ program
   .hook('preAction', async (command: Command, action: Command) => {
     const wallet = command.opts().keypair
     const walletKeypair = wallet
-      ? ((await wallet) as Keypair)
-      : await parseKeypair('~/.config/solana/id.json')
+      ? await parseKeypair(wallet)
+      : await parseKeypair(DEFAULT_KEYPAIR_PATH)
     if (command.opts().debug || command.opts().verbose) {
       logger.level = 'debug'
     }
