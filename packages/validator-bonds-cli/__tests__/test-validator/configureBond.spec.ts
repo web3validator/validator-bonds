@@ -12,22 +12,22 @@ import {
 } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/testTransactions'
 import {
   AnchorExtendedProvider,
+  getValidatorInfo,
   initTest,
 } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
-import { createVoteAccount } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
+import { createVoteAccountWithIdentity } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
 
 describe('Configure bond account using CLI', () => {
   let provider: AnchorExtendedProvider
   let program: ValidatorBondsProgram
-  let voteWithdrawerPath: string
-  let voteWithdrawerKeypair: Keypair
-  let voteWithdrawerCleanup: () => Promise<void>
   let bondAuthorityPath: string
   let bondAuthorityKeypair: Keypair
   let bondAuthorityCleanup: () => Promise<void>
   let configAccount: PublicKey
   let bondAccount: PublicKey
   let voteAccount: PublicKey
+  let validatorIdentity: Keypair
+  let validatorIdentityPath: string
 
   beforeAll(async () => {
     shellMatchers()
@@ -35,11 +35,6 @@ describe('Configure bond account using CLI', () => {
   })
 
   beforeEach(async () => {
-    ;({
-      path: voteWithdrawerPath,
-      keypair: voteWithdrawerKeypair,
-      cleanup: voteWithdrawerCleanup,
-    } = await createTempFileKeypair())
     ;({
       path: bondAuthorityPath,
       keypair: bondAuthorityKeypair,
@@ -54,11 +49,12 @@ describe('Configure bond account using CLI', () => {
     expect(
       provider.connection.getAccountInfo(configAccount)
     ).resolves.not.toBeNull()
-    ;({ voteAccount } = await createVoteAccount(
+    ;({ validatorIdentity, validatorIdentityPath } = await getValidatorInfo(
+      provider.connection
+    ))
+    ;({ voteAccount } = await createVoteAccountWithIdentity(
       provider,
-      undefined,
-      undefined,
-      voteWithdrawerKeypair
+      validatorIdentity
     ))
     ;({ bondAccount } = await executeInitBondInstruction(
       program,
@@ -66,14 +62,13 @@ describe('Configure bond account using CLI', () => {
       configAccount,
       bondAuthorityKeypair,
       voteAccount,
-      voteWithdrawerKeypair,
+      validatorIdentity,
       33
     ))
   })
 
   afterEach(async () => {
     await bondAuthorityCleanup()
-    await voteWithdrawerCleanup()
   })
 
   it('configure bond account', async () => {
@@ -125,7 +120,7 @@ describe('Configure bond account using CLI', () => {
           '--vote-account',
           voteAccount.toBase58(),
           '--authority',
-          voteWithdrawerPath,
+          validatorIdentityPath,
           '--bond-authority',
           newBondAuthority.toBase58(),
           '--revenue-share',
