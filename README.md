@@ -49,6 +49,7 @@ solana program set-buffer-authority --new-buffer-authority 6YAju4nd4t7kyuHV6NvVp
 
 # publish IDL (account Du3XrzTNqhLt9gpui9LUogrLqCDrVC2HrtiNXHSJM58y)
 anchor --provider.cluster devnet idl \
+  --provider.wallet [fee-payer-keypair] \
   # init vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
   upgrade vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
   -f ./target/idl/validator_bonds.json
