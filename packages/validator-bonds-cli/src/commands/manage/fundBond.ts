@@ -1,6 +1,6 @@
-import { parsePubkey } from '@marinade.finance/cli-common'
+import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
 import { Command } from 'commander'
-import { parseSignerOrPubkey, setProgramIdByOwner } from '../../context'
+import { setProgramIdByOwner } from '../../context'
 import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
@@ -50,7 +50,7 @@ export function installFundBond(program: Command) {
       'Stake account authority (probably the withdrawer authority) ' +
         'that is permitted to sign stake account authority changes. ' +
         '(default: wallet keypair)',
-      parseSignerOrPubkey
+      parseWalletOrPubkey
     )
     .action(
       async (

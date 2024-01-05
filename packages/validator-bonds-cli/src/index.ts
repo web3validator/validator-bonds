@@ -5,15 +5,16 @@ import { Command } from 'commander'
 import { configureLogger, parsePubkey } from '@marinade.finance/cli-common'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
-import { parseSigner, setValidatorBondsCliContext } from './context'
+import { setValidatorBondsCliContext } from './context'
 import { VALIDATOR_BONDS_PROGRAM_ID } from '@marinade.finance/validator-bonds-sdk'
+import { parseWallet } from '@marinade.finance/cli-common'
 
 const DEFAULT_KEYPAIR_PATH = '~/.config/solana/id.json'
-const logger: Logger = configureLogger()
+export const logger: Logger = configureLogger()
 const program = new Command()
 
 program
-  .version('0.0.1')
+  .version('1.1.2')
   .allowExcessArguments(false)
   .option(
     '-u, --cluster <cluster>',
@@ -54,8 +55,8 @@ program
   .hook('preAction', async (command: Command, action: Command) => {
     const wallet = command.opts().keypair
     const walletInterface = wallet
-      ? await parseSigner(wallet, logger)
-      : await parseSigner(DEFAULT_KEYPAIR_PATH, logger)
+      ? await parseWallet(wallet, logger)
+      : await parseWallet(DEFAULT_KEYPAIR_PATH, logger)
     if (command.opts().debug || command.opts().verbose) {
       logger.level = 'debug'
     }
@@ -75,9 +76,12 @@ program
 installCommands(program)
 
 program.parseAsync(process.argv).then(
-  () => process.exit(),
+  () => {
+    process.exit()
+  },
   (err: unknown) => {
-    logger.error(err)
-    process.exit(1)
+    logger.error({ command: 'failed', err, args: process.argv })
+    console.error(err)
+    process.exit(200)
   }
 )

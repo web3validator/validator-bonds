@@ -1,7 +1,11 @@
-import { parseKeypair, parsePubkey } from '@marinade.finance/cli-common'
+import {
+  parseKeypair,
+  parsePubkey,
+  parseWalletOrPubkey,
+} from '@marinade.finance/cli-common'
 import { Keypair, PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
-import { getCliContext, parseSignerOrPubkey } from '../../context'
+import { getCliContext } from '../../context'
 import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
@@ -33,7 +37,7 @@ export function installInitConfig(program: Command) {
     .option(
       '--rent-payer <keypair_or_ledger_or_pubkey>',
       'Rent payer for the account creation (default: wallet keypair)',
-      parseSignerOrPubkey
+      parseWalletOrPubkey
     )
     .option(
       '--epochs-to-claim-settlement <number>',

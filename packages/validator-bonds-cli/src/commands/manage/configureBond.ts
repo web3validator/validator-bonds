@@ -1,7 +1,7 @@
-import { parsePubkey } from '@marinade.finance/cli-common'
+import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
-import { parseSignerOrPubkey, setProgramIdByOwner } from '../../context'
+import { setProgramIdByOwner } from '../../context'
 import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
@@ -44,7 +44,7 @@ export function installConfigureBond(program: Command) {
         'It is either the authority defined in bonds account or ' +
         'vote account validator identity that the bond account is connected to. ' +
         '(default: wallet keypair)',
-      parseSignerOrPubkey
+      parseWalletOrPubkey
     )
     .option(
       '--bond-authority <pubkey>',

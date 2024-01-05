@@ -1,6 +1,6 @@
-import { parsePubkey } from '@marinade.finance/cli-common'
+import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
 import { Command } from 'commander'
-import { parseSignerOrPubkey, setProgramIdByOwner } from '../../context'
+import { setProgramIdByOwner } from '../../context'
 import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
@@ -34,7 +34,7 @@ export function installInitBond(program: Command) {
       '--validator-identity <keypair_or_ledger_or_pubkey>',
       'Validator identity linked to the vote account. ' +
         'To create the bond the signature of the validator identity is needed (default: wallet keypair)',
-      parseSignerOrPubkey
+      parseWalletOrPubkey
     )
     .option(
       '--bond-authority <pubkey>',
@@ -50,7 +50,7 @@ export function installInitBond(program: Command) {
     .option(
       '--rent-payer <keypair_or_ledger_or_pubkey>',
       'Rent payer for the account creation (default: wallet keypair)',
-      parseSignerOrPubkey
+      parseWalletOrPubkey
     )
 
     .action(

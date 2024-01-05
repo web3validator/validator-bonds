@@ -1,17 +1,14 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { Logger } from 'pino'
-import { AnchorProvider, Provider, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Provider } from '@coral-xyz/anchor'
 import {
   Context,
-  getClusterUrl,
+  parseClusterUrl,
   getContext,
   parseCommitment,
-  parseKeypair,
-  parsePubkey,
   setContext,
 } from '@marinade.finance/cli-common'
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
-import { parseLedgerWallet } from '@marinade.finance/ledger-utils'
 import {
   ValidatorBondsProgram,
   getProgram as getValidatorBondsProgram,
@@ -84,7 +81,10 @@ export function setValidatorBondsCliContext({
 }) {
   try {
     const parsedCommitment = parseCommitment(commitment)
-    const connection = new Connection(getClusterUrl(cluster), parsedCommitment)
+    const connection = new Connection(
+      parseClusterUrl(cluster),
+      parsedCommitment
+    )
     const provider = new AnchorProvider(connection, wallet, { skipPreflight })
 
     setContext(
@@ -124,34 +124,6 @@ export async function setProgramIdByOwner(
     cliContext.programId = accountInfo.owner
   }
   return cliContext
-}
-
-export async function parseSigner(
-  pathOrLedger: string,
-  logger: Logger | undefined
-): Promise<WalletInterface> {
-  const wallet = await parseLedgerWallet(pathOrLedger, logger)
-  if (wallet) {
-    return wallet
-  }
-  const keypair = await parseKeypair(pathOrLedger)
-  return new Wallet(keypair)
-}
-
-export async function parseSignerOrPubkey(
-  pubkeyOrPathOrLedger: string
-): Promise<WalletInterface | PublicKey> {
-  let logger: Logger | undefined = undefined
-  try {
-    logger = getContext().logger
-  } catch (e) {
-    // ignore as we can work without logger
-  }
-  try {
-    return await parseSigner(pubkeyOrPathOrLedger, logger)
-  } catch (err) {
-    return await parsePubkey(pubkeyOrPathOrLedger)
-  }
 }
 
 export function getCliContext(): ValidatorBondsCliContext {
