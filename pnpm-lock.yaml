@@ -54,7 +54,7 @@ importers:
         specifier: ^2.0.22
         version: 2.0.22(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.1)(@ledgerhq/hw-transport-node-hid-noevents@6.29.1)(@marinade.finance/ts-common@2.0.22)(@solana/web3.js@1.87.6)
       '@marinade.finance/validator-bonds-sdk':
-        specifier: ^1.1.0
+        specifier: ^1.1.1
         version: link:../validator-bonds-sdk
       '@marinade.finance/web3js-common':
         specifier: ^2.0.22

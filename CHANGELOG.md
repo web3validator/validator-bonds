@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.1](https://github.com/marinade-finance/validator-bonds/compare/v1.1.0...v1.1.1) (2024-01-05)
+
+### Features
+
+* support for ledger in CLI
+* adding fund bond CLI command
+
 ## validator-bonds contract release (2024-01-03)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
