@@ -2,12 +2,15 @@
 
 /* eslint-disable no-process-exit */
 import { Command } from 'commander'
-import { configureLogger, parsePubkey } from '@marinade.finance/cli-common'
+import {
+  configureLogger,
+  parsePubkey,
+  parseWallet,
+} from '@marinade.finance/cli-common'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
 import { VALIDATOR_BONDS_PROGRAM_ID } from '@marinade.finance/validator-bonds-sdk'
-import { parseWallet } from '@marinade.finance/cli-common'
 
 const DEFAULT_KEYPAIR_PATH = '~/.config/solana/id.json'
 export const logger: Logger = configureLogger()
