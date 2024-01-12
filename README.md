@@ -1,4 +1,4 @@
-# validator-bonds
+ validator-bonds
 
 Mono repository for Validator Bonds product
 
@@ -37,7 +37,7 @@ pnpm test:cargo
 anchor build --verifiable
 
 # deploy
-solana program deploy -v -ud \
+solana program deploy -v -um \
    --program-id vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
    -k [fee-payer-keypair]
    --upgrade-authority [path-to-keypair] \
