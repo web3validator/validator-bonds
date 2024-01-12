@@ -97,8 +97,7 @@ export async function waitForStakeAccountActivation({
       )
     }
 
-    const startTime = Date.now()
-    let currentEpoch = (await connection.getEpochInfo()).epoch
+    const currentEpoch = (await connection.getEpochInfo()).epoch
     if (
       currentEpoch <
       stakeAccountActivationEpoch.toNumber() + activatedAtLeastFor
@@ -109,24 +108,55 @@ export async function waitForStakeAccountActivation({
             currentEpoch - stakeAccountActivationEpoch.toNumber()
           } epoch(s)`
       )
-    }
-    while (
-      currentEpoch <
-      stakeAccountActivationEpoch.toNumber() + activatedAtLeastFor
-    ) {
-      if (Date.now() - startTime > timeoutSeconds * 1000) {
-        throw new Error(
+      try {
+        await waitForEpoch(
+          connection,
+          stakeAccountActivationEpoch.toNumber() + activatedAtLeastFor,
+          timeoutSeconds
+        )
+      } catch (err) {
+        console.error(
           `Stake account ${stakeAccount.toBase58()} was activated but timeout ${timeoutSeconds} elapsed when waiting ` +
             `for ${activatedAtLeastFor} epochs the account to be activated, it's activated only for ` +
             `${
               currentEpoch - stakeAccountActivationEpoch.toNumber()
             } epochs at this time`
         )
+        throw err
       }
-      await sleep(1000)
-      currentEpoch = (await connection.getEpochInfo()).epoch
     }
   }
+}
+
+export async function waitForEpoch(
+  connection: Connection,
+  targetEpoch: number,
+  timeoutSeconds: number
+) {
+  const startTime = Date.now()
+  let currentEpoch = (await connection.getEpochInfo()).epoch
+  if (currentEpoch < targetEpoch) {
+    console.debug(
+      `Waiting for the epoch ${targetEpoch}, current epoch is ${currentEpoch}`
+    )
+  }
+  while (currentEpoch < targetEpoch) {
+    if (Date.now() - startTime > timeoutSeconds * 1000) {
+      throw new Error(
+        `Timeout ${timeoutSeconds} elapsed when waiting for epoch ${targetEpoch} (current epoch: ${currentEpoch})`
+      )
+    }
+    await sleep(1000)
+    currentEpoch = (await connection.getEpochInfo()).epoch
+  }
+}
+
+export async function waitForNextEpoch(
+  connection: Connection,
+  timeoutSeconds: number
+) {
+  const currentEpoch = (await connection.getEpochInfo()).epoch
+  await waitForEpoch(connection, currentEpoch + 1, timeoutSeconds)
 }
 
 export async function getValidatorInfo(connection: Connection): Promise<{
