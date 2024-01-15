@@ -7,6 +7,8 @@ import {
   parsePubkey,
   parseWallet,
 } from '@marinade.finance/cli-common'
+import { NullWallet } from '@marinade.finance/cli-common/src/wallet'
+import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
@@ -56,25 +58,74 @@ program
   )
   .option('-v, --verbose', 'alias for --debug', false)
   .hook('preAction', async (command: Command, action: Command) => {
-    const wallet = command.opts().keypair
-    const walletInterface = wallet
-      ? await parseWallet(wallet, logger)
-      : await parseWallet(DEFAULT_KEYPAIR_PATH, logger)
     if (command.opts().debug || command.opts().verbose) {
       logger.level = 'debug'
     }
+    const printOnly = Boolean(command.opts().printOnly)
+
+    const walletInterface = await parseWalletFromOpts(
+      command.opts().keypair,
+      printOnly,
+      command.args,
+      logger
+    )
+
     setValidatorBondsCliContext({
       cluster: command.opts().cluster as string,
       wallet: walletInterface,
       programId: await command.opts().programId,
       simulate: Boolean(command.opts().simulate),
-      printOnly: Boolean(command.opts().printOnly),
+      printOnly,
       skipPreflight: Boolean(command.opts().skipPreflight),
       commitment: command.opts().commitment,
       logger,
       command: action.name(),
     })
   })
+
+/**
+ * --keypair (considered as 'wallet') could be defined or undefined (and default is on parsing).
+ * For 'show*' command we don't need a working wallet, so we can use NullWallet.
+ * For '--print-only' we don't need a working wallet, so we can use NullWallet.
+ * For other commands we need a working wallet, when cannot be parsed then Error.
+ */
+async function parseWalletFromOpts(
+  keypairArg: string,
+  printOnly: boolean,
+  commandArgs: string[],
+  logger: Logger
+): Promise<WalletInterface> {
+  const wallet = keypairArg
+  let walletInterface: WalletInterface
+  try {
+    walletInterface = wallet
+      ? await parseWallet(wallet, logger)
+      : await parseWallet(DEFAULT_KEYPAIR_PATH, logger)
+  } catch (err) {
+    if (
+      commandArgs.find(arg => arg.includes('show-')) !== undefined ||
+      printOnly
+    ) {
+      // when working with show command it does not matter to use NullWallet
+      // for other instructions it could matter as the transaction fees cannot be paid by NullWallet
+      // still using NullWallet is ok when one generates only --print-only
+      logger.debug(
+        `Cannot load --keypair wallet '${
+          wallet || DEFAULT_KEYPAIR_PATH
+        }' but it's show or --print-only command, using NullWallet`
+      )
+      walletInterface = new NullWallet()
+    } else {
+      const definedMsg =
+        wallet !== undefined
+          ? `--keypair wallet '${wallet}'`
+          : `default keypair path ${DEFAULT_KEYPAIR_PATH}`
+      logger.error(`Failed to use ${definedMsg}, exiting.`)
+      throw err
+    }
+  }
+  return walletInterface
+}
 
 installCommands(program)
 

@@ -98,6 +98,9 @@ describe('Show command using CLI', () => {
         [
           '--silent',
           'cli',
+          // for show commands there is ok to provide a non-existing keypair
+          '--keypair',
+          '/a/b/c/d/e/f/g',
           '-u',
           provider.connection.rpcEndpoint,
           '--program-id',
