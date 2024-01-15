@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
+## [1.1.4](https://github.com/marinade-finance/validator-bonds/compare/v1.1.3...v1.1.4) (2024-01-15)
+
+### Fixes
+
+* CLI does not require `--keypair` path to exist when `show-*` command or `--print-only` is used
+
+
 ## [1.1.3](https://github.com/marinade-finance/validator-bonds/compare/v1.1.1...v1.1.3) (2024-01-12)
 
 ### Features
