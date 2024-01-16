@@ -27,6 +27,19 @@ validator-bonds -um init-bond -k <fee-payer-keypair> \
 validator-bonds -um configure-bond --help
 ```
 
+#### Bond creation details
+
+The `init-bond` command initiates the creation of an account on the blockchain containing configuration data specific to a particular bond. This bond account is intricately linked with a corresponding vote account. The creation of a bond account requires a validator's identity signature, specifically one associated with the vote account.
+
+The parameters and their meanings are explained in detail below:
+
+* `--k <fee-payer-keypair>:` This parameter designates the account used to cover transaction costs (e.g., `5000` lamports).
+* `--vote-account`: Specifies the vote account on which the bond will be established.
+* `--validator-identity`: Represents the required signature; the validator identity must match one within the designated vote account.
+* `--bond-authority`: Refers to any public key with ownership rights. It is recommended to use a ledger or multisig. This key does not necessarily need to correspond to an existing on-chain account (SOL preloading is unnecessary).
+* `--rent-payer`: This account covers the creation cost of the Solana bond account, and it is expected to be the same as the fee payer (default).
+   The rent cost is `0.00270048` SOL. Note that the `--rent-payer` is unrelated to bond security or "funding," which is addressed through a separate instruction. The bond's security is established by providing a stake account. The lamports in the stake account then corresponds to the SOL amount added to the security of the bond account. There is no direct payment of SOLs to the bond; it is accomplished solely by allocating stake accounts.
+
 ### Show the bond account
 
 ```sh
@@ -34,10 +47,10 @@ validator-bonds -um show-bond <bond-account-address> -f yaml
 ```
 
 ## Support for Ledger signing
-
-Any signature can be signed with Ledger when it's used the pubkey (`usb://ledger/9rPVSygg3brqghvdZ6wsL2i5YNQTGhXGdJzF65YxaCQd`) or the path (`usb://ledger?key=0/0`) as the parameter value.
-For example, when the bond authority is configured to be managed with a key managed in Ledger
-we can run like
+Any signature can be generated using Ledger by specifying either the pubkey 
+(`usb://ledger/9rPVSygg3brqghvdZ6wsL2i5YNQTGhXGdJzF65YxaCQd`) or the path (`usb://ledger?key=0/0`)
+as the parameter value.
+For instance, if the bond authority is set up to be controlled by a key managed on Ledger, the command can be executed as follows:
 
 ```sh
 # using solana-keygen to find pubkey on a particular derivation path
