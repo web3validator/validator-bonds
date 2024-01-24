@@ -136,6 +136,7 @@ async function manageInitBond({
     logger,
     simulate,
     printOnly,
+    {}
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} of config ${config.toBase58()} successfully created`

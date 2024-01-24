@@ -6,9 +6,28 @@ CLI for Validator Bonds contract.
 
 To install the CLI as global npm package
 
+**Requirements:** Node.js version 16 or higher.
+
+See
+
 ```bash
 npm i -g @marinade.finance/validator-bonds-cli
 validator-bonds --help
+```
+
+Successful installation will be shown in similar fashion to this output
+
+```
+npm i -g @marinade.finance/validator-bonds-cli
+
+added 165 packages in 35s
+
+17 packages are looking for funding
+  run `npm fund` for details
+
+# to verify installation run
+validator-bonds --version
+1.1.6
 ```
 
 ### Creating a bond
@@ -44,7 +63,29 @@ The parameters and their meanings are explained in detail below:
 
 ```sh
 validator-bonds -um show-bond <bond-account-address> -f yaml
+
+# to check with vote account address
+validator-bonds -um show-bond --validator-vote-account <vote-account-address>
 ```
+
+Expected output on created bond is like
+
+```
+validator-bonds -um show-bond ...
+{
+  programId: 'vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4',
+  publicKey: '...',
+  account: {
+    config: 'vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU',
+    validatorVoteAccount: '...',
+    authority: '...',
+    revenueShare: { hundredthBps: 0 },
+    bump: 255,
+    reserved: { reserved: [Array] }
+  }
+}
+```
+
 
 ## Support for Ledger signing
 Any signature can be generated using Ledger by specifying either the pubkey 
@@ -99,3 +140,48 @@ Commands:
   show-bond [options] [address]                        Showing data of bond account(s)
   help [command]                                       display help for command
 ```
+
+## FAQ and issues
+
+* **npm WARN EBADENGINE Unsupported engine {**
+
+  When running the `validator-bonds` cli the error continues as
+  ```
+  validator-bonds --help
+  /usr/local/lib/node_modules/@marinade.finance/validator-bonds-cli/node_modules/@solana/web3.js/lib/index.cjs.js:645
+          keyMeta.isSigner ||= accountMeta.isSigner;
+                            ^
+
+  SyntaxError: Unexpected token '='
+  ...
+  ```
+
+  **Solution:** old version of Node.js is installed on the machine. Node.js upgrade to version 16 or later is needed.
+
+* **ExecutionError: Transaction XYZ not found**
+
+  The CLI sent the transaction to blockchain but because of a connection
+  or RPC issue the client was not capable to verify that the transaction
+  has been processed successfully on chain
+
+  ```
+  err: {
+        "type": "ExecutionError",
+        "message": "... : Transaction ... not found",
+        "stack":
+            Error: ...
+                at executeTx (/usr/local/lib/node_modules/@marinade.finance/validator-bonds-cli/node_modules/@marinade.finance/web3js-common/src/tx.js:86:15)
+  ```
+
+  **Solution:** Verify if the transaction `XYX` is at blockchain with a transaction explorer,
+  e.g., https://explorer.solana.com/.
+  Verify with the CLI. For example when bond should be initialized (`init-bond`)
+  you can run search with CLI `validator-bonds -um show-bond --validator-vote-account <vote-account>`
+  to check if account was created.
+
+* **bigint: Failed to load bindings, ...**
+
+  CLI shows error `the bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)`
+  is caused by system configuration requirements from `@solana/web3.js` (details at https://solana.stackexchange.com/questions/4077/bigint-failed-to-load-bindings-pure-js-will-be-used-try-npm-run-rebuild-whe). No functionality issues with this error.
+
+  **Solution:** All works fine, nothing needed.
