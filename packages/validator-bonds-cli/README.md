@@ -65,7 +65,7 @@ The parameters and their meanings are explained in detail below:
 validator-bonds -um show-bond <bond-account-address> -f yaml
 
 # to check with vote account address
-validator-bonds -um show-bond --validator-vote-account <vote-account-address>
+validator-bonds -um show-bond --config vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU --validator-vote-account <vote-account-address>
 ```
 
 Expected output on created bond is like
