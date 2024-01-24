@@ -12,6 +12,7 @@ import { Command } from 'commander'
 import { getCliContext, setProgramIdByOwner } from '../context'
 import {
   Bond,
+  CONFIG_ADDRESS,
   Config,
   findBonds,
   findConfigs,
@@ -82,7 +83,8 @@ export function installShowBond(program: Command) {
     )
     .option(
       '--config <pubkey>',
-      'Config account to filter the bond accounts with',
+      'Config account to filter the bond accounts with (default:' +
+        `${CONFIG_ADDRESS.toBase58()})`,
       parsePubkey
     )
     .option(
@@ -201,7 +203,7 @@ async function showConfig({
 
 async function showBond({
   address,
-  config,
+  config = CONFIG_ADDRESS,
   validatorVoteAccount,
   bondAuthority,
   format,
