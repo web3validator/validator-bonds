@@ -19,7 +19,7 @@ export const logger: Logger = configureLogger()
 const program = new Command()
 
 program
-  .version('1.1.3')
+  .version('1.1.6')
   .allowExcessArguments(false)
   .option(
     '-u, --cluster <cluster>',
