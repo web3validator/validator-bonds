@@ -95,6 +95,7 @@ async function manageMerge({
     logger,
     simulate,
     printOnly,
+    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
   })
   logger.info(
     `Stake account ${source.toBase58()} successfully merged to ${destination.toBase58()}`

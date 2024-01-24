@@ -135,6 +135,7 @@ async function manageConfigureConfig({
     logger,
     simulate,
     printOnly,
+    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
   })
   logger.info(`Config account ${address.toBase58()} successfully configured`)
 }

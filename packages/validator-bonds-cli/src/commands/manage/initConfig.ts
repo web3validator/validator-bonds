@@ -128,6 +128,7 @@ async function manageInitConfig({
     logger,
     simulate,
     printOnly,
+    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
   })
   logger.info(
     `Config account ${address.publicKey.toBase58()} successfully created`

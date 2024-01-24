@@ -136,7 +136,7 @@ async function manageInitBond({
     logger,
     simulate,
     printOnly,
-    {}
+    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} of config ${config.toBase58()} successfully created`

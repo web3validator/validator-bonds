@@ -121,6 +121,7 @@ async function manageFundBond({
     logger,
     simulate,
     printOnly,
+    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} successfully funded ` +
