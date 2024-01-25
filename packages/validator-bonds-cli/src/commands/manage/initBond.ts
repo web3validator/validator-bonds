@@ -126,6 +126,7 @@ async function manageInitBond({
   })
   tx.add(instruction)
 
+  logger.info(`Initializing bond account ${bondAccount.toBase58()}`)
   await executeTx({
     connection: provider.connection,
     transaction: tx,

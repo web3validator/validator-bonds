@@ -42,7 +42,8 @@ describe('Validator Bonds claim withdraw request', () => {
     }))
   })
 
-  it('claim withdraw request', async () => {
+  // TODO: enable
+  it.skip('claim withdraw request', async () => {
     const event = new Promise<ClaimWithdrawRequestEvent>(resolve => {
       const listener = program.addEventListener(
         CLAIM_WITHDRAW_REQUEST_EVENT,

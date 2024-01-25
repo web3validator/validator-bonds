@@ -113,6 +113,7 @@ async function manageFundBond({
   })
   tx.add(instruction)
 
+  logger.info(`Funding bond account ${bondAccount.toBase58()}`)
   await executeTx({
     connection: provider.connection,
     transaction: tx,
