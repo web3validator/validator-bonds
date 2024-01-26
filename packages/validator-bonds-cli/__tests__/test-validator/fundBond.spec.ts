@@ -117,6 +117,8 @@ describe('Fund bond account using CLI', () => {
           stakeAccount1.toBase58(),
           '--stake-authority',
           stakeWithdrawerPath,
+          '--confirmation-finality',
+          'confirmed',
           '--verbose',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,6 +155,8 @@ describe('Fund bond account using CLI', () => {
           voteAccount.toBase58(),
           '--stake-authority',
           stakeWithdrawerPath,
+          '--confirmation-finality',
+          'confirmed',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any

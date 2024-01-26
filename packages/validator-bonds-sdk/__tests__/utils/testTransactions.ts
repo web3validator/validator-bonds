@@ -15,16 +15,16 @@ import {
   StakeProgram,
   SystemProgram,
 } from '@solana/web3.js'
-import { pubkey, signer } from './helpers'
 import { ExtendedProvider } from './provider'
 import { createVoteAccount } from './staking'
 import BN from 'bn.js'
 import assert from 'assert'
+import { pubkey, signer } from '@marinade.finance/web3js-common'
 
 export async function createUserAndFund(
   provider: ExtendedProvider,
-  user: Keypair = Keypair.generate(),
-  lamports = LAMPORTS_PER_SOL
+  lamports = LAMPORTS_PER_SOL,
+  user: Keypair = Keypair.generate()
 ): Promise<Keypair> {
   const instruction = SystemProgram.transfer({
     fromPubkey: provider.walletPubkey,

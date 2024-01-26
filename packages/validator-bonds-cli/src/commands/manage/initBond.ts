@@ -1,11 +1,11 @@
 import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
-import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
   executeTx,
   instanceOfWallet,
+  transaction,
 } from '@marinade.finance/web3js-common'
 import {
   CONFIG_ADDRESS,
@@ -96,8 +96,15 @@ async function manageInitBond({
   revenueShare: number
   rentPayer?: WalletInterface | PublicKey
 }) {
-  const { program, provider, logger, simulate, printOnly, wallet } =
-    await setProgramIdByOwner(config)
+  const {
+    program,
+    provider,
+    logger,
+    simulate,
+    printOnly,
+    wallet,
+    confirmationFinality,
+  } = await setProgramIdByOwner(config)
 
   const tx = await transaction(provider)
   const signers: (Signer | Wallet)[] = [wallet]
@@ -137,7 +144,7 @@ async function manageInitBond({
     logger,
     simulate,
     printOnly,
-    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
+    confirmOpts: confirmationFinality,
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} of config ${config.toBase58()} successfully created`

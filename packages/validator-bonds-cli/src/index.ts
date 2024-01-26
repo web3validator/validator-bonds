@@ -5,10 +5,8 @@ import { Command } from 'commander'
 import {
   configureLogger,
   parsePubkey,
-  parseWallet,
+  parseWalletFromOpts,
 } from '@marinade.finance/cli-common'
-import { NullWallet } from '@marinade.finance/cli-common/src/wallet'
-import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
@@ -23,11 +21,11 @@ program
   .allowExcessArguments(false)
   .option(
     '-u, --cluster <cluster>',
-    'solana cluster URL, accepts shortcuts (d/devnet, m/mainnet)',
-    'http://127.0.0.1:8899'
+    'solana cluster URL or ' +
+      'a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost)',
+    'mainnet'
   )
   .option('-c <cluster>', 'alias for "-u, --cluster"')
-  .option('--commitment <commitment>', 'Commitment', 'confirmed')
   .option(
     '-k, --keypair <keypair-or-ledger>',
     'Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). ' +
@@ -51,6 +49,13 @@ program
     'transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight',
     false
   )
+  .option('--commitment <commitment>', 'Commitment', 'confirmed')
+  .option(
+    '--confirmation-finality <finality>',
+    'Confirmation finality of sent transaction. ' +
+      'Default is "finalized" that means for full cluster finality that takes ~8 seconds.',
+    'finalized'
+  )
   .option(
     '-d, --debug',
     'printing more detailed information of the CLI execution',
@@ -61,8 +66,8 @@ program
     if (command.opts().debug || command.opts().verbose) {
       logger.level = 'debug'
     }
-    const printOnly = Boolean(command.opts().printOnly)
 
+    const printOnly = Boolean(command.opts().printOnly)
     const walletInterface = await parseWalletFromOpts(
       command.opts().keypair,
       printOnly,
@@ -78,54 +83,11 @@ program
       printOnly,
       skipPreflight: Boolean(command.opts().skipPreflight),
       commitment: command.opts().commitment,
+      confirmationFinality: command.opts().confirmationFinality,
       logger,
       command: action.name(),
     })
   })
-
-/**
- * --keypair (considered as 'wallet') could be defined or undefined (and default is on parsing).
- * For 'show*' command we don't need a working wallet, so we can use NullWallet.
- * For '--print-only' we don't need a working wallet, so we can use NullWallet.
- * For other commands we need a working wallet, when cannot be parsed then Error.
- */
-async function parseWalletFromOpts(
-  keypairArg: string,
-  printOnly: boolean,
-  commandArgs: string[],
-  logger: Logger
-): Promise<WalletInterface> {
-  const wallet = keypairArg
-  let walletInterface: WalletInterface
-  try {
-    walletInterface = wallet
-      ? await parseWallet(wallet, logger)
-      : await parseWallet(DEFAULT_KEYPAIR_PATH, logger)
-  } catch (err) {
-    if (
-      commandArgs.find(arg => arg.includes('show-')) !== undefined ||
-      printOnly
-    ) {
-      // when working with show command it does not matter to use NullWallet
-      // for other instructions it could matter as the transaction fees cannot be paid by NullWallet
-      // still using NullWallet is ok when one generates only --print-only
-      logger.debug(
-        `Cannot load --keypair wallet '${
-          wallet || DEFAULT_KEYPAIR_PATH
-        }' but it's show or --print-only command, using NullWallet`
-      )
-      walletInterface = new NullWallet()
-    } else {
-      const definedMsg =
-        wallet !== undefined
-          ? `--keypair wallet '${wallet}'`
-          : `default keypair path ${DEFAULT_KEYPAIR_PATH}`
-      logger.error(`Failed to use ${definedMsg}, exiting.`)
-      throw err
-    }
-  }
-  return walletInterface
-}
 
 installCommands(program)
 

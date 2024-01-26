@@ -1,6 +1,7 @@
 import {
   Bond,
   Config,
+  Errors,
   ValidatorBondsProgram,
   fundBondInstruction,
   getBond,
@@ -27,8 +28,9 @@ import {
   getAndCheckStakeAccount,
   initializedStakeAccount,
 } from '../utils/staking'
-import { checkAnchorErrorMessage, signer } from '../utils/helpers'
 import { BN } from 'bn.js'
+import { signer } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds fund bond account', () => {
   let provider: BankrunExtendedProvider
@@ -83,7 +85,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([signer(withdrawer)], instruction)
       throw new Error('failure expected as not delegated')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6017, 'cannot be used for bonds')
+      verifyError(e, Errors, 6017, 'cannot be used for bonds')
     }
   })
 
@@ -104,7 +106,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([withdrawer], instruction)
       throw new Error('failure expected as not activated')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6023, 'Stake account is not fully activated')
+      verifyError(e, Errors, 6023, 'Stake account is not fully activated')
     }
 
     await warpToNextEpoch(provider)
@@ -112,7 +114,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([withdrawer], instruction)
       throw new Error('failure expected as delegated to wrong validator')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6018, 'delegated to a wrong validator')
+      verifyError(e, Errors, 6018, 'delegated to a wrong validator')
     }
   })
 
@@ -143,7 +145,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([withdrawer], instruction)
       throw new Error('failure expected as should be locked')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6028, 'stake account is locked-up')
+      verifyError(e, Errors, 6028, 'stake account is locked-up')
     }
   })
 

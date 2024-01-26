@@ -1,6 +1,7 @@
 import {
   Bond,
   Config,
+  Errors,
   ValidatorBondsProgram,
   configureBondInstruction,
   getBond,
@@ -14,7 +15,7 @@ import {
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { Keypair } from '@solana/web3.js'
 import { createVoteAccount } from '../utils/staking'
-import { checkAnchorErrorMessage } from '../utils/helpers'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds configure bond account', () => {
   let provider: BankrunExtendedProvider
@@ -117,7 +118,7 @@ describe('Validator Bonds configure bond account', () => {
       await provider.sendIx([voterAuthority], instruction)
       throw new Error('failure expected as wrong admin')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6016, 'Wrong authority')
+      verifyError(e, Errors, 6016, 'Wrong authority')
     }
   })
 
@@ -133,7 +134,7 @@ describe('Validator Bonds configure bond account', () => {
       await provider.sendIx([newBondAuthority], instruction)
       throw new Error('failure expected as wrong admin')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6016, 'Wrong authority')
+      verifyError(e, Errors, 6016, 'Wrong authority')
     }
   })
 })

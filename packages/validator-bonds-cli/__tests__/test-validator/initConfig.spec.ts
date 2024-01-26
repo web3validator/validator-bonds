@@ -105,6 +105,8 @@ describe('Init config account using CLI', () => {
             42,
             '--withdraw-lockup-epochs',
             43,
+            '--confirmation-finality',
+            'confirmed',
             '-v',
           ],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

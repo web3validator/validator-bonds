@@ -9,9 +9,12 @@ import {
   initBondInstruction,
 } from '../../src'
 import { getValidatorInfo, initTest } from './testValidator'
-import { transaction } from '@marinade.finance/anchor-common'
-import { Wallet, splitAndExecuteTx } from '@marinade.finance/web3js-common'
-import { signer } from '../utils/helpers'
+import {
+  Wallet,
+  signer,
+  splitAndExecuteTx,
+  transaction,
+} from '@marinade.finance/web3js-common'
 import { executeInitConfigInstruction } from '../utils/testTransactions'
 import { ExtendedProvider } from '../utils/provider'
 import { createVoteAccountWithIdentity } from '../utils/staking'

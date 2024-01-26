@@ -1,6 +1,7 @@
 import {
   Bond,
   Config,
+  Errors,
   ValidatorBondsProgram,
   getBond,
   getConfig,
@@ -22,7 +23,9 @@ import {
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { createVoteAccount } from '../utils/staking'
-import { checkAnchorErrorMessage, signer } from '../utils/helpers'
+
+import { pubkey, signer } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds init withdraw request', () => {
   let provider: BankrunExtendedProvider
@@ -78,7 +81,7 @@ describe('Validator Bonds init withdraw request', () => {
       await provider.sendIx([signer(randomAuthority)], instruction)
       throw new Error('failure; expected wrong authority')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6002, 'Invalid authority')
+      verifyError(e, Errors, 6002, 'Invalid authority')
     }
   })
 
@@ -114,11 +117,7 @@ describe('Validator Bonds init withdraw request', () => {
   })
 
   it('init withdraw request withdrawer validator identity authority', async () => {
-    const rentWallet = await createUserAndFund(
-      provider,
-      Keypair.generate(),
-      LAMPORTS_PER_SOL
-    )
+    const rentWallet = await createUserAndFund(provider, LAMPORTS_PER_SOL)
 
     const { instruction, withdrawRequest } =
       await initWithdrawRequestInstruction({
@@ -126,12 +125,12 @@ describe('Validator Bonds init withdraw request', () => {
         bondAccount: bond.publicKey,
         authority: validatorIdentity,
         amount: 123,
-        rentPayer: rentWallet.publicKey,
+        rentPayer: pubkey(rentWallet),
       })
-    await provider.sendIx([validatorIdentity, rentWallet], instruction)
+    await provider.sendIx([validatorIdentity, signer(rentWallet)], instruction)
 
     const rentWalletInfo = await provider.connection.getAccountInfo(
-      rentWallet.publicKey
+      pubkey(rentWallet)
     )
     const withdrawRequestInfo = await provider.connection.getAccountInfo(
       withdrawRequest

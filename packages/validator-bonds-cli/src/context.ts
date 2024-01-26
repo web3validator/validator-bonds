@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, Finality, PublicKey } from '@solana/web3.js'
 import { Logger } from 'pino'
 import { AnchorProvider, Provider } from '@coral-xyz/anchor'
 import {
@@ -7,6 +7,7 @@ import {
   getContext,
   parseCommitment,
   setContext,
+  parseConfirmationFinality,
 } from '@marinade.finance/cli-common'
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import {
@@ -23,21 +24,31 @@ export class ValidatorBondsCliContext extends Context {
     provider,
     wallet,
     logger,
-    skipPreflight,
     simulate,
     printOnly,
+    skipPreflight,
+    confirmationFinality,
     commandName,
   }: {
     programId?: PublicKey
     provider: Provider
     wallet: WalletInterface
     logger: Logger
-    skipPreflight: boolean
     simulate: boolean
     printOnly: boolean
+    skipPreflight: boolean
+    confirmationFinality: Finality
     commandName: string
   }) {
-    super({ wallet, logger, skipPreflight, simulate, printOnly, commandName })
+    super({
+      wallet,
+      logger,
+      skipPreflight,
+      simulate,
+      printOnly,
+      commandName,
+      confirmationFinality,
+    })
     this.provider = provider
     this.bondsProgramId = programId
   }
@@ -64,8 +75,9 @@ export function setValidatorBondsCliContext({
   programId,
   simulate,
   printOnly,
-  commitment = 'confirmed',
   skipPreflight,
+  commitment,
+  confirmationFinality,
   logger,
   command,
 }: {
@@ -75,7 +87,8 @@ export function setValidatorBondsCliContext({
   simulate: boolean
   printOnly: boolean
   skipPreflight: boolean
-  commitment?: string
+  commitment: string
+  confirmationFinality: string
   logger: Logger
   command: string
 }) {
@@ -93,9 +106,10 @@ export function setValidatorBondsCliContext({
         provider,
         wallet,
         logger,
-        skipPreflight,
         simulate,
         printOnly,
+        skipPreflight,
+        confirmationFinality: parseConfirmationFinality(confirmationFinality),
         commandName: command,
       })
     )

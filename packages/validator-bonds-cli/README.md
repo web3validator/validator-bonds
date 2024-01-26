@@ -167,7 +167,7 @@ Commands:
   ```
   err: {
         "type": "ExecutionError",
-        "message": "... : Transaction ... not found",
+        "message": "... : Transaction ... not found, failed to get from ...",
         "stack":
             Error: ...
                 at executeTx (/usr/local/lib/node_modules/@marinade.finance/validator-bonds-cli/node_modules/@marinade.finance/web3js-common/src/tx.js:86:15)

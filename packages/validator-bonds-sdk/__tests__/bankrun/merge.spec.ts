@@ -1,5 +1,6 @@
 import {
   Config,
+  Errors,
   ValidatorBondsProgram,
   bondAddress,
   getConfig,
@@ -31,7 +32,9 @@ import {
   delegatedStakeAccount,
   initializedStakeAccount,
 } from '../utils/staking'
-import { checkAnchorErrorMessage, pubkey } from '../utils/helpers'
+
+import { pubkey } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 // -------------------
 /// TODO:
@@ -85,7 +88,7 @@ describe('Validator Bonds fund bond account', () => {
         'failure expected as accounts are not owned by bonds program'
       )
     } catch (e) {
-      checkAnchorErrorMessage(e, 6043, 'does not belong to bonds program')
+      verifyError(e, Errors, 6043, 'does not belong to bonds program')
     }
   })
 
@@ -120,7 +123,7 @@ describe('Validator Bonds fund bond account', () => {
         'failure expected as accounts are not owned by bonds program'
       )
     } catch (e) {
-      checkAnchorErrorMessage(e, 6043, 'does not belong to bonds program')
+      verifyError(e, Errors, 6043, 'does not belong to bonds program')
     }
   })
 
@@ -155,8 +158,9 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction)
       throw new Error('failure expected; non delegated')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6045,
         'Delegation of provided stake account mismatches'
       )
@@ -206,8 +210,9 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction)
       throw new Error('failure expected; wrong delegation')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6045,
         'Delegation of provided stake account mismatches'
       )
@@ -222,8 +227,9 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction2)
       throw new Error('failure expected; wrong delegation')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6045,
         'Delegation of provided stake account mismatches'
       )
@@ -324,8 +330,9 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction)
       throw new Error('failure expected; wrong delegation')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6045,
         'Delegation of provided stake account mismatches'
       )
@@ -340,8 +347,9 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction2)
       throw new Error('failure expected; wrong delegation')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6045,
         'Delegation of provided stake account mismatches'
       )
@@ -404,7 +412,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction)
       throw new Error('failure expected; wrong authorities')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6042, 'staker does not match')
+      verifyError(e, Errors, 6042, 'staker does not match')
     }
     const { instruction: instruction2 } = await mergeInstruction({
       program,
@@ -416,7 +424,7 @@ describe('Validator Bonds fund bond account', () => {
       await provider.sendIx([], instruction2)
       throw new Error('failure expected; wrong authorities')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6042, 'staker does not match')
+      verifyError(e, Errors, 6042, 'staker does not match')
     }
   })
 

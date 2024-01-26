@@ -3,6 +3,7 @@ import {
   ValidatorBondsProgram,
   getConfig,
   configureConfigInstruction,
+  Errors,
 } from '../../src'
 import {
   BankrunExtendedProvider,
@@ -14,7 +15,7 @@ import {
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import { executeInitConfigInstruction } from '../utils/testTransactions'
-import { checkAnchorErrorMessage } from '../utils/helpers'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds configure config tests', () => {
   let provider: BankrunExtendedProvider
@@ -100,8 +101,9 @@ describe('Validator Bonds configure config tests', () => {
     const tx = await getConfigureConfigTx(randomKey.publicKey)
     try {
       await bankrunExecute(provider, [provider.wallet, randomKey], tx)
+      throw new Error('failure expected as wrong admin')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6001, 'requires admin authority')
+      verifyError(e, Errors, 6001, 'requires admin authority')
     }
 
     // trying to use operator authority
@@ -114,7 +116,7 @@ describe('Validator Bonds configure config tests', () => {
       )
       throw new Error('failure expected as wrong admin')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6001, 'requires admin authority')
+      verifyError(e, Errors, 6001, 'requires admin authority')
     }
   })
 

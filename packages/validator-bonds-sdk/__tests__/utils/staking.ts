@@ -20,7 +20,7 @@ import {
   STAKE_STATE_BORSH_SCHEMA,
 } from '@marinade.finance/marinade-ts-sdk/dist/src/marinade-state/borsh/stake-state'
 import assert from 'assert'
-import { pubkey } from './helpers'
+import { pubkey } from '@marinade.finance/web3js-common'
 
 // Depending if new vote account feature-set is gated on.
 // It can be 3762 or 3736

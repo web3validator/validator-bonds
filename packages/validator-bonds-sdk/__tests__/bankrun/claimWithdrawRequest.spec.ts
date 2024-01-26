@@ -1,6 +1,7 @@
 import {
   Bond,
   Config,
+  Errors,
   ValidatorBondsProgram,
   cancelWithdrawRequestInstruction,
   getBond,
@@ -32,9 +33,11 @@ import {
   deserializeStakeState,
   initializedStakeAccount,
 } from '../utils/staking'
-import { checkAnchorErrorMessage, pubkey } from '../utils/helpers'
+
 import assert from 'assert'
 import BN from 'bn.js'
+import { pubkey, signer } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 // TODO: test the merging stake accounts through the orchestrate withdraw request, i.e., test orchestrators/orchestrateWithdrawRequest.ts
 
@@ -109,7 +112,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('Expected withdraw request should not be elapsed')
     } catch (err) {
-      checkAnchorErrorMessage(err, 6019, 'Withdraw request has not elapsed')
+      verifyError(err, Errors, 6019, 'Withdraw request has not elapsed')
     }
 
     // withdrawLockupEpochs is 1, then the warp should make the withdraw request unlocked
@@ -291,7 +294,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected; already claimed')
     } catch (err) {
-      checkAnchorErrorMessage(err, 6047, 'already fulfilled')
+      verifyError(err, Errors, 6047, 'already fulfilled')
     }
   })
 
@@ -303,16 +306,8 @@ describe('Validator Bonds claim withdraw request', () => {
         stakeAccountAmount,
         requestedAmount
       )
-    const rentPayerUser = await createUserAndFund(
-      provider,
-      undefined,
-      LAMPORTS_PER_SOL
-    )
-    const withdrawer = await createUserAndFund(
-      provider,
-      undefined,
-      LAMPORTS_PER_SOL
-    )
+    const rentPayerUser = await createUserAndFund(provider, LAMPORTS_PER_SOL)
+    const withdrawer = await createUserAndFund(provider, LAMPORTS_PER_SOL)
     const { instruction, splitStakeAccount } =
       await claimWithdrawRequestInstruction({
         program,
@@ -327,7 +322,7 @@ describe('Validator Bonds claim withdraw request', () => {
       })
     await warpToUnlock()
     await provider.sendIx(
-      [splitStakeAccount, rentPayerUser, bondAuthority],
+      [splitStakeAccount, signer(rentPayerUser), bondAuthority],
       instruction
     )
 
@@ -355,7 +350,7 @@ describe('Validator Bonds claim withdraw request', () => {
         splitStakeAccountInfo.data.length
       )
     expect(
-      (await provider.connection.getAccountInfo(rentPayerUser.publicKey))
+      (await provider.connection.getAccountInfo(pubkey(rentPayerUser)))
         ?.lamports
     ).toEqual(LAMPORTS_PER_SOL - rentExemptStakeAccount)
   })
@@ -394,7 +389,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitCannotSplit, bondAuthority], ixCannotSplit)
       throw new Error('failure expected; cannot split')
     } catch (err) {
-      checkAnchorErrorMessage(err, 6029, 'Stake account is not big enough')
+      verifyError(err, Errors, 6029, 'Stake account is not big enough')
     }
 
     const {
@@ -413,7 +408,7 @@ describe('Validator Bonds claim withdraw request', () => {
       )
       throw new Error('failure expected; cannot split')
     } catch (err) {
-      checkAnchorErrorMessage(err, 6046, 'cancel and init new one')
+      verifyError(err, Errors, 6046, 'cancel and init new one')
     }
   })
 
@@ -438,7 +433,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('is less to 1 SOL: should fail as  split is not possible')
     } catch (err) {
-      checkAnchorErrorMessage(err, 6029, 'not big enough to be split')
+      verifyError(err, Errors, 6029, 'not big enough to be split')
     }
   })
 
@@ -523,7 +518,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, wrongAuthority], instruction)
       throw new Error('failure expected; wrong authority to claim')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6002, 'Invalid authority to operate')
+      verifyError(e, Errors, 6002, 'Invalid authority to operate')
     }
   })
 
@@ -545,7 +540,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected; stake account is not delegated')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6017, 'cannot be used for bonds')
+      verifyError(e, Errors, 6017, 'cannot be used for bonds')
     }
   })
 
@@ -571,7 +566,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected as not activated')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6023, 'not fully activated')
+      verifyError(e, Errors, 6023, 'not fully activated')
     }
 
     await warpToNextEpoch(provider)
@@ -579,7 +574,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected as delegated to wrong validator')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6018, 'delegated to a wrong validator')
+      verifyError(e, Errors, 6018, 'delegated to a wrong validator')
     }
   })
 
@@ -615,7 +610,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected; wrong withdrawer')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6010, 'Wrong withdrawer authority')
+      verifyError(e, Errors, 6010, 'Wrong withdrawer authority')
     }
 
     await authorizeStakeAccount({
@@ -629,7 +624,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected; wrong withdrawer')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6010, 'Wrong withdrawer authority')
+      verifyError(e, Errors, 6010, 'Wrong withdrawer authority')
     }
 
     await authorizeStakeAccount({
@@ -643,7 +638,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected; wrong staker')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6026, 'already funded to a settlement')
+      verifyError(e, Errors, 6026, 'already funded to a settlement')
     }
   })
 
@@ -678,7 +673,7 @@ describe('Validator Bonds claim withdraw request', () => {
       await provider.sendIx([splitStakeAccount, validatorIdentity], instruction)
       throw new Error('failure expected as should be locked')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6028, 'stake account is locked-up')
+      verifyError(e, Errors, 6028, 'stake account is locked-up')
     }
   })
 

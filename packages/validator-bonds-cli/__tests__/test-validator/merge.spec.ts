@@ -69,6 +69,8 @@ describe('Merge stake accounts using CLI', () => {
           stakeAccount2.toBase58(),
           '--config',
           configAccount.toBase58(),
+          '--confirmation-finality',
+          'confirmed',
           '-v',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

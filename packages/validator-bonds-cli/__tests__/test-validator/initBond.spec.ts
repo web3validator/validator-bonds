@@ -102,6 +102,8 @@ describe('Init bond account using CLI', () => {
           '10',
           '--rent-payer',
           rentPayerPath,
+          '--confirmation-finality',
+          'confirmed',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any

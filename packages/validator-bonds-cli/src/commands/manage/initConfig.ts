@@ -6,11 +6,11 @@ import {
 import { Keypair, PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
 import { getCliContext } from '../../context'
-import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
   executeTx,
   instanceOfWallet,
+  transaction,
 } from '@marinade.finance/web3js-common'
 import { initConfigInstruction } from '@marinade.finance/validator-bonds-sdk'
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
@@ -94,8 +94,15 @@ async function manageInitConfig({
   epochsToClaimSettlement: number
   withdrawLockupEpochs: number
 }) {
-  const { program, provider, logger, simulate, printOnly, wallet } =
-    getCliContext()
+  const {
+    program,
+    provider,
+    logger,
+    simulate,
+    printOnly,
+    wallet,
+    confirmationFinality,
+  } = getCliContext()
 
   const tx = await transaction(provider)
   const signers: (Signer | Wallet)[] = [address, wallet]
@@ -128,7 +135,7 @@ async function manageInitConfig({
     logger,
     simulate,
     printOnly,
-    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
+    confirmOpts: confirmationFinality,
   })
   logger.info(
     `Config account ${address.publicKey.toBase58()} successfully created`

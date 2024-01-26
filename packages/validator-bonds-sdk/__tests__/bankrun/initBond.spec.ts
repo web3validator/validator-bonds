@@ -1,5 +1,6 @@
 import {
   Config,
+  Errors,
   ValidatorBondsProgram,
   bondAddress,
   getBond,
@@ -15,7 +16,9 @@ import {
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { createVoteAccount } from '../utils/staking'
-import { checkAnchorErrorMessage } from '../utils/helpers'
+
+import { pubkey, signer } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds init bond account', () => {
   let provider: BankrunExtendedProvider
@@ -44,11 +47,7 @@ describe('Validator Bonds init bond account', () => {
   it('init bond', async () => {
     const bondAuthority = Keypair.generate()
     const { voteAccount, validatorIdentity } = await createVoteAccount(provider)
-    const rentWallet = await createUserAndFund(
-      provider,
-      Keypair.generate(),
-      LAMPORTS_PER_SOL
-    )
+    const rentWallet = await createUserAndFund(provider, LAMPORTS_PER_SOL)
     const { instruction, bondAccount } = await initBondInstruction({
       program,
       configAccount: config.publicKey,
@@ -56,12 +55,12 @@ describe('Validator Bonds init bond account', () => {
       revenueShareHundredthBps: 30,
       validatorVoteAccount: voteAccount,
       validatorIdentity: validatorIdentity.publicKey,
-      rentPayer: rentWallet.publicKey,
+      rentPayer: pubkey(rentWallet),
     })
-    await provider.sendIx([rentWallet, validatorIdentity], instruction)
+    await provider.sendIx([signer(rentWallet), validatorIdentity], instruction)
 
     const rentWalletInfo = await provider.connection.getAccountInfo(
-      rentWallet.publicKey
+      pubkey(rentWallet)
     )
     const bondAccountInfo = await provider.connection.getAccountInfo(
       bondAccount
@@ -106,8 +105,9 @@ describe('Validator Bonds init bond account', () => {
       await provider.sendIx([authorizedWithdrawer], instruction)
       throw new Error('Should have failed as using wrong identity')
     } catch (e) {
-      checkAnchorErrorMessage(
+      verifyError(
         e,
+        Errors,
         6035,
         'does not match to provided validator identity'
       )

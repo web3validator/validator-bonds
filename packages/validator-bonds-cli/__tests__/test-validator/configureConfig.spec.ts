@@ -63,6 +63,8 @@ describe('Configure config account using CLI', () => {
           program.programId.toBase58(),
           'configure-config',
           configAccount.toBase58(),
+          '--confirmation-finality',
+          'confirmed',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
@@ -95,6 +97,8 @@ describe('Configure config account using CLI', () => {
           112,
           '--minimum-stake-lamports',
           134,
+          '--confirmation-finality',
+          'confirmed',
           '-v',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -6,14 +6,16 @@ import {
   ValidatorBondsProgram,
   withdrawerAuthority,
 } from '@marinade.finance/validator-bonds-sdk'
-import { executeTxSimple } from '@marinade.finance/web3js-common'
-import { transaction } from '@marinade.finance/anchor-common'
+import {
+  executeTxSimple,
+  signerWithPubkey,
+  transaction,
+} from '@marinade.finance/web3js-common'
 import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import {
   AnchorExtendedProvider,
   initTest,
 } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
-import { signerWithPubkey } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/helpers'
 import {
   executeInitBondInstruction,
   executeInitConfigInstruction,

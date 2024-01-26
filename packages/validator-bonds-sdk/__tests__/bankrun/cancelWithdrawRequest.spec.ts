@@ -1,6 +1,7 @@
 import {
   Bond,
   Config,
+  Errors,
   ValidatorBondsProgram,
   cancelWithdrawRequestInstruction,
   getBond,
@@ -23,8 +24,10 @@ import {
 } from '../utils/testTransactions'
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import { checkAnchorErrorMessage } from '../utils/helpers'
+
 import assert from 'assert'
+import { pubkey } from '@marinade.finance/web3js-common'
+import { verifyError } from '@marinade.finance/anchor-common'
 
 describe('Validator Bonds cancel withdraw request', () => {
   let provider: BankrunExtendedProvider
@@ -70,13 +73,9 @@ describe('Validator Bonds cancel withdraw request', () => {
   })
 
   it('cancel withdraw request with bond authority', async () => {
-    const rentCollector = await createUserAndFund(
-      provider,
-      undefined,
-      LAMPORTS_PER_SOL
-    )
+    const rentCollector = await createUserAndFund(provider, LAMPORTS_PER_SOL)
     let rentCollectorInfo = await provider.connection.getAccountInfo(
-      rentCollector.publicKey
+      pubkey(rentCollector)
     )
     expect(rentCollectorInfo).not.toBeNull()
     assert(rentCollectorInfo !== null)
@@ -95,13 +94,13 @@ describe('Validator Bonds cancel withdraw request', () => {
       withdrawRequestAccount: withdrawRequest,
       bondAccount: bond.publicKey,
       authority: bondAuthority,
-      rentCollector: rentCollector.publicKey,
+      rentCollector: pubkey(rentCollector),
     })
     await provider.sendIx([bondAuthority], instruction)
     await assertNotExist(provider, withdrawRequest)
 
     rentCollectorInfo = await provider.connection.getAccountInfo(
-      rentCollector.publicKey
+      pubkey(rentCollector)
     )
     expect(rentCollectorInfo).not.toBeNull()
     assert(rentCollectorInfo !== null)
@@ -249,7 +248,7 @@ describe('Validator Bonds cancel withdraw request', () => {
       await provider.sendIx([wrongAuthority], instruction)
       throw new Error('failure; expected wrong authority')
     } catch (e) {
-      checkAnchorErrorMessage(e, 6002, 'Invalid authority')
+      verifyError(e, Errors, 6002, 'Invalid authority')
     }
     expect(
       provider.connection.getAccountInfo(withdrawRequest)

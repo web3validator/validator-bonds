@@ -202,7 +202,7 @@ async function showConfig({
 
 async function showBond({
   address,
-  config = CONFIG_ADDRESS,
+  config,
   validatorVoteAccount,
   bondAuthority,
   format,

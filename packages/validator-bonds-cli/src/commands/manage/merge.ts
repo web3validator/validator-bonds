@@ -2,8 +2,7 @@ import { parsePubkey } from '@marinade.finance/cli-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
-import { transaction } from '@marinade.finance/anchor-common'
-import { Wallet, executeTx } from '@marinade.finance/web3js-common'
+import { Wallet, executeTx, transaction } from '@marinade.finance/web3js-common'
 import {
   CONFIG_ADDRESS,
   mergeInstruction,
@@ -70,8 +69,15 @@ async function manageMerge({
   config?: PublicKey
   settlement?: PublicKey
 }) {
-  const { program, provider, logger, simulate, printOnly, wallet } =
-    await setProgramIdByOwner(config)
+  const {
+    program,
+    provider,
+    logger,
+    simulate,
+    printOnly,
+    wallet,
+    confirmationFinality,
+  } = await setProgramIdByOwner(config)
 
   const tx = await transaction(provider)
   const signers: (Signer | Wallet)[] = [wallet]
@@ -95,7 +101,7 @@ async function manageMerge({
     logger,
     simulate,
     printOnly,
-    confirmOpts: { commitment: 'finalized', timeoutMs: 60 * 1000 },
+    confirmOpts: confirmationFinality,
   })
   logger.info(
     `Stake account ${source.toBase58()} successfully merged to ${destination.toBase58()}`

@@ -87,6 +87,8 @@ describe('Configure bond account using CLI', () => {
           bondAuthorityPath,
           '--revenue-share',
           '42',
+          '--confirmation-finality',
+          'confirmed',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
@@ -125,6 +127,8 @@ describe('Configure bond account using CLI', () => {
           newBondAuthority.toBase58(),
           '--revenue-share',
           43,
+          '--confirmation-finality',
+          'confirmed',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any

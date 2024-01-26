@@ -12,9 +12,8 @@ import {
   TransactionInstruction,
   TransactionInstructionCtorFields,
 } from '@solana/web3.js'
-import { transaction } from '@marinade.finance/anchor-common'
-import { executeTxSimple } from '@marinade.finance/web3js-common'
-import { sleep } from '../utils/helpers'
+import { executeTxSimple, transaction } from '@marinade.finance/web3js-common'
+import { sleep } from '@marinade.finance/ts-common'
 import { readFile } from 'fs/promises'
 import fs from 'fs'
 
@@ -45,8 +44,19 @@ export async function initTest(): Promise<{
   provider: AnchorExtendedProvider
 }> {
   const anchorProvider = AnchorExtendedProvider.env()
+  let connection = anchorProvider.connection
+  // fix for IPv6 default resolution
+  if (
+    anchorProvider.connection.rpcEndpoint.includes('::1') ||
+    anchorProvider.connection.rpcEndpoint.includes('0.0.0.0')
+  ) {
+    connection = new Connection(
+      'http://127.0.0.1:8899',
+      anchorProvider.connection.commitment
+    )
+  }
   const provider = new AnchorExtendedProvider(
-    anchorProvider.connection,
+    connection,
     anchorProvider.wallet,
     { ...anchorProvider.opts, skipPreflight: true }
   )

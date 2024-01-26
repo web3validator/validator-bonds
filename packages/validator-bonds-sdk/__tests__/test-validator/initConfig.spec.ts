@@ -9,13 +9,14 @@ import {
 } from '../../src'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import { initTest } from './testValidator'
-import { transaction } from '@marinade.finance/anchor-common'
 import {
   Wallet,
   executeTxSimple,
+  signer,
+  signerWithPubkey,
   splitAndExecuteTx,
+  transaction,
 } from '@marinade.finance/web3js-common'
-import { signer, signerWithPubkey } from '../utils/helpers'
 
 describe('Validator Bonds init config', () => {
   let provider: AnchorProvider
