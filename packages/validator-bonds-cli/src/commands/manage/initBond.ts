@@ -1,4 +1,8 @@
-import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
+import {
+  parsePubkey,
+  parsePubkeyOrPubkeyFromWallet,
+  parseWalletOrPubkey,
+} from '@marinade.finance/cli-common'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
 import {
@@ -39,7 +43,7 @@ export function installInitBond(program: Command) {
     .option(
       '--bond-authority <pubkey>',
       'Authority that is permitted to operate with bond account (default: wallet pubkey)',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--revenue-share <number>',

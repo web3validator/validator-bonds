@@ -1,4 +1,8 @@
-import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
+import {
+  parsePubkey,
+  parsePubkeyOrPubkeyFromWallet,
+  parseWalletOrPubkey,
+} from '@marinade.finance/cli-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
@@ -49,7 +53,7 @@ export function installConfigureBond(program: Command) {
     .option(
       '--bond-authority <pubkey>',
       'New value of authority that is permitted to operate with bond account.',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--revenue-share <number>',

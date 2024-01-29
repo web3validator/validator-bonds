@@ -48,11 +48,11 @@ importers:
         specifier: ^2.0.0
         version: 2.2.0(@coral-xyz/anchor@0.29.0)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)
       '@marinade.finance/cli-common':
-        specifier: ^2.0.0
-        version: 2.2.0(@marinade.finance/ledger-utils@3.0.0)(@marinade.finance/ts-common@2.2.0)(@marinade.finance/web3js-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(expand-tilde@2.0.2)(pino@8.16.1)(yaml@2.3.3)
+        specifier: file:/home/chalda/marinade/marinade-ts-cli/build/packages/lib/cli-common/
+        version: file:../marinade-ts-cli/build/packages/lib/cli-common(@marinade.finance/ledger-utils@3.0.0)(@marinade.finance/ts-common@2.2.0)(@marinade.finance/web3js-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(expand-tilde@2.0.2)(pino@8.16.1)(yaml@2.3.3)
       '@marinade.finance/ledger-utils':
-        specifier: ^3.0.0
-        version: 3.0.0(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)
+        specifier: file:/home/chalda/marinade/ledger-utils/build/packages/ledger-utils/
+        version: file:../ledger-utils/build/packages/ledger-utils(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)
       '@marinade.finance/ts-common':
         specifier: ^2.0.0
         version: 2.2.0
@@ -980,33 +980,6 @@ packages:
       '@solana/web3.js': 1.87.6
       bn.js: 5.2.1
 
-  /@marinade.finance/cli-common@2.2.0(@marinade.finance/ledger-utils@3.0.0)(@marinade.finance/ts-common@2.2.0)(@marinade.finance/web3js-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(expand-tilde@2.0.2)(pino@8.16.1)(yaml@2.3.3):
-    resolution: {integrity: sha512-WkGZJClM8RwUw1qZiSvAXP3o57m/Z7YJlg38rpLgcI7WjMECeO/V9QIc9Yk8H4sX2YxPQOdX8+VSbQJND4hyaQ==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      '@marinade.finance/ledger-utils': ^3.0.0
-      '@marinade.finance/ts-common': ^2.2.0
-      '@marinade.finance/web3js-common': ^2.2.0
-      '@solana/web3.js': ^1.78.5
-      bn.js: ^5.2.1
-      borsh: ^0.7.0
-      bs58: ^5.0.0
-      expand-tilde: ^2.0.2
-      pino: ^8.15.1
-      yaml: ^2.3.2
-    dependencies:
-      '@marinade.finance/ledger-utils': 3.0.0(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)
-      '@marinade.finance/ts-common': 2.2.0
-      '@marinade.finance/web3js-common': 2.2.0(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
-      '@solana/web3.js': 1.87.6
-      bn.js: 5.2.1
-      borsh: 0.7.0
-      bs58: 5.0.0
-      expand-tilde: 2.0.2
-      pino: 8.16.1
-      yaml: 2.3.3
-    dev: false
-
   /@marinade.finance/directed-stake-sdk@0.0.4(@solana/web3.js@1.87.6)(bn.js@5.2.1)(jsbi@4.3.0):
     resolution: {integrity: sha512-5WTBDRg8hbCHS54wUUhPUuXj9JiQE3Bc1+nmDI3JivQPHu7VsDaPB3w1SHRh0bfARnZQg9oKg8s6jVwNiScCsQ==}
     engines: {node: '>10'}
@@ -1039,22 +1012,6 @@ packages:
       bn.js: 5.2.1
       jest-shell-matchers: 1.0.2(jest@29.7.0)
     dev: true
-
-  /@marinade.finance/ledger-utils@3.0.0(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6):
-    resolution: {integrity: sha512-MYyIg7Rba2aw1AIDbF2pfxU+JCFbcvEyX33xwL/ssOdVWDUin7vw59JJxQ1rSaBj46igpkXj1Lza/c7TdZlipg==}
-    peerDependencies:
-      '@ledgerhq/errors': ^6.16.1
-      '@ledgerhq/hw-app-solana': ^7.1.2
-      '@ledgerhq/hw-transport-node-hid-noevents': ^6.29.2
-      '@marinade.finance/ts-common': ^2.1.4
-      '@solana/web3.js': ^1.78.5
-    dependencies:
-      '@ledgerhq/errors': 6.16.1
-      '@ledgerhq/hw-app-solana': 7.1.2
-      '@ledgerhq/hw-transport-node-hid-noevents': 6.29.2
-      '@marinade.finance/ts-common': 2.2.0
-      '@solana/web3.js': 1.87.6
-    dev: false
 
   /@marinade.finance/marinade-ts-sdk@5.0.7(@solana/web3.js@1.87.6)(bn.js@5.2.1)(jsbi@4.3.0):
     resolution: {integrity: sha512-J2oTeD4C5uIeqlXaVLoYIoUa+qvBwUXTbUWXw45qDCtFbt06HYusnuDc9f2eLEmr3IiNpKYQyZpUqsxPjuNvVg==}
@@ -4854,3 +4811,50 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  file:../ledger-utils/build/packages/ledger-utils(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6):
+    resolution: {directory: ../ledger-utils/build/packages/ledger-utils, type: directory}
+    id: file:../ledger-utils/build/packages/ledger-utils
+    name: '@marinade.finance/ledger-utils'
+    peerDependencies:
+      '@ledgerhq/errors': ^6.16.1
+      '@ledgerhq/hw-app-solana': ^7.1.2
+      '@ledgerhq/hw-transport-node-hid-noevents': ^6.29.2
+      '@marinade.finance/ts-common': ^2.1.4
+      '@solana/web3.js': ^1.78.5
+    dependencies:
+      '@ledgerhq/errors': 6.16.1
+      '@ledgerhq/hw-app-solana': 7.1.2
+      '@ledgerhq/hw-transport-node-hid-noevents': 6.29.2
+      '@marinade.finance/ts-common': 2.2.0
+      '@solana/web3.js': 1.87.6
+    dev: false
+
+  file:../marinade-ts-cli/build/packages/lib/cli-common(@marinade.finance/ledger-utils@3.0.0)(@marinade.finance/ts-common@2.2.0)(@marinade.finance/web3js-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(expand-tilde@2.0.2)(pino@8.16.1)(yaml@2.3.3):
+    resolution: {directory: ../marinade-ts-cli/build/packages/lib/cli-common, type: directory}
+    id: file:../marinade-ts-cli/build/packages/lib/cli-common
+    name: '@marinade.finance/cli-common'
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@marinade.finance/ledger-utils': ^3.0.0
+      '@marinade.finance/ts-common': ^2.2.1-beta
+      '@marinade.finance/web3js-common': ^2.2.1-beta
+      '@solana/web3.js': ^1.78.5
+      bn.js: ^5.2.1
+      borsh: ^0.7.0
+      bs58: ^5.0.0
+      expand-tilde: ^2.0.2
+      pino: ^8.15.1
+      yaml: ^2.3.2
+    dependencies:
+      '@marinade.finance/ledger-utils': file:../ledger-utils/build/packages/ledger-utils(@ledgerhq/errors@6.16.1)(@ledgerhq/hw-app-solana@7.1.2)(@ledgerhq/hw-transport-node-hid-noevents@6.29.2)(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)
+      '@marinade.finance/ts-common': 2.2.0
+      '@marinade.finance/web3js-common': 2.2.0(@marinade.finance/ts-common@2.2.0)(@solana/web3.js@1.87.6)(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+      '@solana/web3.js': 1.87.6
+      bn.js: 5.2.1
+      borsh: 0.7.0
+      bs58: 5.0.0
+      expand-tilde: 2.0.2
+      pino: 8.16.1
+      yaml: 2.3.3
+    dev: false

@@ -1,5 +1,6 @@
 import {
   parsePubkey,
+  parsePubkeyOrPubkeyFromWallet,
   CliCommandError,
   FORMAT_TYPE_DEF,
   print_data,
@@ -37,12 +38,12 @@ export function installShowConfig(program: Command) {
     .option(
       '--admin <pubkey>',
       'Admin authority to filter the config accounts with',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--operator <pubkey>',
       'Operator authority to filter the config accounts with',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       `-f, --format <${FORMAT_TYPE_DEF.join('|')}>`,
@@ -84,17 +85,17 @@ export function installShowBond(program: Command) {
     .option(
       '--config <pubkey>',
       `Config account to filter the bond accounts with (Marinade config: ${CONFIG_ADDRESS.toBase58()})`,
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--validator-vote-account <pubkey>',
       'Validator vote account to filter the bond accounts with',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--bond-authority <pubkey>',
       'Bond authority to filter the bond accounts with',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       `-f, --format <${FORMAT_TYPE_DEF.join('|')}>`,

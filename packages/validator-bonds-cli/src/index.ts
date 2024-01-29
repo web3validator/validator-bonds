@@ -53,8 +53,8 @@ program
   .option(
     '--confirmation-finality <confirmed|finalized>',
     'Confirmation finality of sent transaction. ' +
-      'Default is "finalized" that means for full cluster finality that takes ~8 seconds.',
-    'finalized'
+      'Default is "confirmed" that means for full cluster finality that takes ~8 seconds.',
+    'confirmed'
   )
   .option(
     '-d, --debug',

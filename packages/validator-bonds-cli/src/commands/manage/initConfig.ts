@@ -1,6 +1,6 @@
 import {
   parseKeypair,
-  parsePubkey,
+  parsePubkeyOrPubkeyFromWallet,
   parseWalletOrPubkey,
 } from '@marinade.finance/cli-common'
 import { Keypair, PublicKey, Signer } from '@solana/web3.js'
@@ -27,12 +27,12 @@ export function installInitConfig(program: Command) {
     .option(
       '--admin <pubkey>',
       'Admin authority to initialize the config account with (default: wallet pubkey)',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--operator <pubkey>',
       'Operator authority to initialize the config account with (default: admin authority)',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--rent-payer <keypair_or_ledger_or_pubkey>',

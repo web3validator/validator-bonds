@@ -1,4 +1,8 @@
-import { parsePubkey, parseWalletOrPubkey } from '@marinade.finance/cli-common'
+import {
+  parsePubkey,
+  parsePubkeyOrPubkeyFromWallet,
+  parseWalletOrPubkey,
+} from '@marinade.finance/cli-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
@@ -32,12 +36,12 @@ export function installConfigureConfig(program: Command) {
     .option(
       '--operator <pubkey>',
       'New operator authority to be configured',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--admin <pubkey>',
       'New admin authority to be configured',
-      parsePubkey
+      parsePubkeyOrPubkeyFromWallet
     )
     .option(
       '--epochs-to-claim-settlement <number>',
