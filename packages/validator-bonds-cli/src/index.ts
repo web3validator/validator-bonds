@@ -51,7 +51,7 @@ program
   )
   .option('--commitment <commitment>', 'Commitment', 'confirmed')
   .option(
-    '--confirmation-finality <finality>',
+    '--confirmation-finality <confirmed|finalized>',
     'Confirmation finality of sent transaction. ' +
       'Default is "finalized" that means for full cluster finality that takes ~8 seconds.',
     'finalized'
@@ -97,7 +97,6 @@ program.parseAsync(process.argv).then(
   },
   (err: unknown) => {
     logger.error({ command: 'failed', err, args: process.argv })
-    console.error(err)
     process.exit(200)
   }
 )

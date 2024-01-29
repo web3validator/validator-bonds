@@ -30,6 +30,12 @@ validator-bonds --version
 1.1.7
 ```
 
+
+  **WARNING:** By default, the CLI employs confirmation finality to ensure transactions are `finalized`.
+    For more details on the meaning of Solana finality, refer to the [documentation](https://solanacookbook.com/guides/retrying-transactions.html#after-a-transaction-is-processed-and-before-it-is-finalized).
+    Please note that finalizing transactions may take several seconds, depending on the load of the Solana cluster. Use `--confirmation-finality confirmed` to speed-up processing
+    with lower confirmation certainty.
+
 ### Creating a bond
 
 Any validator may create a bond account to protect the processing.
@@ -127,7 +133,7 @@ Options:
   -p, --print-only                                     Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
   --skip-preflight                                     transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                            Commitment (default: "confirmed")
-  --confirmation-finality <finality>                   Confirmation finality of sent transaction. Default is "finalized" that means for full cluster finality that takes ~8 seconds. (default: "finalized")
+  --confirmation-finality <confirmed|finalized>        Confirmation finality of sent transaction. Default is "finalized" that means for full cluster finality that takes ~8 seconds. (default: "finalized")
   -d, --debug                                          printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                        alias for --debug (default: false)
   -h, --help                                           display help for command

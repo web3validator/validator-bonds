@@ -53,7 +53,7 @@ export function installConfigureBond(program: Command) {
     )
     .option(
       '--revenue-share <number>',
-      'New value of the revenue share in percents (the precision is 1/10000 of the percent).',
+      'New value of the revenue share in percents (the precision is 1/10000 of the percent, use e.g. 1.0001).',
       toHundredsBps
     )
 
@@ -131,7 +131,9 @@ async function manageConfigureBond({
   })
   tx.add(instruction)
 
-  logger.info(`Configuring bond account ${bondAccount.toBase58()}`)
+  logger.info(
+    `Configuring bond account ${bondAccount.toBase58()} (finalization may take seconds)`
+  )
   await executeTx({
     connection: provider.connection,
     transaction: tx,
