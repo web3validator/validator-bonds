@@ -27,7 +27,7 @@ added 165 packages in 35s
 
 # to verify installation run
 validator-bonds --version
-1.1.8
+1.1.7
 ```
 
 ### Creating a bond
@@ -88,6 +88,7 @@ validator-bonds -um show-bond ...
 
 
 ## Support for Ledger signing
+
 Any signature can be generated using Ledger by specifying either the pubkey 
 (`usb://ledger/9rPVSygg3brqghvdZ6wsL2i5YNQTGhXGdJzF65YxaCQd`) or the path (`usb://ledger?key=0/0`)
 as the parameter value.
@@ -114,18 +115,19 @@ The support for ledger came from (`@marinade.finance/ledger-utils` TS implementa
 ```sh
 validator-bonds cli --help
 
-Usage: validator-bonds [options] [command]
+Usage: src [options] [command]
 
 Options:
   -V, --version                                        output the version number
-  -u, --cluster <cluster>                              solana cluster URL, accepts shortcuts (d/devnet, m/mainnet) (default: "http://127.0.0.1:8899")
+  -u, --cluster <cluster>                              solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                         alias for "-u, --cluster"
-  --commitment <commitment>                            Commitment (default: "confirmed")
   -k, --keypair <keypair-or-ledger>                    Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default: ~/.config/solana/id.json)
   --program-id <pubkey>                                Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                       Simulate (default: false)
   -p, --print-only                                     Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
   --skip-preflight                                     transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
+  --commitment <commitment>                            Commitment (default: "confirmed")
+  --confirmation-finality <finality>                   Confirmation finality of sent transaction. Default is "finalized" that means for full cluster finality that takes ~8 seconds. (default: "finalized")
   -d, --debug                                          printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                        alias for --debug (default: false)
   -h, --help                                           display help for command
@@ -135,6 +137,8 @@ Commands:
   configure-config [options] [config-account-address]  Configure existing config account.
   init-bond [options]                                  Create a new bond account.
   configure-bond [options] [bond-account-address]      Configure existing bond account.
+  merge [options]                                      Merging stake accounts belonging to validator bonds program.
+  fund-bond [options] [bond-account-address]           Funding a bond account with amount of SOL within a stake account.
   show-config [options] [address]                      Showing data of config account(s)
   show-event [options] <event-data>                    Showing data of anchor event
   show-bond [options] [address]                        Showing data of bond account(s)
