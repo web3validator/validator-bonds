@@ -8,6 +8,18 @@ Mono repository for Validator Bonds product
 * [`packages/`](./packages/) - TypeScript packages related to on-chain program
   ([SDK](./packages/validator-bonds-sdk/), [CLI](./packages/validator-bonds-cli/))
 
+## CLI usage from source
+
+To run the CLI you need to have installed Node.js in version 16+ and `pnpm`.
+For details on CLI options see [validator-bonds-cli README](./packages/validator-bonds-cli/README.md).
+
+```sh
+# installing TS dependencies
+pnpm install
+# run CLI
+pnpm cli --help
+```
+
 ## Development
 
 ### On-Chain related parts
