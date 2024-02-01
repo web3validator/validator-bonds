@@ -73,8 +73,12 @@ anchor --provider.cluster devnet idl \
   -f ./target/idl/validator_bonds.json
 
 ## publish IDL (mainnet, spl gov)
-anchor idl write-buffer --provider.cluster mainnet \
+anchor idl write-buffer --provider.cluster mainnet --provider.wallet [fee-payer-keypair] \
   --filepath target/idl/validator_bonds.json vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
+anchor idl set-authority --provider.cluster mainnet --provider.wallet [fee-payer-keypair] \
+  --new-authority 6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm --program-id vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
+  <BUFFER_PUBKEY>
+
 
 
 # 3.check verifiable deployment (<BUFFER_PUBKEY> can be verified as well)
