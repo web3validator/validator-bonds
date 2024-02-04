@@ -30,23 +30,30 @@ validator-bonds --version
 1.1.7
 ```
 
-
-  **WARNING:** By default, the CLI employs confirmation finality to ensure transactions are `finalized`.
-    For more details on the meaning of Solana finality, refer to the [documentation](https://solanacookbook.com/guides/retrying-transactions.html#after-a-transaction-is-processed-and-before-it-is-finalized).
-    Please note that finalizing transactions may take several seconds, depending on the load of the Solana cluster. Use `--confirmation-finality confirmed` to speed-up processing
-    with lower confirmation certainty.
-
 ### Creating a bond
 
-Any validator may create a bond account to protect the processing.
-The bond account is bound to a validator vote account.
+Any validator may create a bond account.
+
+The bond account is strictly coupled with a vote account.
+
+It can be created in two ways:
+
+* permission-ed: `--validator-identity <keypair-wallet>` signature is needed.
+  One may then configure additional authority that permits future changes at the bond account
+  with argument `--bond-authority`.
+* permission-less: anybody may create the bond account. For any future configuration change
+  of bond account, or for withdrawal funds, the validator identity signature is needed.
 
 ```sh
-# bond account at mainnet
+# permission-ed: bond account at mainnet
 validator-bonds -um init-bond -k <fee-payer-keypair> \
   --vote-account <vote-account-pubkey> --validator-identity <validator-identity-keypair> \
   --bond-authority <authority-on-bond-account-pubkey> \
   --rent-payer <rent-payer-account-keypair>
+
+# permission-less: bond account at mainnet
+validator-bonds -um init-bond -k <fee-payer-keypair> \
+  --vote-account <vote-account-pubkey> --rent-payer <rent-payer-account-keypair>
 
 # to configure bond account properties
 validator-bonds -um configure-bond --help
@@ -127,13 +134,14 @@ Options:
   -V, --version                                        output the version number
   -u, --cluster <cluster>                              solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                         alias for "-u, --cluster"
-  -k, --keypair <keypair-or-ledger>                    Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default: ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>                    Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for
+                                                       signers. (default: ~/.config/solana/id.json)
   --program-id <pubkey>                                Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                       Simulate (default: false)
   -p, --print-only                                     Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
   --skip-preflight                                     transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                            Commitment (default: "confirmed")
-  --confirmation-finality <confirmed|finalized>        Confirmation finality of sent transaction. Default is "finalized" that means for full cluster finality that takes ~8 seconds. (default: "finalized")
+  --confirmation-finality <confirmed|finalized>        Confirmation finality of sent transaction. Default is "confirmed" that means for full cluster finality that takes ~8 seconds. (default: "confirmed")
   -d, --debug                                          printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                        alias for --debug (default: false)
   -h, --help                                           display help for command

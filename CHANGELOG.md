@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.9](https://github.com/marinade-finance/validator-bonds/compare/v1.1.8...v1.1.9) (2024-02-04)
+
+### Features
+
+* allow init-bond to be used without validator identity signature, aligning with contract v1.1.0 update
+
+## contract release v1.1.0 (2024-02-04)
+
+* address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
+* tag: [`284f060`](https://github.com/marinade-finance/validator-bonds/commit/284f060)
+* tx: [`4o894JcxJJQcq9HXnfdrBKfydvgfxdXqgnbvGPK6vEoZeGXfeURunFBvhKEtBr7zrCjN5LYXrxXkvKSsdzUHTD1n`](https://explorer.solana.com/tx/4o894JcxJJQcq9HXnfdrBKfydvgfxdXqgnbvGPK6vEoZeGXfeURunFBvhKEtBr7zrCjN5LYXrxXkvKSsdzUHTD1n)
+* anchor verify command:
+  ```
+  git checkout 284f060 &&\
+  anchor verify  --provider.cluster mainnet -p validator_bonds --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.1.0'`
+  ```
+
+## [1.1.8](https://github.com/marinade-finance/validator-bonds/compare/v1.1.7...v1.1.8) (2024-01-30)
+
+### Fixes
+
+* pubkeys arguments to accept keypair or wallet and take the pubkey part from it
+
+## [1.1.7](https://github.com/marinade-finance/validator-bonds/compare/v1.1.4...v1.1.7) (2024-01-27)
+
+### Fixes
+
+* CLI works better on confirming sent transactions
 
 ## [1.1.4](https://github.com/marinade-finance/validator-bonds/compare/v1.1.3...v1.1.4) (2024-01-15)
 
