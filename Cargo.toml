@@ -3,7 +3,8 @@ members = [
     "programs/*",
     "insurance-engine",
     "snapshot-parser",
-    "merkle-tree"
+    "merkle-tree",
+    "bot"
 ]
 resolver = "1"
 
