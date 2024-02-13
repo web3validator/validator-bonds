@@ -1,11 +1,11 @@
-[[bin]]
-name = "bonds-bot"
-path = "src/bin/cli.rs"
-
 [package]
-name = "bonds-bot"
+name = "collect"
 version = "0.0.0"
 edition = "2021"
+
+[[bin]]
+name = "collect"
+path = "src/bin/cli.rs"
 
 [dependencies]
 uuid = "1.4.1"

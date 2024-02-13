@@ -873,56 +873,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
-name = "bonds-bot"
-version = "0.0.0"
-dependencies = [
- "amqprs",
- "anchor-lang",
- "anchor-spl",
- "anyhow",
- "async-stream",
- "axum",
- "base64 0.13.1",
- "bincode",
- "bs58 0.3.1",
- "cached",
- "chrono",
- "env_logger 0.10.1",
- "futures",
- "log",
- "reqwest",
- "rust_decimal",
- "serde",
- "serde_json",
- "serde_yaml 0.8.26",
- "shellexpand",
- "solana-account-decoder",
- "solana-address-lookup-table-program",
- "solana-clap-utils",
- "solana-cli-config",
- "solana-client",
- "solana-logger",
- "solana-program",
- "solana-sdk",
- "solana-transaction-status",
- "spl-memo",
- "structopt",
- "tokio",
- "tokio-executor-trait",
- "tokio-postgres",
- "tokio-reactor-trait",
- "tower",
- "tower-http",
- "tower_governor",
- "tracing",
- "tracing-log 0.1.4",
- "tracing-subscriber",
- "uriparse",
- "uuid",
- "validator-bonds",
-]
-
-[[package]]
 name = "borsh"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1369,6 +1319,56 @@ name = "clap_lex"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "702fc72eb24e5a1e48ce58027a675bc24edd52096d5397d4aea7c6dd9eca0bd1"
+
+[[package]]
+name = "collect"
+version = "0.0.0"
+dependencies = [
+ "amqprs",
+ "anchor-lang",
+ "anchor-spl",
+ "anyhow",
+ "async-stream",
+ "axum",
+ "base64 0.13.1",
+ "bincode",
+ "bs58 0.3.1",
+ "cached",
+ "chrono",
+ "env_logger 0.10.1",
+ "futures",
+ "log",
+ "reqwest",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "serde_yaml 0.8.26",
+ "shellexpand",
+ "solana-account-decoder",
+ "solana-address-lookup-table-program",
+ "solana-clap-utils",
+ "solana-cli-config",
+ "solana-client",
+ "solana-logger",
+ "solana-program",
+ "solana-sdk",
+ "solana-transaction-status",
+ "spl-memo",
+ "structopt",
+ "tokio",
+ "tokio-executor-trait",
+ "tokio-postgres",
+ "tokio-reactor-trait",
+ "tower",
+ "tower-http",
+ "tower_governor",
+ "tracing",
+ "tracing-log 0.1.4",
+ "tracing-subscriber",
+ "uriparse",
+ "uuid",
+ "validator-bonds",
+]
 
 [[package]]
 name = "colorchoice"
@@ -6223,6 +6223,57 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
+name = "store"
+version = "0.0.0"
+dependencies = [
+ "amqprs",
+ "anchor-lang",
+ "anchor-spl",
+ "anyhow",
+ "async-stream",
+ "axum",
+ "base64 0.13.1",
+ "bincode",
+ "bs58 0.3.1",
+ "cached",
+ "chrono",
+ "collect",
+ "env_logger 0.10.1",
+ "futures",
+ "log",
+ "reqwest",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "serde_yaml 0.8.26",
+ "shellexpand",
+ "solana-account-decoder",
+ "solana-address-lookup-table-program",
+ "solana-clap-utils",
+ "solana-cli-config",
+ "solana-client",
+ "solana-logger",
+ "solana-program",
+ "solana-sdk",
+ "solana-transaction-status",
+ "spl-memo",
+ "structopt",
+ "tokio",
+ "tokio-executor-trait",
+ "tokio-postgres",
+ "tokio-reactor-trait",
+ "tower",
+ "tower-http",
+ "tower_governor",
+ "tracing",
+ "tracing-log 0.1.4",
+ "tracing-subscriber",
+ "uriparse",
+ "uuid",
+ "validator-bonds",
+]
 
 [[package]]
 name = "stringprep"

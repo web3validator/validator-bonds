@@ -1,4 +1,4 @@
-use crate::commands::collect::common::CommonCollectOptions;
+use crate::commands::common::CommonCollectOptions;
 use crate::{dto::ValidatorBondRecord, utils::rpc::get_rpc_client};
 use anchor_lang::AccountDeserialize;
 use serde_yaml;

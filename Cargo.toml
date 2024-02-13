@@ -4,7 +4,8 @@ members = [
     "insurance-engine",
     "snapshot-parser",
     "merkle-tree",
-    "bot"
+    "store",
+    "collect",
 ]
 resolver = "1"
 

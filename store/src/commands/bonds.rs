@@ -1,11 +1,11 @@
+use collect::dto::ValidatorBondRecord;
 use log::info;
 use serde_yaml;
 use std::collections::{HashMap, HashSet};
 use tokio_postgres::types::ToSql;
 use tokio_postgres::NoTls;
 
-use crate::commands::store::utils::{InsertQueryCombiner, UpdateQueryCombiner};
-use crate::dto::ValidatorBondRecord;
+use crate::commands::utils::{InsertQueryCombiner, UpdateQueryCombiner};
 
 use super::common::CommonStoreOptions;
 
