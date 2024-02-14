@@ -3,9 +3,7 @@ use tokio_postgres::Client;
 
 use crate::dto::ValidatorBondRecord;
 
-pub async fn get_bonds(
-    psql_client: &Client,
-) -> anyhow::Result<Vec<ValidatorBondRecord>> {
+pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBondRecord>> {
     let rows = psql_client
         .query(
             "

@@ -1,6 +1,9 @@
 use crate::{context::WrappedContext, data::data::get_bonds, dto::ValidatorBondRecord};
 use serde::{Deserialize, Serialize};
-use warp::{reject::Reject, reply::{json, Reply}};
+use warp::{
+    reject::Reject,
+    reply::{json, Reply},
+};
 
 #[derive(Serialize, Debug, utoipa::ToSchema)]
 pub struct BondsResponse {
@@ -9,8 +12,7 @@ pub struct BondsResponse {
 
 #[derive(Deserialize, Serialize, Debug, utoipa::IntoParams)]
 #[into_params(parameter_in = Query)]
-pub struct QueryParams {
-}
+pub struct QueryParams {}
 
 #[derive(Debug)]
 struct CustomError {
@@ -33,11 +35,9 @@ pub async fn handler(
     context: WrappedContext,
 ) -> Result<impl Reply, warp::Rejection> {
     match get_bonds(&context.read().await.psql_client).await {
-        Ok(bonds) => {
-            Ok(json(&BondsResponse { bonds }))
-        },
-        Err(_) => {
-            Err(warp::reject::custom(CustomError { message: "Failed to fetch bonds".into() }))
-        }
+        Ok(bonds) => Ok(json(&BondsResponse { bonds })),
+        Err(_) => Err(warp::reject::custom(CustomError {
+            message: "Failed to fetch bonds".into(),
+        })),
     }
 }

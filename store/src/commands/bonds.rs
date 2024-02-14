@@ -11,9 +11,7 @@ use super::common::CommonStoreOptions;
 
 const DEFAULT_CHUNK_SIZE: usize = 500;
 
-pub async fn store_bonds(
-    options: CommonStoreOptions,
-) -> anyhow::Result<()> {
+pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
     let (mut psql_client, psql_conn) =
         tokio_postgres::connect(&options.postgres_url, NoTls).await?;
 

@@ -30,9 +30,7 @@ async fn main() -> anyhow::Result<()> {
         }
     });
 
-    let context = Arc::new(RwLock::new(Context::new(
-        psql_client,
-    )?));
+    let context = Arc::new(RwLock::new(Context::new(psql_client)?));
 
     let cors = warp::cors()
         .allow_any_origin()

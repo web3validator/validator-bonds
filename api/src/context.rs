@@ -7,12 +7,8 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(
-        psql_client: Client,
-    ) -> anyhow::Result<Self> {
-        Ok(Self {
-            psql_client,
-        })
+    pub fn new(psql_client: Client) -> anyhow::Result<Self> {
+        Ok(Self { psql_client })
     }
 }
 
