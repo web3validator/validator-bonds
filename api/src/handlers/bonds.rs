@@ -36,8 +36,8 @@ pub async fn handler(
 ) -> Result<impl Reply, warp::Rejection> {
     match get_bonds(&context.read().await.psql_client).await {
         Ok(bonds) => Ok(json(&BondsResponse { bonds })),
-        Err(_) => Err(warp::reject::custom(CustomError {
-            message: "Failed to fetch bonds".into(),
+        Err(error) => Err(warp::reject::custom(CustomError {
+            message: format!("Failed to fetch bonds. Error: {:?}", error),
         })),
     }
 }
