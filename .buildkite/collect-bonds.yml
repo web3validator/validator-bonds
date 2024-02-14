@@ -43,7 +43,7 @@ steps:
     - 'chmod +x target/release/validator-bonds-api-cli'
     - |
       ./target/release/validator-bonds-api-cli \
-        store-bonds --postgres-url "$POTSGRES_URL" --input-file bonds.yaml
+        store-bonds --postgres-url "$POSTGRES_URL" --input-file bonds.yaml
 
   - command: echo "End of concurrency gate <--"
     concurrency_group: 'validator-bonds/collect-bonds'
