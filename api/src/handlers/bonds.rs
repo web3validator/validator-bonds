@@ -1,4 +1,4 @@
-use crate::{context::WrappedContext, data::data::get_bonds, dto::ValidatorBondRecord};
+use crate::{context::WrappedContext, dto::ValidatorBondRecord, repositories::bond::get_bonds};
 use serde::{Deserialize, Serialize};
 use warp::{
     reject::Reject,
@@ -25,7 +25,7 @@ impl Reject for CustomError {}
     get,
     tag = "Bonds",
     operation_id = "List validator bonds",
-    path = "/bonds",
+    path = "/v1/bonds",
     responses(
         (status = 200, body = BondsResponse),
     )

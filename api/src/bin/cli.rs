@@ -1,5 +1,4 @@
-use collect::commands::bonds::collect_bonds;
-use collect::commands::common::CommonCollectOptions;
+use api::repositories::{bond::store_bonds, common::CommonStoreOptions};
 use structopt::StructOpt;
 use tracing_log::LogTracer;
 
@@ -20,7 +19,7 @@ struct Params {
 
 #[derive(Debug, StructOpt)]
 pub enum Command {
-    CollectBonds(CommonCollectOptions),
+    StoreBonds(CommonStoreOptions),
 }
 
 #[tokio::main]
@@ -48,6 +47,6 @@ async fn main() -> anyhow::Result<()> {
     }));
 
     Ok(match params.command {
-        Command::CollectBonds(options) => collect_bonds(options).await?,
+        Command::StoreBonds(options) => store_bonds(options).await?,
     })
 }

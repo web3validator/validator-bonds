@@ -7,7 +7,7 @@ pub struct ValidatorBondRecord {
     pub pubkey: String,
     pub vote_account: String,
     pub authority: String,
-    pub revenue_share: Decimal,
+    pub cpmpe: Decimal,
     pub epoch: u64,
     pub updated_at: DateTime<Utc>,
 }

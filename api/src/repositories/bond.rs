@@ -1,13 +1,42 @@
-use collect::dto::ValidatorBondRecord;
-use log::info;
-use serde_yaml;
 use std::collections::{HashMap, HashSet};
-use tokio_postgres::types::ToSql;
-use tokio_postgres::NoTls;
 
-use crate::commands::utils::{InsertQueryCombiner, UpdateQueryCombiner};
+use log::info;
+use rust_decimal::Decimal;
+use tokio_postgres::{types::ToSql, Client, NoTls};
+
+use crate::{
+    dto::ValidatorBondRecord,
+    repositories::utils::{InsertQueryCombiner, UpdateQueryCombiner},
+};
 
 use super::common::CommonStoreOptions;
+
+pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBondRecord>> {
+    let rows = psql_client
+        .query(
+            "
+            WITH cluster AS (SELECT MAX(epoch) as last_epoch FROM bonds)
+            SELECT
+                pubkey, vote_account, authority, cpmpe, updated_at, epoch
+            FROM bonds, cluster WHERE epoch = cluster.last_epoch",
+            &[],
+        )
+        .await?;
+
+    let mut bonds: Vec<ValidatorBondRecord> = vec![];
+    for row in rows {
+        bonds.push(ValidatorBondRecord {
+            pubkey: row.get("pubkey"),
+            vote_account: row.get("vote_account"),
+            authority: row.get("authority"),
+            epoch: row.get::<_, i32>("epoch").try_into()?,
+            cpmpe: row.get::<_, Decimal>("cpmpe").try_into()?,
+            updated_at: row.get("updated_at"),
+        })
+    }
+
+    Ok(bonds)
+}
 
 const DEFAULT_CHUNK_SIZE: usize = 500;
 
@@ -50,7 +79,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
             pubkey = u.pubkey,
             vote_account = u.vote_account,
             authority = u.authority,
-            revenue_share = u.revenue_share,
+            cpmpe = u.cpmpe,
             updated_at = u.updated_at,
             epoch = u.epoch
             "
@@ -59,7 +88,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
                 pubkey,
                 vote_account,
                 authority,
-                revenue_share,
+                cpmpe,
                 updated_at,
                 epoch
             )"
@@ -74,7 +103,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
                     &b.pubkey,
                     &b.vote_account,
                     &b.authority,
-                    &b.revenue_share,
+                    &b.cpmpe,
                     &b.updated_at,
                     &epoch,
                 ];
@@ -84,7 +113,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
                         (0, "TEXT".into()),                     // pubkey
                         (1, "TEXT".into()),                     // vote_account
                         (2, "TEXT".into()),                     // authority
-                        (3, "NUMERIC".into()),                  // revenue_share
+                        (3, "NUMERIC".into()),                  // cpmpe
                         (4, "TIMESTAMP WITH TIME ZONE".into()), // updated_at
                         (5, "INTEGER".into()),                  // epoch
                     ]),
@@ -111,7 +140,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
                 pubkey,
                 vote_account,
                 authority,
-                revenue_share,
+                cpmpe,
                 updated_at,
                 epoch
         "
@@ -126,7 +155,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
                 &b.pubkey,
                 &b.vote_account,
                 &b.authority,
-                &b.revenue_share,
+                &b.cpmpe,
                 &b.updated_at,
                 &epoch,
             ];

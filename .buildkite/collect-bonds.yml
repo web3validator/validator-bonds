@@ -5,10 +5,10 @@ steps:
   - label: ":hammer_and_wrench: :rust: Build"
     commands:
     - '. "$HOME/.cargo/env"'
-    - 'cargo build --release --bin collect --bin store'
+    - 'cargo build --release --bin validator-bonds-cli --bin validator-bonds-api-cli'
     artifact_paths:
-      - target/release/collect
-      - target/release/store
+      - target/release/validator-bonds-cli
+      - target/release/validator-bonds-api-cli
 
   - wait: ~
 
@@ -26,10 +26,10 @@ steps:
 
   - label: ":microscope: Collect Bonds"
     commands:
-    - 'buildkite-agent artifact download --include-retried-jobs target/release/collect .'
-    - 'chmod +x target/release/collect'
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/validator-bonds-cli .'
+    - 'chmod +x target/release/validator-bonds-cli'
     - |
-      ./target/release/collect \
+      ./target/release/validator-bonds-cli \
         collect-bonds -u "$RPC_URL" > bonds.yaml
     artifact_paths:
       - bonds.yml
@@ -38,11 +38,11 @@ steps:
 
   - label: ":microscope: Store Bonds"
     commands:
-    - 'buildkite-agent artifact download --include-retried-jobs target/release/store .'
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/validator-bonds-api-cli .'
     - 'buildkite-agent artifact download --include-retried-jobs bonds.yml .'
-    - 'chmod +x target/release/store'
+    - 'chmod +x target/release/validator-bonds-api-cli'
     - |
-      ./target/release/store \
+      ./target/release/validator-bonds-api-cli \
         store-bonds --postgres-url "$POTSGRES_URL" --input-file bonds.yaml
 
   - command: echo "End of concurrency gate <--"
