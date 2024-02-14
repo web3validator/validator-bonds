@@ -39,7 +39,7 @@ steps:
   - label: ":microscope: Store Bonds"
     commands:
     - 'buildkite-agent artifact download --include-retried-jobs target/release/validator-bonds-api-cli .'
-    - 'buildkite-agent artifact download --include-retried-jobs bonds.yml .'
+    - 'buildkite-agent artifact download --include-retried-jobs bonds.yaml .'
     - 'chmod +x target/release/validator-bonds-api-cli'
     - |
       ./target/release/validator-bonds-api-cli \
