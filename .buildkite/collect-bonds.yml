@@ -1,0 +1,50 @@
+agents:
+  queue: "snapshots"
+
+steps:
+  - label: ":hammer_and_wrench: :rust: Build"
+    commands:
+    - '. "$HOME/.cargo/env"'
+    - 'cargo build --release --bin collect --bin store'
+    artifact_paths:
+      - target/release/collect
+      - target/release/store
+
+  - wait: ~
+
+  - label: ":gear: Setup"
+    commands:
+    - '. "$HOME/.cargo/env"'
+
+  - wait: ~
+
+  - command: echo "--> Start of concurrency gate"
+    concurrency_group: 'validator-bonds/collect-bonds'
+    concurrency: 1
+
+  - wait: ~
+
+  - label: ":microscope: Collect Bonds"
+    commands:
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/collect .'
+    - 'chmod +x target/release/collect'
+    - |
+      ./target/release/collect \
+        collect-bonds -u "$RPC_URL" > bonds.yaml
+    artifact_paths:
+      - bonds.yml
+
+  - wait: ~
+
+  - label: ":microscope: Store Bonds"
+    commands:
+    - 'buildkite-agent artifact download --include-retried-jobs target/release/store .'
+    - 'buildkite-agent artifact download --include-retried-jobs bonds.yml .'
+    - 'chmod +x target/release/store'
+    - |
+      ./target/release/store \
+        store-bonds --postgres-url "$POTSGRES_URL" --input-file bonds.yaml
+
+  - command: echo "End of concurrency gate <--"
+    concurrency_group: 'validator-bonds/collect-bonds'
+    concurrency: 1
