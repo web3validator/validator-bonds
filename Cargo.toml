@@ -6,6 +6,7 @@ members = [
     "merkle-tree",
     "store",
     "collect",
+    "api",
 ]
 resolver = "1"
 
