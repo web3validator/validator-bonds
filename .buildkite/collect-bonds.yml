@@ -32,7 +32,7 @@ steps:
       ./target/release/validator-bonds-cli \
         collect-bonds -u "$RPC_URL" > bonds.yaml
     artifact_paths:
-      - bonds.yml
+      - bonds.yaml
 
   - wait: ~
 
