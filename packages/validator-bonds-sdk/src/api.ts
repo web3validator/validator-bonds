@@ -143,7 +143,7 @@ export async function findBonds({
   const bondPublicKeys = bondAccounts.map(account => account.pubkey)
   return (
     await getMultipleBonds({ program, addresses: bondPublicKeys })
-  ).filter(account => account.account !== null) as ProgramAccount<Bond>[]
+  ).filter(account => account !== null) as ProgramAccount<Bond>[]
 }
 
 export async function getWithdrawRequest(
