@@ -3,8 +3,10 @@ CREATE TABLE bonds (
   pubkey TEXT NOT NULL,
   vote_account TEXT NOT NULL,
   authority TEXT NOT NULL,
-  revenue_share NUMERIC NOT NULL,
+  cpme NUMERIC NOT NULL,
   epoch INTEGER NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
   PRIMARY KEY(id)
 )
+
+ALTER TABLE bonds ADD CONSTRAINT pubkey_epoch_unique UNIQUE (pubkey, epoch);

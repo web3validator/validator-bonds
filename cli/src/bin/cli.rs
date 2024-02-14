@@ -1,7 +1,7 @@
-use validator_bonds_cli::commands::bonds::collect_bonds;
-use validator_bonds_cli::commands::common::CommonCollectOptions;
 use structopt::StructOpt;
 use tracing_log::LogTracer;
+use validator_bonds_cli::commands::bonds::collect_bonds;
+use validator_bonds_cli::commands::common::CommonCollectOptions;
 
 #[derive(Debug, StructOpt)]
 pub struct Common {

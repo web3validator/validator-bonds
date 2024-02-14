@@ -1,13 +1,9 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use log::info;
 use rust_decimal::Decimal;
 use tokio_postgres::{types::ToSql, Client, NoTls};
 
-use crate::{
-    dto::ValidatorBondRecord,
-    repositories::utils::{InsertQueryCombiner, UpdateQueryCombiner},
-};
+use crate::dto::ValidatorBondRecord;
 
 use super::common::CommonStoreOptions;
 
@@ -38,11 +34,11 @@ pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBond
     Ok(bonds)
 }
 
-const DEFAULT_CHUNK_SIZE: usize = 500;
-
 pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
-    let (mut psql_client, psql_conn) =
-        tokio_postgres::connect(&options.postgres_url, NoTls).await?;
+    const CHUNK_SIZE: usize = 512;
+    const PARAMS_PER_INSERT: usize = 6;
+
+    let (psql_client, psql_conn) = tokio_postgres::connect(&options.postgres_url, NoTls).await?;
 
     tokio::spawn(async move {
         if let Err(err) = psql_conn.await {
@@ -59,110 +55,51 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
         .collect();
     let epoch = bonds[0].epoch as i32;
 
-    let mut updated_bonds: HashSet<_> = Default::default();
-
-    for chunk in psql_client
-        .query(
-            "
-        SELECT pubkey
-        FROM bonds
-        WHERE epoch = $1
-    ",
-            &[&epoch],
-        )
-        .await?
-        .chunks(DEFAULT_CHUNK_SIZE)
-    {
-        let mut query = UpdateQueryCombiner::new(
-            "bonds".to_string(),
-            "
-            pubkey = u.pubkey,
-            vote_account = u.vote_account,
-            authority = u.authority,
-            cpmpe = u.cpmpe,
-            updated_at = u.updated_at,
-            epoch = u.epoch
-            "
-            .to_string(),
-            "u(
-                pubkey,
-                vote_account,
-                authority,
-                cpmpe,
-                updated_at,
-                epoch
-            )"
-            .to_string(),
-            "bonds.pubkey = u.pubkey AND bonds.epoch = u.epoch".to_string(),
-        );
-        for row in chunk {
-            let pubkey: &str = row.get("pubkey");
-
-            if let Some(b) = bonds_records.get(pubkey) {
-                let mut params: Vec<&(dyn ToSql + Sync)> = vec![
-                    &b.pubkey,
-                    &b.vote_account,
-                    &b.authority,
-                    &b.cpmpe,
-                    &b.updated_at,
-                    &epoch,
-                ];
-                query.add(
-                    &mut params,
-                    HashMap::from_iter([
-                        (0, "TEXT".into()),                     // pubkey
-                        (1, "TEXT".into()),                     // vote_account
-                        (2, "TEXT".into()),                     // authority
-                        (3, "NUMERIC".into()),                  // cpmpe
-                        (4, "TIMESTAMP WITH TIME ZONE".into()), // updated_at
-                        (5, "INTEGER".into()),                  // epoch
-                    ]),
-                );
-                updated_bonds.insert(pubkey.to_string());
-            }
-        }
-        query.execute(&mut psql_client).await?;
-        info!(
-            "Updated previously existing Bond records: {}",
-            updated_bonds.len()
-        );
-    }
-    let bonds_records: Vec<_> = bonds_records
+    for chunk in bonds_records
         .into_iter()
-        .filter(|(pubkey, _)| !updated_bonds.contains(pubkey))
-        .collect();
-    let mut insertions = 0;
+        .collect::<Vec<_>>()
+        .chunks(CHUNK_SIZE)
+    {
+        let mut param_index = 1;
+        let mut params: Vec<Box<dyn ToSql + Sync + Send>> = Vec::new();
+        let mut insert_values = String::new();
 
-    for chunk in bonds_records.chunks(DEFAULT_CHUNK_SIZE) {
-        let mut query = InsertQueryCombiner::new(
-            "bonds".to_string(),
+        for (pubkey, bond) in chunk {
+            let placeholders = (param_index..param_index + PARAMS_PER_INSERT)
+                .map(|index| format!("${}", index))
+                .collect::<Vec<_>>()
+                .join(", ");
+            insert_values.push_str(&format!("({}),", placeholders));
+            param_index += PARAMS_PER_INSERT;
+
+            params.push(Box::new(pubkey));
+            params.push(Box::new(&bond.vote_account));
+            params.push(Box::new(&bond.authority));
+            params.push(Box::new(epoch));
+            params.push(Box::new(bond.updated_at));
+            params.push(Box::new(Decimal::from(bond.cpmpe)));
+        }
+
+        insert_values.pop();
+
+        let query = format!(
             "
-                pubkey,
-                vote_account,
-                authority,
-                cpmpe,
-                updated_at,
-                epoch
-        "
-            .to_string(),
+            INSERT INTO bonds (pubkey, vote_account, authority, epoch, updated_at, cpmpe)
+            VALUES {}
+            ON CONFLICT (pubkey, epoch) DO UPDATE
+            SET vote_account = EXCLUDED.vote_account,
+                authority = EXCLUDED.authority,
+                updated_at = EXCLUDED.updated_at,
+                cpmpe = EXCLUDED.cpmpe
+            ",
+            insert_values
         );
 
-        for (pubkey, b) in chunk {
-            if updated_bonds.contains(pubkey) {
-                continue;
-            }
-            let mut params: Vec<&(dyn ToSql + Sync)> = vec![
-                &b.pubkey,
-                &b.vote_account,
-                &b.authority,
-                &b.cpmpe,
-                &b.updated_at,
-                &epoch,
-            ];
-            query.add(&mut params);
-        }
-        insertions += query.execute(&mut psql_client).await?.unwrap_or(0);
-        info!("Stored {} new Bond records", insertions);
+        let params = params
+            .iter()
+            .map(|param| param.as_ref() as &(dyn ToSql + Sync))
+            .collect::<Vec<_>>();
+        psql_client.query(&query, &params).await?;
     }
 
     Ok(())
