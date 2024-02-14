@@ -80,6 +80,9 @@ anchor idl set-authority --provider.cluster mainnet --provider.wallet [fee-payer
   --new-authority 6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm --program-id vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
   <BUFFER_PUBKEY>
 
+## in case a need of base64 anchor update
+anchor idl --provider.cluster mainnet --print-only \
+  set-buffer --buffer <BUFFER_PUBKEY> vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
 
 
 # 3.check verifiable deployment (<BUFFER_PUBKEY> can be verified as well)

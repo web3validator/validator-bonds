@@ -2,15 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## contract release v1.1.0 (2024-02-*)
+## [1.1.11](https://github.com/marinade-finance/validator-bonds/compare/v1.1.10...v1.1.11) (2024-02-15)
+
+### Fixes
+
+* moved to work with contract update v1.2.0
+
+### Features
+
+* `show-bond` command is capable to list more bond records than before (still limited by `getProgramAccounts` RPC call)
+
+## contract release v1.2.0 (2024-02-15)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
-* tag: [`contract-v1.2.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.2.0), commit: [`61740b0`](https://github.com/marinade-finance/validator-bonds/commit/61740b0), 
-* tx: [`TODO`](https://explorer.solana.com/tx/...)
+* tag: [`contract-v1.2.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.2.0), commit: [`7be11c7`](https://github.com/marinade-finance/validator-bonds/commit/7be11c7), 
+* tx: [`2D4JnDLZ7wuD41gzdMNYGc9Rya9AFR6XTZqhDxQGPq3bLY7WazadLHpH8AjFnZ6HtF6T4jLpGoqEd574Ecjb73hY`](https://explorer.solana.com/tx/2D4JnDLZ7wuD41gzdMNYGc9Rya9AFR6XTZqhDxQGPq3bLY7WazadLHpH8AjFnZ6HtF6T4jLpGoqEd574Ecjb73hY)
 * anchor verify command:
   ```
-  git checkout 61740b0 &&\
-  anchor verify  --provider.cluster mainnet -p validator_bonds --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.2.0'`
+  git checkout 7be11c7 &&\
+  anchor verify  --provider.cluster mainnet -p validator_bonds \
+    --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.2.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
   ```
 
 ## [1.1.10](https://github.com/marinade-finance/validator-bonds/compare/v1.1.8...v1.1.10) (2024-02-04)
