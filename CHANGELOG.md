@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## contract release v1.1.0 (2024-02-*)
+
+* address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
+* tag: [`contract-v1.2.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.2.0), commit: [`61740b0`](https://github.com/marinade-finance/validator-bonds/commit/61740b0), 
+* tx: [`TODO`](https://explorer.solana.com/tx/...)
+* anchor verify command:
+  ```
+  git checkout 61740b0 &&\
+  anchor verify  --provider.cluster mainnet -p validator_bonds --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.2.0'`
+  ```
+
 ## [1.1.10](https://github.com/marinade-finance/validator-bonds/compare/v1.1.8...v1.1.10) (2024-02-04)
 
 ### Features

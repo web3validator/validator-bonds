@@ -43,7 +43,8 @@ export function installInitBond(program: Command) {
     )
     .option(
       '--bond-authority <pubkey>',
-      'Authority that is permitted to operate with bond account (default: vote account validator identity)',
+      'Authority that is permitted to operate with bond account. ' +
+        'Only possible to set in permission-ed mode (see above, default: vote account validator identity)',
       parsePubkeyOrPubkeyFromWallet
     )
     .option(

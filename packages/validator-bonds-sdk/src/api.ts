@@ -1,5 +1,6 @@
 import { ProgramAccount } from '@coral-xyz/anchor'
-import { EpochInfo, PublicKey } from '@solana/web3.js'
+import { EpochInfo, GetProgramAccountsFilter, PublicKey } from '@solana/web3.js'
+import { chunkArray } from '@marinade.finance/ts-common'
 import {
   ValidatorBondsProgram,
   Config,
@@ -62,6 +63,28 @@ export async function getBond(
   return program.account.bond.fetch(address)
 }
 
+export async function getMultipleBonds({
+  program,
+  addresses,
+}: {
+  program: ValidatorBondsProgram
+  addresses: PublicKey[]
+}): Promise<ProgramAccountNullable<Bond>[]> {
+  const result: ProgramAccountNullable<Bond>[] = []
+  // getMultipleAccounts should limit by 100 of addresses, see doc https://solana.com/docs/rpc/http/getmultipleaccounts
+  for (const addressesChunked of chunkArray(addresses, 100)) {
+    const fetchedRecords =
+      await program.account.bond.fetchMultiple(addressesChunked)
+    for (const [index, fetchedRecord] of fetchedRecords.entries()) {
+      result.push({
+        publicKey: addressesChunked[index],
+        account: fetchedRecord,
+      })
+    }
+  }
+  return result
+}
+
 export async function findBonds({
   program,
   config,
@@ -78,7 +101,7 @@ export async function findBonds({
     const bondData = await getBond(program, bondAccount)
     return [{ publicKey: bondAccount, account: bondData }]
   }
-  const filters = []
+  const filters: GetProgramAccountsFilter[] = []
   if (config) {
     filters.push({
       memcmp: {
@@ -106,7 +129,21 @@ export async function findBonds({
       },
     })
   }
-  return await program.account.bond.all(filters)
+
+  const bondDiscriminator = bs58.encode([224,128,48,251,182,246,111,196])
+  filters.push({memcmp: {bytes: bondDiscriminator, offset: 0}})
+  const bondAccounts = await program.provider.connection.getProgramAccounts(
+    program.programId,
+    {
+      dataSlice: { offset: 0, length: 0 },
+      filters,
+      commitment: program.provider.connection.commitment,
+    }
+  )
+  const bondPublicKeys = bondAccounts.map(account => account.pubkey)
+  return (
+    await getMultipleBonds({ program, addresses: bondPublicKeys })
+  ).filter(account => account.account !== null) as ProgramAccount<Bond>[]
 }
 
 export async function getWithdrawRequest(
@@ -268,4 +305,10 @@ export async function findSettlementClaims({
     })
   }
   return await program.account.settlementClaim.all(filters)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ProgramAccountNullable<T = any> = {
+  publicKey: PublicKey
+  account: T | null
 }
