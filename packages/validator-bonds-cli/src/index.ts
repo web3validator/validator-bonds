@@ -93,7 +93,7 @@ installCommands(program)
 
 program.parseAsync(process.argv).then(
   () => {
-    process.exit()
+    logger.debug({ command: 'success', args: process.argv })
   },
   (err: unknown) => {
     logger.error({ command: 'failed', err, args: process.argv })

@@ -199,7 +199,7 @@ async function showConfig({
   }
 
   const reformatted = reformat(data, reformatReserved)
-  print_data(reformatted, format)
+  await print_data(reformatted, format)
 }
 
 async function showBond({
@@ -261,7 +261,7 @@ async function showBond({
   }
 
   const reformatted = reformat(data, reformatBonds)
-  print_data(reformatted, format)
+  await print_data(reformatted, format)
 }
 
 async function showEvent({ eventData }: { eventData: string }) {
@@ -269,7 +269,7 @@ async function showEvent({ eventData }: { eventData: string }) {
 
   const decodedData = program.coder.events.decode(eventData)
   const reformattedData = reformat(decodedData)
-  print_data(reformattedData, 'text')
+  await print_data(reformattedData, 'text')
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
