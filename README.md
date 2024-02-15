@@ -43,6 +43,30 @@ pnpm test:validator
 pnpm test:cargo
 ```
 
+### Validator Bonds CLI
+
+```sh
+cargo build --release
+
+# Collect bonds data in YAML format
+./target/release/validator-bonds-cli \
+  collect-bonds -u "$RPC_URL" > bonds.yaml
+
+# Store YAML bonds data to a POSTGRES DB
+./target/release/validator-bonds-api-cli \
+  store-bonds --postgres-url "$POSTGRES_URL" --input-file bonds.yaml
+```
+
+### Validator Bonds API
+
+```sh
+cargo build --release
+
+# Run API on port 8000 (default) or set a custom one using --port
+./target/release/api \
+  --postgres-url "$POSTGRES_URL"
+```
+
 ### Contract deployment
 
 ```sh
