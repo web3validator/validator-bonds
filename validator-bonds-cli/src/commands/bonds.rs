@@ -41,9 +41,9 @@ pub async fn collect_bonds(options: CommonCollectOptions) -> anyhow::Result<()> 
         let bond: Bond = AccountDeserialize::try_deserialize(&mut bond_account.1.data.as_slice())?;
         bonds.push(ValidatorBondRecord {
             pubkey: bond_account.0.to_string(),
-            vote_account: bond.validator_vote_account.to_string(),
+            vote_account: bond.vote_account.to_string(),
             authority: bond.authority.to_string(),
-            cpmpe: bond.revenue_share.hundredth_bps.try_into().unwrap(),
+            cpmpe: bond.cpmpe.try_into().unwrap(),
             epoch: epoch,
             updated_at,
         })
