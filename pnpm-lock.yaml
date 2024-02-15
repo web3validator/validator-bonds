@@ -57,7 +57,7 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       '@marinade.finance/validator-bonds-sdk':
-        specifier: ^1.1.10
+        specifier: ^1.1.11
         version: link:../validator-bonds-sdk
       '@marinade.finance/web3js-common':
         specifier: ^2.2.2

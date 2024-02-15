@@ -27,7 +27,7 @@ added 165 packages in 35s
 
 # to verify installation run
 validator-bonds --version
-1.1.7
+1.1.11
 ```
 
 ### Creating a bond
