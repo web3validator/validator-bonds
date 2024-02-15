@@ -70,7 +70,8 @@ cargo build --release
 ### Contract deployment
 
 ```sh
-anchor build --verifiable
+anchor build --verifiable \
+  --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=<SOME_VERSION>'
 
 # 1. DEPLOY
 ## deploy (devnet, hot wallet upgrade)
@@ -103,12 +104,18 @@ anchor idl set-authority --provider.cluster mainnet --provider.wallet [fee-payer
   --new-authority 6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm --program-id vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 \
   <BUFFER_PUBKEY>
 
+## in case a need of base64 anchor update
+anchor idl --provider.cluster mainnet --print-only \
+  set-buffer --buffer <BUFFER_PUBKEY> vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
 
 
 # 3.check verifiable deployment (<BUFFER_PUBKEY> can be verified as well)
+#   a) when the target/verifiable/.so has been built already use switch --skip-build
 anchor --provider.cluster mainnet \
    verify -p validator_bonds \
-   vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
+   --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.1.0' \
+   <PROGRAM_ID_or_BUFFER_ID>
+
 ```
 
 ## TODO

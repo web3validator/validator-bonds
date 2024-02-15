@@ -27,7 +27,7 @@ added 165 packages in 35s
 
 # to verify installation run
 validator-bonds --version
-1.1.7
+1.1.11
 ```
 
 ### Creating a bond
@@ -92,9 +92,7 @@ validator-bonds -um show-bond ...
     config: 'vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU',
     validatorVoteAccount: '...',
     authority: '...',
-    revenueShare: { hundredthBps: 0 },
     bump: 255,
-    reserved: { reserved: [Array] }
   }
 }
 ```

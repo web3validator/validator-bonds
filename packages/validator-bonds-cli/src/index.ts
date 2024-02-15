@@ -17,7 +17,7 @@ export const logger: Logger = configureLogger()
 const program = new Command()
 
 program
-  .version('1.1.10')
+  .version('1.1.11')
   .allowExcessArguments(false)
   .option(
     '-u, --cluster <cluster>',
@@ -93,7 +93,7 @@ installCommands(program)
 
 program.parseAsync(process.argv).then(
   () => {
-    process.exit()
+    logger.debug({ command: 'success', args: process.argv })
   },
   (err: unknown) => {
     logger.error({ command: 'failed', err, args: process.argv })
