@@ -13,7 +13,10 @@ use warp::Filter;
 #[derive(Debug, StructOpt)]
 pub struct Params {
     #[structopt(long = "postgres-url")]
-    postgres_url: String,
+    pub postgres_url: String,
+
+    #[structopt(long = "port", default_value = "8000")]
+    pub port: u16,
 }
 
 #[tokio::main]
@@ -68,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
         .or(route_bonds)
         .with(cors);
 
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], params.port)).await;
 
     Ok(())
 }
