@@ -130,8 +130,8 @@ export async function findBonds({
     })
   }
 
-  const bondDiscriminator = bs58.encode([224,128,48,251,182,246,111,196])
-  filters.push({memcmp: {bytes: bondDiscriminator, offset: 0}})
+  const bondDiscriminator = bs58.encode([224, 128, 48, 251, 182, 246, 111, 196])
+  filters.push({ memcmp: { bytes: bondDiscriminator, offset: 0 } })
   const bondAccounts = await program.provider.connection.getProgramAccounts(
     program.programId,
     {
