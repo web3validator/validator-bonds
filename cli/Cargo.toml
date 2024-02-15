@@ -31,7 +31,7 @@ solana-cli-config = { workspace = true }
 solana-account-decoder = { workspace = true }
 solana-program = { workspace = true }
 rust_decimal = { workspace = true }
-validator-bonds = { version = "0.1.0", path="../programs/validator-bonds", features=["cpi"] }
+validator-bonds = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 tracing-log = { workspace = true }
