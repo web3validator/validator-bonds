@@ -4,7 +4,7 @@ members = [
     "insurance-engine",
     "snapshot-parser",
     "merkle-tree",
-    "cli",
+    "validator-bonds-cli",
     "api",
 ]
 resolver = "1"
