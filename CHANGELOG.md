@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.1.11](https://github.com/marinade-finance/validator-bonds/compare/v1.1.10...v1.1.11) (2024-02-15)
+## TS CLI&SDK [1.1.11](https://github.com/marinade-finance/validator-bonds/compare/v1.1.10...v1.1.11) (2024-02-15)
 
 ### Fixes
 
@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file. See [standa
     --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.2.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
   ```
 
-## [1.1.10](https://github.com/marinade-finance/validator-bonds/compare/v1.1.8...v1.1.10) (2024-02-04)
+## TS CLI&SDK [1.1.10](https://github.com/marinade-finance/validator-bonds/compare/v1.1.8...v1.1.10) (2024-02-04)
 
 ### Features
 
@@ -41,26 +41,26 @@ All notable changes to this project will be documented in this file. See [standa
   anchor verify  --provider.cluster mainnet -p validator_bonds --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.1.0'`
   ```
 
-## [1.1.8](https://github.com/marinade-finance/validator-bonds/compare/v1.1.7...v1.1.8) (2024-01-30)
+## TS CLI&SDK [1.1.8](https://github.com/marinade-finance/validator-bonds/compare/v1.1.7...v1.1.8) (2024-01-30)
 
 ### Fixes
 
 * pubkeys arguments to accept keypair or wallet and take the pubkey part from it
 
-## [1.1.7](https://github.com/marinade-finance/validator-bonds/compare/v1.1.4...v1.1.7) (2024-01-27)
+## TS CLI&SDK [1.1.7](https://github.com/marinade-finance/validator-bonds/compare/v1.1.4...v1.1.7) (2024-01-27)
 
 ### Fixes
 
 * CLI works better on confirming sent transactions
 
-## [1.1.4](https://github.com/marinade-finance/validator-bonds/compare/v1.1.3...v1.1.4) (2024-01-15)
+## TS CLI&SDK [1.1.4](https://github.com/marinade-finance/validator-bonds/compare/v1.1.3...v1.1.4) (2024-01-15)
 
 ### Fixes
 
 * CLI does not require `--keypair` path to exist when `show-*` command or `--print-only` is used
 
 
-## [1.1.3](https://github.com/marinade-finance/validator-bonds/compare/v1.1.1...v1.1.3) (2024-01-12)
+## TS CLI&SDK [1.1.3](https://github.com/marinade-finance/validator-bonds/compare/v1.1.1...v1.1.3) (2024-01-12)
 
 ### Features
 
@@ -73,7 +73,7 @@ All notable changes to this project will be documented in this file. See [standa
 * tx: [`5WseNRgBgqQD2eZD6z4S8aFhPUWX741tiYGTnheENZ34SisH2rZVzsBotnVj52oTBxwCr5wSYqxog8FLMeXGrg58`](https://explorer.solana.com/tx/5WseNRgBgqQD2eZD6z4S8aFhPUWX741tiYGTnheENZ34SisH2rZVzsBotnVj52oTBxwCr5wSYqxog8FLMeXGrg58)
 
 
-## [1.1.1](https://github.com/marinade-finance/validator-bonds/compare/v1.1.0...v1.1.1) (2024-01-05)
+## TS CLI&SDK [1.1.1](https://github.com/marinade-finance/validator-bonds/compare/v1.1.0...v1.1.1) (2024-01-05)
 
 ### Features
 
@@ -87,7 +87,7 @@ All notable changes to this project will be documented in this file. See [standa
 * tx: [`5uSwyCpQe3zniVRU6sdbWdaoiLNoiAf9TggqhNRe7BsUN2hxquwWhERTd2jBcMVScmAgYNgA9keVxJ1qf6hnwJvf`](https://explorer.solana.com/tx/5uSwyCpQe3zniVRU6sdbWdaoiLNoiAf9TggqhNRe7BsUN2hxquwWhERTd2jBcMVScmAgYNgA9keVxJ1qf6hnwJvf)
 
 
-## [1.1.0](https://github.com/marinade-finance/validator-bonds/compare/cli_v1.0.3...v1.1.0) (2024-01-03)
+## TS CLI&SDK [1.1.0](https://github.com/marinade-finance/validator-bonds/compare/cli_v1.0.3...v1.1.0) (2024-01-03)
 
 ### Features
 
@@ -99,7 +99,7 @@ All notable changes to this project will be documented in this file. See [standa
 * CLI fixing nodejs bin installation
 * fixing `--keypair` argument being parsed correctly
 
-## CLI [1.0.3](https://github.com/marinade-finance/validator-bonds/compare/v1.0.0...cli_v1.0.3) (2024-01-02)
+## TS CLI&SDK [1.0.3](https://github.com/marinade-finance/validator-bonds/compare/v1.0.0...cli_v1.0.3) (2024-01-02)
 
 ### Fixes
 
@@ -108,7 +108,7 @@ All notable changes to this project will be documented in this file. See [standa
 * fixing `--keypair` argument being parsed correctly
 
 
-## CLI&SDK [1.0.0](https://github.com/marinade-finance/validator-bonds/compare/v1.0.0) (2023-12-31)
+## TS CLI&SDK [1.0.0](https://github.com/marinade-finance/validator-bonds/compare/v1.0.0) (2023-12-31)
 
 ### Features
 
