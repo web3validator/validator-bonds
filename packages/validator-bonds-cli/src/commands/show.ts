@@ -16,10 +16,11 @@ import {
   Bond,
   CONFIG_ADDRESS,
   Config,
+  bondAddress,
   findBonds,
   findConfigs,
-  getBond,
   getConfig,
+  getVoteAccountFromData,
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
 
@@ -80,7 +81,7 @@ export function installShowBond(program: Command) {
     .description('Showing data of bond account(s)')
     .argument(
       '[address]',
-      'Address of the bond account to show (when the argument is provided other filter options are ignored)',
+      'Address of the bond account or vote account. It will show bond account data (when the argument is provided other filter options are ignored)',
       parsePubkey
     )
     .option(
@@ -169,7 +170,7 @@ async function showConfig({
       }
     } catch (e) {
       throw new CliCommandError({
-        valueName: '--address',
+        valueName: '[address]',
         value: address.toBase58(),
         msg: 'Failed to fetch config account data',
         cause: e as Error,
@@ -199,7 +200,7 @@ async function showConfig({
   }
 
   const reformatted = reformat(data, reformatReserved)
-  await print_data(reformatted, format)
+  print_data(reformatted, format)
 }
 
 async function showBond({
@@ -215,26 +216,79 @@ async function showBond({
   bondAuthority?: PublicKey
   format: FormatType
 }) {
-  const { program } = await setProgramIdByOwner(address)
+  const cliContext = getCliContext()
+  let program = cliContext.program
+  const logger = cliContext.logger
 
   let data:
     | ProgramAccountWithProgramId<Bond>
     | ProgramAccountWithProgramId<Bond>[]
   if (address) {
+    // Check if address exists as an account on-chain
+    let accountInfo = await program.provider.connection.getAccountInfo(address)
+    if (accountInfo === null) {
+      throw new CliCommandError({
+        valueName: '[address]',
+        value: address.toBase58(),
+        msg: 'Account not found',
+      })
+    }
+
+    // Check if the address is a vote account
+    let voteAccountAddress = null
     try {
-      const bondData = await getBond(program, address)
-      data = {
-        programId: program.programId,
-        publicKey: address,
-        account: bondData,
+      const voteAccount = await getVoteAccountFromData(address, accountInfo)
+      voteAccountAddress = voteAccount.publicKey
+    } catch (e) {
+      // Ignore error, we will try to fetch the address as the bond account data
+      logger.debug(
+        'Address is not a vote account, considering being it as a bond',
+        e
+      )
+      ;({ program } = await setProgramIdByOwner(address))
+    }
+
+    // If the address is a vote account, derive the bond account address from it
+    if (voteAccountAddress !== null) {
+      if (config === undefined) {
+        config = CONFIG_ADDRESS
       }
+      ;[address] = bondAddress(config, voteAccountAddress, program.programId)
+      accountInfo = await program.provider.connection.getAccountInfo(address)
+      if (accountInfo === null) {
+        throw new CliCommandError({
+          valueName: '[vote account address]:[bond account address]',
+          value: voteAccountAddress.toBase58() + ':' + address.toBase58(),
+          msg: 'Bond account address derived from provided vote account not found',
+        })
+      }
+    }
+
+    if (accountInfo === null) {
+      throw new CliCommandError({
+        valueName: '[address]',
+        value: address.toBase58(),
+        msg: 'Address is neither a vote account nor a bond account',
+      })
+    }
+
+    // Decode data from the account info
+    let bondData
+    try {
+      bondData = program.coder.accounts.decode<Bond>('bond', accountInfo.data)
     } catch (e) {
       throw new CliCommandError({
-        valueName: '--address',
+        valueName: '[address]',
         value: address.toBase58(),
         msg: 'Failed to fetch bond account data',
         cause: e as Error,
       })
+    }
+
+    data = {
+      programId: program.programId,
+      publicKey: address,
+      account: bondData,
     }
   } else {
     // CLI did not provide an address, we will search for accounts based on filter parameters
@@ -261,7 +315,7 @@ async function showBond({
   }
 
   const reformatted = reformat(data, reformatBonds)
-  await print_data(reformatted, format)
+  print_data(reformatted, format)
 }
 
 async function showEvent({ eventData }: { eventData: string }) {
@@ -269,7 +323,7 @@ async function showEvent({ eventData }: { eventData: string }) {
 
   const decodedData = program.coder.events.decode(eventData)
   const reformattedData = reformat(decodedData)
-  await print_data(reformattedData, 'text')
+  print_data(reformattedData, 'text')
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -8,6 +8,7 @@ import {
   BlockTimestamp,
   AuthorizedVoter,
   PriorVoter,
+  AccountInfo,
 } from '@solana/web3.js'
 import { ProgramAccountInfo, programAccountInfo } from '../sdk'
 import { getConnection } from '.'
@@ -26,6 +27,13 @@ export async function getVoteAccount<IDL extends Idl = Idl>(
     )
   }
 
+  return await getVoteAccountFromData(address, voteAccountInfo)
+}
+
+export async function getVoteAccountFromData(
+  address: PublicKey,
+  voteAccountInfo: AccountInfo<Buffer>
+): Promise<ProgramAccountInfo<VoteAccount>> {
   const versionOffset = 4
   const version = VoteAccountVersionLayout.decode(
     toBuffer(voteAccountInfo.data),
