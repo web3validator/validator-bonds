@@ -1,13 +1,14 @@
-use std::collections::HashSet;
-
 use env_logger::{Builder, Env};
+use insurance_engine::insurance_claims::stake_authorities_filter;
 use insurance_engine::{
-    insurance_claims::{generate_insurance_claim_collection, stake_authorities_filter},
+    insurance_claims::generate_insurance_claim_collection,
     insured_events::generate_insured_event_collection,
     merkle_tree_collection::generate_merkle_tree_collection,
     utils::{read_from_json_file, write_to_json_file},
 };
 use snapshot_parser::{stake_meta::StakeMetaCollection, validator_meta::ValidatorMetaCollection};
+use solana_sdk::pubkey::Pubkey;
+use std::collections::HashSet;
 use {clap::Parser, log::info};
 
 #[derive(Parser, Debug)]
@@ -29,7 +30,7 @@ struct Args {
     output_merkle_tree_collection: String,
 
     #[arg(long, env, value_delimiter = ',')]
-    whitelist_stake_authority: Option<Vec<String>>,
+    whitelist_stake_authority: Option<Vec<Pubkey>>,
 
     #[arg(long, env)]
     low_rewards_threshold_pct: f64,
