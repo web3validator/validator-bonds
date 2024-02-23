@@ -1,6 +1,6 @@
+use crate::utils::map_pubkey_string_conversion;
 use solana_sdk::pubkey::Pubkey;
 use std::collections::HashMap;
-
 use {
     serde::{Deserialize, Serialize},
     snapshot_parser::validator_meta::ValidatorMetaCollection,
@@ -47,6 +47,7 @@ pub struct InsuredEventCollection {
     pub epoch: u64,
     pub slot: u64,
     pub low_rewards_threshold_pct: f64,
+    #[serde(with = "map_pubkey_string_conversion")]
     pub events: HashMap</* vote_account */ Pubkey, Vec<InsuredEvent>>,
 }
 
