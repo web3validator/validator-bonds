@@ -212,8 +212,3 @@ anchor --provider.cluster mainnet \
    <PROGRAM_ID_or_BUFFER_ID>
 
 ```
-
-## TODO
-
-* add table of authorities - what state means what authority
-* add flow diagram how calls will be done
