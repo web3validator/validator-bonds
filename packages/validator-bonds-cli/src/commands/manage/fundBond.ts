@@ -7,10 +7,7 @@ import {
   instanceOfWallet,
   transaction,
 } from '@marinade.finance/web3js-common'
-import {
-  CONFIG_ADDRESS,
-  fundBondInstruction,
-} from '@marinade.finance/validator-bonds-sdk'
+import { fundBondInstruction } from '@marinade.finance/validator-bonds-sdk'
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 
@@ -29,14 +26,13 @@ export function installFundBond(program: Command) {
     )
     .option(
       '--config <pubkey>',
-      '(optional when the argument bond-account-address is provided, used to derive the bond address) ' +
-        'The config account that the bond is created under ' +
-        `(default: ${CONFIG_ADDRESS.toBase58()})`,
+      '(optional when the argument bond-account-address is NOT provided, used to derive the bond address) ' +
+        'The config account that the bond is created under.',
       parsePubkey
     )
     .option(
       '--vote-account <pubkey>',
-      '(optional when the argument bond-account-address is provided, used to derive the bond address) ' +
+      '(optional when the argument bond-account-address is NOT provided, used to derive the bond address) ' +
         'Validator vote account that the bond is bound to',
       parsePubkey
     )

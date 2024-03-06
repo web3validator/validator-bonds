@@ -210,7 +210,8 @@ anchor idl --provider.cluster mainnet --print-only \
 #   a) when the target/verifiable/.so has been built already use switch --skip-build
 anchor --provider.cluster mainnet \
    verify -p validator_bonds \
-   --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.1.0' \
+   --env "GIT_REV=`git rev-parse --short HEAD`" --env "GIT_REV_NAME=${VERSION}" \
+   # --skip-build
    <PROGRAM_ID_or_BUFFER_ID>
 
 ```

@@ -103,6 +103,25 @@ validator-bonds -um show-bond ...
 }
 ```
 
+### Funding bond accounts
+
+The bond account exists to be funded, where the funds may be used to cover a protected event
+when a validator under-performs or experiences a serious issue.
+"Funding the bond" involves charging lamports to a stake account and
+then assigning ownership of the stake account to the Validator Bonds program using the `fund-bond` CLI command.
+
+* The stake account **must be delegated** to the vote account belonging to the bond account.
+* The stake account **must be fully activated**.
+
+All lamports held in the stake accounts are considered part of the protected stake amount.
+
+```sh
+validator-bonds -um fund-bond <bond-address> \
+  --stake-account <stake-account-address> \
+  --stake-authority <withdrawer-stake-account-authority>
+  --vote-account <vote-account-pubkey>
+```
+
 
 ## Support for Ledger signing
 

@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file. See [standa
 ## contract release v1.3.0 (2024-03-XX)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
-* tag: [`contract-v1.3.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.3.0), commit: [`TODO`](https://github.com/marinade-finance/validator-bonds/commit/TODO),
-* tx: [`TODO`](https://explorer.solana.com/tx/TODO)
+* tag: [`contract-v1.3.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.3.0), commit: [`776b1b7`](https://github.com/marinade-finance/validator-bonds/commit/776b1b7d76ccee204e938cd6572e4c40281146d4),
+* tx: [`4a6LZFT1CzBSpCGY6SUcw1MPwxKVXt7h2Z4J21MSrH5uKmXnNmXQtMzpJt4oPTKbjXDGzpZyHrAUMxsHkUAESDSK`](https://explorer.solana.com/tx/4a6LZFT1CzBSpCGY6SUcw1MPwxKVXt7h2Z4J21MSrH5uKmXnNmXQtMzpJt4oPTKbjXDGzpZyHrAUMxsHkUAESDSK)
 * anchor verify command:
   ```
-  git checkout TODO &&\
+  git checkout 776b1b7 &&\
   anchor verify  --provider.cluster mainnet -p validator_bonds \
     --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.3.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
   ```
