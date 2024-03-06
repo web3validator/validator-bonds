@@ -165,8 +165,10 @@ pnpm test:cargo
 #### Contract deployment
 
 ```sh
+VERSION='v'`grep version programs/validator-bonds/Cargo.toml | sed 's/.*"\([^"]\+\)".*/\1/'`
+echo "Building version $VERSION"
 anchor build --verifiable \
-  --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=<SOME_VERSION>'
+  --env "GIT_REV=`git rev-parse --short HEAD`" --env "GIT_REV_NAME=${VERSION}"
 
 # 1. DEPLOY
 ## deploy (devnet, hot wallet upgrade)
