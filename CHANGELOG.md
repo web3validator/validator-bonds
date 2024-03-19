@@ -2,7 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## contract release v1.3.0 (2024-03-XX)
+## TS CLI&SDK [1.2.0](https://github.com/marinade-finance/validator-bonds/compare/v1.1.12...v1.2.0) (2024-03-19)
+
+### Updates
+
+CLI and SDK aligned with contract release v1.3.0
+
+### CLI Features
+
+* `init-withdraw-request`, `cancel-withdraw-request`, `claim-withdraw-request` commands were added to work with funding and withdrawing stake accounts to Bonds Program
+* `mint-bond` command were added to make possible to configure the bond account without signing CLI with validator identity
+* `configure-bond` command adjusted to work with `mint-bond` SPL tokens
+* `show-bond` adjusted to show funded amounts
+* `pause`, `resume` commands for emergency purposes added
+
+### Fixes
+
+* on execution the error `Server responded with 429 Too Many Requests.  Retrying after 1000ms delay...` should not be failing the commands anymore
+
+## contract release v1.3.0 (2024-03-08)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
 * tag: [`contract-v1.3.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.3.0), commit: [`776b1b7`](https://github.com/marinade-finance/validator-bonds/commit/776b1b7d76ccee204e938cd6572e4c40281146d4),
