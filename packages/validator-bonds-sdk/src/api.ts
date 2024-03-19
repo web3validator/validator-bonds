@@ -662,10 +662,6 @@ export async function getBondsFunding({
     program,
     configAccount,
   })
-  // const allStakeAccountsMap: Map<
-  //   string,
-  //   ProgramAccountInfo<StakeAccountParsed>[]
-  // > =
 
   const bondFundedStakeAccounts = allStakeAccounts
     // filter OUT the stake accounts that are in a settlement

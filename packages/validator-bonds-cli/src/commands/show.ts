@@ -21,6 +21,7 @@ import {
   getConfig,
   getBondsFunding,
   BondFunding,
+  bondsWithdrawerAuthority,
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { getBondFromAddress } from './utils'
@@ -155,6 +156,10 @@ export function installShowEvent(program: Command) {
     })
 }
 
+export type ShowConfigType = ProgramAccountWithProgramId<Config> & {
+  bondsWithdrawerAuthority: PublicKey
+}
+
 async function showConfig({
   address,
   adminAuthority,
@@ -169,9 +174,7 @@ async function showConfig({
   const { program } = await setProgramIdByOwner(address)
 
   // CLI provided an address, we will search for that one account
-  let data:
-    | ProgramAccountWithProgramId<Config>
-    | ProgramAccountWithProgramId<Config>[]
+  let data: ShowConfigType | ShowConfigType[]
   if (address) {
     try {
       const configData = await getConfig(program, address)
@@ -179,6 +182,10 @@ async function showConfig({
         programId: program.programId,
         publicKey: address,
         account: configData,
+        bondsWithdrawerAuthority: bondsWithdrawerAuthority(
+          address,
+          program.programId
+        )[0],
       }
     } catch (e) {
       throw new CliCommandError({
@@ -200,6 +207,10 @@ async function showConfig({
         programId: program.programId,
         publicKey: configData.publicKey,
         account: configData.account,
+        bondsWithdrawerAuthority: bondsWithdrawerAuthority(
+          configData.publicKey,
+          program.programId
+        )[0],
       }))
     } catch (err) {
       throw new CliCommandError({

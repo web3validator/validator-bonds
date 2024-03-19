@@ -5,6 +5,7 @@ import {
   ValidatorBondsProgram,
   getWithdrawRequest,
   cancelWithdrawRequestInstruction,
+  bondsWithdrawerAuthority,
 } from '@marinade.finance/validator-bonds-sdk'
 import {
   executeTxSimple,
@@ -90,6 +91,10 @@ describe('Show command using CLI', () => {
           paused: false,
           reserved: [479],
         },
+        bondsWithdrawerAuthority: bondsWithdrawerAuthority(
+          configPubkey,
+          program.programId
+        )[0].toBase58(),
       }),
     })
 
@@ -132,6 +137,10 @@ describe('Show command using CLI', () => {
             paused: false,
             reserved: [479],
           },
+          bondsWithdrawerAuthority: bondsWithdrawerAuthority(
+            configPubkey,
+            program.programId
+          )[0].toBase58(),
         },
       ]),
     })
@@ -198,6 +207,10 @@ describe('Show command using CLI', () => {
             paused: false,
             reserved: [479],
           },
+          bondsWithdrawerAuthority: bondsWithdrawerAuthority(
+            configPubkey,
+            program.programId
+          )[0].toBase58(),
         },
       ]),
     })
