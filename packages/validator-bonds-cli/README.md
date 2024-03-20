@@ -10,16 +10,13 @@ To install the CLI as global npm package
 
 See
 
-```bash
-npm i -g @marinade.finance/validator-bonds-cli
-validator-bonds --help
+```sh
+npm i -g @marinade.finance/validator-bonds-cli@latest
 ```
 
 Successful installation will be shown in similar fashion to this output
 
 ```
-npm i -g @marinade.finance/validator-bonds-cli
-
 added 165 packages in 35s
 
 17 packages are looking for funding
@@ -28,6 +25,12 @@ added 165 packages in 35s
 # to verify installed version
 validator-bonds --version
 1.2.0
+```
+
+To get info on available commands
+
+```sh
+validator-bonds --help
 ```
 
 ### Creating a bond
