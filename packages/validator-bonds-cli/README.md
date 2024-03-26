@@ -388,4 +388,13 @@ Commands:
   CLI shows error `the bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)`
   is caused by system configuration requirements from `@solana/web3.js` (details at https://solana.stackexchange.com/questions/4077/bigint-failed-to-load-bindings-pure-js-will-be-used-try-npm-run-rebuild-whe). No functionality issues with this error.
 
-  **Solution:** All works fine, nothing needed.
+  **Solution:**
+
+  All works fine.
+
+  To get rid of the warning, one can install packages `build-essential python3` and reinstall the cli package.
+  Relevant for Ubuntu/Debian systems, for other OS search appropriate packages on your own.
+  ```
+  apt-get install build-essential python3
+  npm i -g @marinade.finance/validator-bonds-cli@latest
+  ```

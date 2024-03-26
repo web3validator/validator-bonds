@@ -92,10 +92,6 @@ importers:
         version: 2.4.1(@jest/globals@29.7.0)(@solana/web3.js@1.91.1)(bn.js@5.2.1)(jest-shell-matchers@1.0.2)
 
   packages/validator-bonds-sdk:
-    dependencies:
-      crypto-js:
-        specifier: ^4.2.0
-        version: 4.2.0
     devDependencies:
       '@coral-xyz/anchor':
         specifier: ^0.29.0
@@ -145,6 +141,9 @@ importers:
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
+      crypto-js:
+        specifier: ^4.2.0
+        version: 4.2.0
       jsbi:
         specifier: ^4.3.0
         version: 4.3.0
@@ -2326,7 +2325,7 @@ packages:
 
   /crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
-    dev: false
+    dev: true
 
   /dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
