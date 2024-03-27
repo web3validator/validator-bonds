@@ -288,7 +288,7 @@ validator-bonds -um configure-bond \
   <bond-account-address>
 ```
 
-The support for ledger came from (`@marinade.finance/ledger-utils` TS implementation wrapper)[https://github.com/marinade-finance/marinade-ts-cli/tree/main/packages/lib/ledger-utils] around `@ledgerhq/hw-app-solana`. The implementation tries to be compatible with way how (`solana` CLI)[https://github.com/solana-labs/solana/blob/v1.14.19/clap-utils/src/keypair.rs#L613] behaves.
+The support for ledger came from [`@marinade.finance/ledger-utils` TS implementation wrapper](https://github.com/marinade-finance/marinade-ts-cli/tree/main/packages/lib/ledger-utils) around `@ledgerhq/hw-app-solana`. The implementation tries to be compatible with way how [`solana` CLI](https://github.com/solana-labs/solana/blob/v1.14.19/clap-utils/src/keypair.rs#L613) behaves.
 
 
 
