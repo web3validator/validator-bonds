@@ -4459,6 +4459,7 @@ dependencies = [
  "merkle-tree",
  "serde",
  "serde_json",
+ "serde_yaml 0.8.26",
  "snapshot-parser",
  "solana-sdk",
  "tokio",

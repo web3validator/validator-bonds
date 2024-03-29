@@ -1,14 +1,16 @@
 #![allow(clippy::type_complexity)]
+use crate::{
+    protected_events::ProtectedEvent,
+    settlement_config::{build_protected_event_matcher, SettlementConfig},
+    stake_meta_index::StakeMetaIndex,
+};
+use log::info;
 use solana_sdk::pubkey::Pubkey;
-use std::collections::HashSet;
-
-use snapshot_parser::stake_meta::StakeMeta;
 
 use {
-    crate::protected_events::InsuredEventCollection,
+    crate::protected_events::ProtectedEventCollection,
     merkle_tree::serde_serialize::{map_pubkey_string_conversion, pubkey_string_conversion},
     serde::{Deserialize, Serialize},
-    snapshot_parser::stake_meta::StakeMetaCollection,
     std::collections::HashMap,
 };
 
@@ -18,98 +20,150 @@ pub struct SettlementClaim {
     pub withdraw_authority: Pubkey,
     #[serde(with = "pubkey_string_conversion")]
     pub stake_authority: Pubkey,
-    #[serde(with = "pubkey_string_conversion")]
-    pub vote_account: Pubkey,
     #[serde(with = "map_pubkey_string_conversion")]
     pub stake_accounts: HashMap<Pubkey, u64>,
-    pub stake: u64,
-    pub claim: u64,
+    pub active_stake: u64,
+    pub claim_amount: u64,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
-pub struct SettlementClaimCollection {
-    pub epoch: u64,
-    pub slot: u64,
+pub enum SettlementReason {
+    ProtectedEvent(ProtectedEvent),
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub enum SettlementFunder {
+    ValidatorBond,
+    Marinade,
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct SettlementMeta {
+    funder: SettlementFunder,
+}
+
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct Settlement {
+    pub reason: SettlementReason,
+    pub meta: SettlementMeta,
+    #[serde(with = "pubkey_string_conversion")]
+    pub vote_account: Pubkey,
+    pub claims_count: usize,
+    pub claims_amount: u64,
     pub claims: Vec<SettlementClaim>,
 }
 
-pub fn stake_authorities_filter(whitelist: HashSet<Pubkey>) -> Box<dyn Fn(&StakeMeta) -> bool> {
-    Box::new(move |s| whitelist.contains(&s.stake_authority))
+#[derive(Clone, Deserialize, Serialize, Debug)]
+pub struct SettlementCollection {
+    pub slot: u64,
+    pub epoch: u64,
+    pub settlements: Vec<Settlement>,
 }
 
-fn no_filter() -> Box<dyn Fn(&StakeMeta) -> bool> {
-    Box::new(|_| true)
-}
-
-pub fn generate_settlement_claim_collection(
-    stake_meta_collection: StakeMetaCollection,
-    protected_event_collection: InsuredEventCollection,
-    stake_meta_filter: Option<Box<dyn Fn(&StakeMeta) -> bool>>,
-) -> SettlementClaimCollection {
+pub fn generate_settlements(
+    stake_meta_index: &StakeMetaIndex,
+    protected_event_collection: &ProtectedEventCollection,
+    stake_authority_filter: &Box<dyn Fn(&Pubkey) -> bool>,
+    settlement_config: &SettlementConfig,
+) -> Vec<Settlement> {
+    info!("Generating settlement claim collection {settlement_config:?}...");
     assert_eq!(
-        stake_meta_collection.epoch,
-        protected_event_collection.epoch
+        stake_meta_index.stake_meta_collection.epoch, protected_event_collection.epoch,
+        "Protected event collection epoch must be same as stake meta collection epoch"
     );
-    assert_eq!(stake_meta_collection.slot, protected_event_collection.slot);
+    assert_eq!(
+        stake_meta_index.stake_meta_collection.slot,
+        protected_event_collection.slot
+    );
 
-    let stake_meta_filter = stake_meta_filter.unwrap_or_else(|| no_filter());
+    let protected_event_matcher = build_protected_event_matcher(&settlement_config);
+    let matching_protected_events = protected_event_collection
+        .events
+        .iter()
+        .filter(|event| protected_event_matcher(event));
 
-    let filtered_stake_meta_iter = stake_meta_collection
-        .stake_metas
-        .into_iter()
-        .filter(stake_meta_filter);
+    let mut settlement_claim_collections = vec![];
 
-    let mut grouped_stake_meta: HashMap<(Pubkey, Pubkey, Pubkey), Vec<StakeMeta>> =
-        Default::default();
-    for stake_meta in filtered_stake_meta_iter {
-        if stake_meta.active_delegation_lamports == 0 {
-            continue;
-        }
-        if let Some(validator) = &stake_meta.validator {
-            grouped_stake_meta
-                .entry((
-                    *validator,
-                    stake_meta.withdraw_authority,
-                    stake_meta.stake_authority,
-                ))
-                .or_default()
-                .push(stake_meta);
-        }
-    }
+    for protected_event in matching_protected_events {
+        if let Some(grouped_stake_metas) =
+            stake_meta_index.iter_grouped_stake_metas(protected_event.vote_account())
+        {
+            let mut claims = vec![];
+            let mut claims_amount = 0;
+            for ((withdraw_authority, stake_authority), stake_metas) in grouped_stake_metas {
+                if !stake_authority_filter(&stake_authority) {
+                    continue;
+                }
 
-    let claims = grouped_stake_meta
-        .into_iter()
-        .flat_map(
-            |((vote_account, withdraw_authority, stake_authority), stake_metas)| {
-                let stake_accounts = stake_metas
+                let stake_accounts: HashMap<_, _> = stake_metas
                     .iter()
                     .map(|s| (s.pubkey, s.active_delegation_lamports))
                     .collect();
+                let active_stake = stake_accounts.values().sum();
 
-                let stake: u64 = stake_metas
-                    .iter()
-                    .map(|s| s.active_delegation_lamports)
-                    .sum();
+                let claim_amount = protected_event.claim_amount_in_loss_range(
+                    settlement_config.covered_range_bps(),
+                    active_stake,
+                );
 
-                let claim: Option<u64> = protected_event_collection
-                    .events_by_validator(&vote_account)
-                    .map(|events| events.iter().map(|e| e.claim_amount(stake)).sum());
+                if active_stake > 0 && claim_amount > 0 {
+                    claims.push(SettlementClaim {
+                        withdraw_authority: **withdraw_authority,
+                        stake_authority: **stake_authority,
+                        stake_accounts,
+                        active_stake,
+                        claim_amount,
+                    });
+                    claims_amount += claim_amount;
+                }
+            }
 
-                claim.map(|claim| SettlementClaim {
-                    withdraw_authority,
-                    stake_authority,
-                    vote_account,
-                    stake_accounts,
-                    stake,
-                    claim,
-                })
-            },
-        )
+            if claims_amount >= settlement_config.min_settlement_lamports() {
+                settlement_claim_collections.push(Settlement {
+                    reason: SettlementReason::ProtectedEvent(protected_event.clone()),
+                    meta: settlement_config.meta().clone(),
+                    vote_account: *protected_event.vote_account(),
+                    claims_count: claims.len(),
+                    claims_amount,
+                    claims,
+                });
+            }
+        }
+    }
+    settlement_claim_collections
+}
+
+pub fn generate_settlement_collection(
+    stake_meta_index: &StakeMetaIndex,
+    protected_event_collection: &ProtectedEventCollection,
+    stake_authority_filter: &Box<dyn Fn(&Pubkey) -> bool>,
+    settlement_configs: &Vec<SettlementConfig>,
+) -> SettlementCollection {
+    assert_eq!(
+        stake_meta_index.stake_meta_collection.epoch, protected_event_collection.epoch,
+        "Protected event collection epoch must be same as stake meta collection epoch"
+    );
+    assert_eq!(
+        stake_meta_index.stake_meta_collection.slot,
+        protected_event_collection.slot
+    );
+
+    let settlements: Vec<_> = settlement_configs
+        .iter()
+        .map(|settlement_config| {
+            generate_settlements(
+                &stake_meta_index,
+                &protected_event_collection,
+                &stake_authority_filter,
+                settlement_config,
+            )
+        })
+        .flatten()
         .collect();
 
-    SettlementClaimCollection {
-        epoch: protected_event_collection.epoch,
-        slot: protected_event_collection.slot,
-        claims,
+    SettlementCollection {
+        slot: stake_meta_index.stake_meta_collection.slot,
+        epoch: stake_meta_index.stake_meta_collection.epoch,
+        settlements,
     }
 }

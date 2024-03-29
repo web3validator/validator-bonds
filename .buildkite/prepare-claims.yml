@@ -49,7 +49,7 @@ steps:
 
   - wait: ~
 
-  - label: ":scales: Evaluate Marinade Insured Events"
+  - label: ":scales: Evaluate Marinade Protected Events"
     env:
       WHITELIST_STAKE_AUTHORITY: stWirqFCf2Uts1JBL1Jsd3r6VBWhgnpdPxCTe1MFjrq,4bZ6o3eUUNXhKuqjdCnCoPAoLgWiuLYixKaxoa8PpiKk,ex9CfkBZZd6Nv9XdnoDmmB45ymbu4arXVk7g5pWnt3N
     commands:
@@ -60,24 +60,18 @@ steps:
       ./target/release/settlement-engine-cli \
         --validator-meta-collection "$$snapshot_dir/validators.json" \
         --stake-meta-collection "$$snapshot_dir/stakes.json" \
-        --output-protected-event-collection "$$snapshot_dir/events.json" \
-        --output-settlement-claim-collection "$$snapshot_dir/claims.json" \
-        --output-merkle-tree-collection "$$snapshot_dir/claims_merkle.json" \
-        --low-rewards-threshold-pct 0.9
+        --output-protected-event-collection "$$snapshot_dir/protected-events.json" \
+        --output-settlement-collection "$$snapshot_dir/settlements.json" \
+        --output-merkle-tree-collection "$$snapshot_dir/settlement-merkle-trees.json" \
+        --settlement-config settlement-config.yaml
+# --past-validator-meta-collection $$snapshot_dir/past-validators.json \
 
-  - label: ":scales: Evaluate All Insured Events"
+  - wait: ~
+
+  - label: ":📓: Generating report"
     commands:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
-    - 'buildkite-agent artifact download --include-retried-jobs target/release/settlement-engine-cli .'
-    - 'chmod +x target/release/settlement-engine-cli'
-    - |
-      ./target/release/settlement-engine-cli \
-        --validator-meta-collection "$$snapshot_dir/validators.json" \
-        --stake-meta-collection "$$snapshot_dir/stakes.json" \
-        --output-protected-event-collection "$$snapshot_dir/events_all.json" \
-        --output-settlement-claim-collection "$$snapshot_dir/claims_all.json" \
-        --output-merkle-tree-collection "$$snapshot_dir/claims_merkle_all.json" \
-        --low-rewards-threshold-pct 0.9
+    - ./scripts/generate-discord-public-report.bash "$$snapshot_dir/settlements.json" > "$$snapshot_dir/discord-public-report.txt"
 
   - wait: ~
 
@@ -89,11 +83,10 @@ steps:
     - 'epoch=$(buildkite-agent meta-data get epoch)'
     - 'gcloud storage cp "$$snapshot_dir/validators.json" "$$gs_bucket/$$epoch/"'
     - 'gcloud storage cp "$$snapshot_dir/stakes.json" "$$gs_bucket/$$epoch/"'
-    - 'gcloud storage cp "$$snapshot_dir/claims.json" "$$gs_bucket/$$epoch/"'
-    - 'gcloud storage cp "$$snapshot_dir/claims_merkle.json" "$$gs_bucket/$$epoch/"'
-    - 'gcloud storage cp "$$snapshot_dir/events_all.json" "$$gs_bucket/$$epoch/"'
-    - 'gcloud storage cp "$$snapshot_dir/claims_all.json" "$$gs_bucket/$$epoch/"'
-    - 'gcloud storage cp "$$snapshot_dir/claims_merkle_all.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/protected-events.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/settlements.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/settlement-merkle-trees.json" "$$gs_bucket/$$epoch/"'
+    - 'gcloud storage cp "$$snapshot_dir/discord-public-report.txt" "$$gs_bucket/$$epoch/"'
 
   - wait: ~
 
@@ -110,6 +103,23 @@ steps:
           }
         ]
       }'
+
+  - label: ":mega: PSR feed"
+    commands:
+    - |
+      snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)
+      report=$(cat "$$snapshot_dir/discord-public-report.txt")
+      curl "$$DISCORD_WEBHOOK_PSR_FEED" -H "Content-Type: application/json" -d '{
+        "content": "```\n'"$$report"'```",
+        "embeds": null,
+        "attachments": []
+      }'
+
+  - label: "🗑️ Cleanup"
+    commands:
+    - 'snapshot_dir=${SNAPSHOT_DIR:-$(buildkite-agent meta-data get snapshot_dir)}'
+    - 'echo "Snapshot dir: $$snapshot_dir"'
+    - 'rm -r "$$snapshot_dir"'
 
   - command: echo "End of concurrency gate <--"
     concurrency_group: 'validator-bonds/prepare-claims'
