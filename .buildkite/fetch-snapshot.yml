@@ -63,6 +63,7 @@ steps:
           label: ":rocket: Trigger: Prepare claims ($$snapshot_dir)"
           async: false
           build:
+            branch: $$BUILDKITE_BRANCH
             env:
               SNAPSHOT_DIR: $$snapshot_dir
       EOF
