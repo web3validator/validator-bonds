@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 settlement_collection_file="$1"
 
 if [[ -z $settlement_collection_file ]]
