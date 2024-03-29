@@ -55,7 +55,7 @@ steps:
     commands:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - 'epoch=$(buildkite-agent meta-data get epoch)'
-    - 'previous_epoch=$$(epoch - 1)'
+    - 'previous_epoch=$((epoch - 1))'
     - 'gcloud storage cp "$$gs_bucket/$$previous_epoch/validators.json" "$$snapshot_dir/past-validators.json" || echo "Previous validator data not available!"'
 
   - label: ":scales: Evaluate Marinade Protected Events"
