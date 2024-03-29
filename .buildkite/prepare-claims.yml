@@ -67,7 +67,7 @@ steps:
     - 'chmod +x target/release/settlement-engine-cli'
     - 'past_validators_arg=$( [[ -f $$snapshot_dir/past-validators.json ]] && echo "--past-validator-meta-collection $$snapshot_dir/past-validators.json" )'
     - |
-      ./target/release/settlement-engine-cli $past_validators_arg \
+      ./target/release/settlement-engine-cli $$past_validators_arg \
         --validator-meta-collection "$$snapshot_dir/validators.json" \
         --stake-meta-collection "$$snapshot_dir/stakes.json" \
         --output-protected-event-collection "$$snapshot_dir/protected-events.json" \
