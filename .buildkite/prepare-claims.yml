@@ -49,6 +49,15 @@ steps:
 
   - wait: ~
 
+  - label: ":floppy_disk: :arrow_left: :cloud: Fetch past validator data"
+    env:
+      gs_bucket: gs://marinade-validator-bonds-mainnet
+    commands:
+    - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
+    - 'epoch=$(buildkite-agent meta-data get epoch)'
+    - 'previous_epoch=$$(epoch - 1)'
+    - 'gcloud storage cp "$$gs_bucket/$$previous_epoch/validators.json" "$$snapshot_dir/past-validators.json" || echo "Previous validator data not available!"'
+
   - label: ":scales: Evaluate Marinade Protected Events"
     env:
       WHITELIST_STAKE_AUTHORITY: stWirqFCf2Uts1JBL1Jsd3r6VBWhgnpdPxCTe1MFjrq,4bZ6o3eUUNXhKuqjdCnCoPAoLgWiuLYixKaxoa8PpiKk,ex9CfkBZZd6Nv9XdnoDmmB45ymbu4arXVk7g5pWnt3N
@@ -56,15 +65,15 @@ steps:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - 'buildkite-agent artifact download --include-retried-jobs target/release/settlement-engine-cli .'
     - 'chmod +x target/release/settlement-engine-cli'
+    - 'past_validators_arg=$( [[ -f $$snapshot_dir/past-validators.json ]] && echo "--past-validator-meta-collection $$snapshot_dir/past-validators.json" )'
     - |
-      ./target/release/settlement-engine-cli \
+      ./target/release/settlement-engine-cli $past_validators_arg \
         --validator-meta-collection "$$snapshot_dir/validators.json" \
         --stake-meta-collection "$$snapshot_dir/stakes.json" \
         --output-protected-event-collection "$$snapshot_dir/protected-events.json" \
         --output-settlement-collection "$$snapshot_dir/settlements.json" \
         --output-merkle-tree-collection "$$snapshot_dir/settlement-merkle-trees.json" \
         --settlement-config settlement-config.yaml
-# --past-validator-meta-collection $$snapshot_dir/past-validators.json \
 
   - wait: ~
 
@@ -81,6 +90,7 @@ steps:
     commands:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - 'epoch=$(buildkite-agent meta-data get epoch)'
+    - 'gcloud storage cp "$$snapshot_dir/past-validators.json" "$$gs_bucket/$$epoch/" || echo "Previous validator data not available!"''
     - 'gcloud storage cp "$$snapshot_dir/validators.json" "$$gs_bucket/$$epoch/"'
     - 'gcloud storage cp "$$snapshot_dir/stakes.json" "$$gs_bucket/$$epoch/"'
     - 'gcloud storage cp "$$snapshot_dir/protected-events.json" "$$gs_bucket/$$epoch/"'
