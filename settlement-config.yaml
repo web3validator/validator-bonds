@@ -1,0 +1,24 @@
+---
+- LowCreditsSettlement:
+    meta:
+      funder: ValidatorBond
+    min_settlement_lamports: 100000000
+    grace_low_credits_bps: 100 # 1 %
+    covered_range_bps: [0, 2000] # 0 % - 20 %
+- LowCreditsSettlement:
+    meta:
+      funder: Marinade
+    min_settlement_lamports: 100000000
+    covered_range_bps: [2000, 10000] # 20 % - 100 %
+- CommissionIncreaseSettlement:
+    meta:
+      funder: ValidatorBond
+    min_settlement_lamports: 100000000
+    grace_commission_increase: 1 # 1 pct. point
+    covered_range_bps: [0, 2000] # 0 % - 20 %
+- CommissionIncreaseSettlement:
+    meta:
+      funder: Marinade
+    min_settlement_lamports: 100000000
+    grace_commission_increase: 1 # 1 pct. point
+    covered_range_bps: [2000, 10000] # 20 % - 100 %
