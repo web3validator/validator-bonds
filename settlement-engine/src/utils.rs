@@ -32,13 +32,13 @@ pub fn read_from_yaml_file<T: DeserializeOwned>(in_path: &str) -> anyhow::Result
 }
 
 pub fn write_to_yaml_file<T: Serialize>(data: &T, out_path: &str) -> anyhow::Result<()> {
-  let file = File::create(out_path)?;
-  let mut writer = BufWriter::new(file);
-  let json = serde_yaml::to_string(data)?;
-  writer.write_all(json.as_bytes())?;
-  writer.flush()?;
+    let file = File::create(out_path)?;
+    let mut writer = BufWriter::new(file);
+    let json = serde_yaml::to_string(data)?;
+    writer.write_all(json.as_bytes())?;
+    writer.flush()?;
 
-  Ok(())
+    Ok(())
 }
 
 pub fn bps(value: u64, max: u64) -> u64 {
@@ -46,6 +46,6 @@ pub fn bps(value: u64, max: u64) -> u64 {
     10000 * value / max
 }
 
-pub fn bps_to_fraction (value: u64) -> f64 {
-  value as f64 / 10000.0
+pub fn bps_to_fraction(value: u64) -> f64 {
+    value as f64 / 10000.0
 }
