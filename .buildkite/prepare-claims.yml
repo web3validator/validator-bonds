@@ -90,7 +90,7 @@ steps:
     commands:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - 'epoch=$(buildkite-agent meta-data get epoch)'
-    - 'gcloud storage cp "$$snapshot_dir/past-validators.json" "$$gs_bucket/$$epoch/" || echo "Previous validator data not available!"''
+    - 'gcloud storage cp "$$snapshot_dir/past-validators.json" "$$gs_bucket/$$epoch/" || echo "Previous validator data not available!"'
     - 'gcloud storage cp "$$snapshot_dir/validators.json" "$$gs_bucket/$$epoch/"'
     - 'gcloud storage cp "$$snapshot_dir/stakes.json" "$$gs_bucket/$$epoch/"'
     - 'gcloud storage cp "$$snapshot_dir/protected-events.json" "$$gs_bucket/$$epoch/"'
