@@ -77,7 +77,7 @@ steps:
 
   - wait: ~
 
-  - label: ":📓: Generating report"
+  - label: "📓 Generating report"
     commands:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - './scripts/generate-discord-public-report.bash "$$snapshot_dir/settlements.json" > "$$snapshot_dir/discord-public-report.txt"'
