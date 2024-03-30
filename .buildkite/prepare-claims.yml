@@ -125,6 +125,8 @@ steps:
         "attachments": []
       }'
 
+  - wait: ~
+
   - label: "🗑️ Cleanup"
     commands:
     - 'snapshot_dir=${SNAPSHOT_DIR:-$(buildkite-agent meta-data get snapshot_dir)}'
