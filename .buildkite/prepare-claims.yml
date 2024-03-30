@@ -129,6 +129,8 @@ steps:
     - 'echo "Snapshot dir: $$snapshot_dir"'
     - 'rm -r "$$snapshot_dir"'
 
+  - wait: ~
+
   - command: echo "End of concurrency gate <--"
     concurrency_group: 'validator-bonds/prepare-claims'
     concurrency: 1
