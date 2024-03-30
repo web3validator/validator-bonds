@@ -65,7 +65,7 @@ steps:
     - 'snapshot_dir=$(buildkite-agent meta-data get snapshot_dir)'
     - 'buildkite-agent artifact download --include-retried-jobs target/release/settlement-engine-cli .'
     - 'chmod +x target/release/settlement-engine-cli'
-    - 'past_validators_arg=$( [[ -f $$snapshot_dir/past-validators.json ]] && echo "--past-validator-meta-collection $$snapshot_dir/past-validators.json" )'
+    - 'past_validators_arg=$( [[ -f $$snapshot_dir/past-validators.json ]] && echo "--past-validator-meta-collection $$snapshot_dir/past-validators.json" || echo "" )'
     - |
       ./target/release/settlement-engine-cli $$past_validators_arg \
         --validator-meta-collection "$$snapshot_dir/validators.json" \
