@@ -53,11 +53,11 @@ do
     funder=$(<<<"$settlement" jq '.meta.funder' -r)
     case $funder in
         Marinade)
-          funder_info="(settlement funded by Marinade DAO)"
+          funder_info="(funded by Marinade DAO)"
           ;;
 
         ValidatorBond)
-          funder_info="(settlement funded by the validator)"
+          funder_info="(funded by the validator)"
           ;;
 
         *)
@@ -68,5 +68,5 @@ do
 
     
 
-    echo -e "$vote_account\tsettlement: ☉$claims_amount\t$reason\t$funder_info"
+    echo -e "$vote_account\t☉$claims_amount\t$reason\t$funder_info"
 done < <(<"$settlement_collection_file" jq '.settlements | sort_by((.reason.ProtectedEvent | to_entries[0].value.actual_epr), (-.claims_amount)) | .[]' -c)
