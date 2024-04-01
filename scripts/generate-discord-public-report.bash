@@ -17,12 +17,14 @@ then
     exit
 fi
 
-echo "Total settlements in epoch $epoch: ☉$(<"$settlement_collection_file" jq '[.settlements[].claims_amount / 1e9] | add')"
+decimal_format="%0.9f"
+
+echo "Total settlements in epoch $epoch: ☉$(<"$settlement_collection_file" jq '[.settlements[].claims_amount / 1e9] | add' | xargs printf $decimal_format)"
 echo
 while read -r settlement
 do
     vote_account=$(<<<"$settlement" jq '.vote_account' -r)
-    claims_amount=$(<<<"$settlement" jq '.claims_amount / 1e9' -r)
+    claims_amount=$(<<<"$settlement" jq '.claims_amount / 1e9' -r | xargs printf $decimal_format)
     reason_code=$(<<<"$settlement" jq '.reason | keys[0]' -r)
 
     if ! [[ $reason_code == "ProtectedEvent" ]]
@@ -68,5 +70,5 @@ do
 
     
 
-    echo -e "$vote_account\t☉$claims_amount\t$reason\t$funder_info"
+    echo -e "$(printf "%44s" "$vote_account")\t$(printf "%15s" "☉$claims_amount")\t$(printf "%24s" "$reason")\t$funder_info"
 done < <(<"$settlement_collection_file" jq '.settlements | sort_by((.reason.ProtectedEvent | to_entries[0].value.actual_epr), (-.claims_amount)) | .[]' -c)
