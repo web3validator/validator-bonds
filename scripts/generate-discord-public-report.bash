@@ -19,8 +19,15 @@ fi
 
 decimal_format="%0.9f"
 
+function fmt_human_number {
+    numfmt --to si $@
+}
+export -f fmt_human_number
+
 echo "Total settlements in epoch $epoch: ☉$(<"$settlement_collection_file" jq '[.settlements[].claims_amount / 1e9] | add' | xargs printf $decimal_format)"
 echo
+echo "                                vote account    settlement                   reason   stake     funded by"
+echo "--------------------------------------------+-------------+------------------------+-------+-------------"
 while read -r settlement
 do
     vote_account=$(<<<"$settlement" jq '.vote_account' -r)
@@ -40,10 +47,12 @@ do
           actual_credits=$(<<<"$protected_event_attributes" jq '.actual_credits')
           expected_credits=$(<<<"$protected_event_attributes" jq '.expected_credits')
           reason="Uptime $(bc <<<"scale=2; 100 * $actual_credits / $expected_credits")%"
+          stake=$(<<<"$protected_event_attributes" jq '.stake' | xargs -I{} bash -c 'fmt_human_number "$@"' _ {})
           ;;
 
         CommissionIncrease)
           reason="Commission $(<<<"$protected_event_attributes" jq '.previous_commission')% -> $(<<<"$protected_event_attributes" jq '.current_commission')%"
+          stake=$(<<<"$protected_event_attributes" jq '.stake' | xargs -I{} bash -c 'fmt_human_number "$@"' _ {})
           ;;
 
         *)
@@ -55,11 +64,11 @@ do
     funder=$(<<<"$settlement" jq '.meta.funder' -r)
     case $funder in
         Marinade)
-          funder_info="(funded by Marinade DAO)"
+          funder_info="Marinade DAO"
           ;;
 
         ValidatorBond)
-          funder_info="(funded by the validator)"
+          funder_info="Validator"
           ;;
 
         *)
@@ -70,5 +79,5 @@ do
 
     
 
-    echo -e "$(printf "%44s" "$vote_account")\t$(printf "%15s" "☉$claims_amount")\t$(printf "%24s" "$reason")\t$funder_info"
+    echo -e "$(printf "%44s" "$vote_account") $(printf "%15s" "☉$claims_amount") $(printf "%24s" "$reason") $(printf "%9s" "☉$stake") $(printf "%13s" "$funder_info")"
 done < <(<"$settlement_collection_file" jq '.settlements | sort_by((.reason.ProtectedEvent | to_entries[0].value.actual_epr), (-.claims_amount)) | .[]' -c)
