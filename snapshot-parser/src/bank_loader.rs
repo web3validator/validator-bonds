@@ -46,7 +46,7 @@ pub fn create_bank_from_ledger(ledger_path: &Path) -> anyhow::Result<Arc<Bank>> 
     info!("Blockstore loaded.");
 
     let drive_dir = PathBuf::from(ledger_path).join("drive1");
-    fs::create_dir(&drive_dir).unwrap();
+    fs::create_dir_all(&drive_dir).unwrap();
 
     let (bank_forks, _, _) = bank_forks_utils::load_bank_forks(
         &genesis_config,
