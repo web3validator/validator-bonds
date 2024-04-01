@@ -1,10 +1,14 @@
 use {
     log::info,
-    solana_accounts_db::hardened_unpack::{open_genesis_config, MAX_GENESIS_ARCHIVE_UNPACKED_SIZE},
-    solana_ledger::{bank_forks_utils, blockstore_processor::ProcessOptions},
+    solana_accounts_db::{
+        accounts_db::AccountsDbConfig,
+        hardened_unpack::{open_genesis_config, MAX_GENESIS_ARCHIVE_UNPACKED_SIZE},
+    },
     solana_ledger::{
+        bank_forks_utils,
         blockstore::Blockstore,
         blockstore_options::{AccessType, BlockstoreOptions, LedgerColumnOptions},
+        blockstore_processor::ProcessOptions,
     },
     solana_runtime::{
         bank::Bank,
@@ -45,7 +49,13 @@ pub fn create_bank_from_ledger(ledger_path: &Path) -> anyhow::Result<Arc<Bank>> 
         vec![PathBuf::from(ledger_path).join(Path::new("stake-meta.accounts"))],
         None,
         Some(&snapshot_config),
-        &ProcessOptions::default(),
+        &ProcessOptions {
+            accounts_db_config: Some(AccountsDbConfig {
+                base_working_path: Some(PathBuf::from(ledger_path)),
+                ..AccountsDbConfig::default()
+            }),
+            ..ProcessOptions::default()
+        },
         None,
         None,
         None,
