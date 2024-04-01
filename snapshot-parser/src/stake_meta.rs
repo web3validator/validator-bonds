@@ -69,7 +69,7 @@ pub fn generate_stake_meta_collection(bank: &Arc<Bank>) -> anyhow::Result<StakeM
     info!("Stake history loaded.");
 
     let stake_accounts_raw =
-        bank.get_program_accounts(&solana_program::stake::program::ID, &ScanConfig::default())?;
+        bank.get_program_accounts(&solana_program::stake::program::ID, &ScanConfig::new(true))?;
     // let stake_accounts_raw = bank.get_filtered_indexed_accounts(
     //     &solana_accounts_db::accounts_index::IndexKey::ProgramId(
     //         solana_program::stake::program::ID,
