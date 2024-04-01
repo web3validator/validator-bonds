@@ -32,6 +32,7 @@ while read -r settlement
 do
     vote_account=$(<<<"$settlement" jq '.vote_account' -r)
     claims_amount=$(<<<"$settlement" jq '.claims_amount / 1e9' -r | xargs printf $decimal_format)
+    protected_stake=$(<<<"$settlement" jq '[.claims[].active_stake] | add / 1e9' -r | xargs -I{} bash -c 'fmt_human_number "$@"' _ {})
     reason_code=$(<<<"$settlement" jq '.reason | keys[0]' -r)
 
     if ! [[ $reason_code == "ProtectedEvent" ]]
@@ -47,12 +48,10 @@ do
           actual_credits=$(<<<"$protected_event_attributes" jq '.actual_credits')
           expected_credits=$(<<<"$protected_event_attributes" jq '.expected_credits')
           reason="Uptime $(bc <<<"scale=2; 100 * $actual_credits / $expected_credits")%"
-          stake=$(<<<"$protected_event_attributes" jq '.stake' | xargs -I{} bash -c 'fmt_human_number "$@"' _ {})
           ;;
 
         CommissionIncrease)
           reason="Commission $(<<<"$protected_event_attributes" jq '.previous_commission')% -> $(<<<"$protected_event_attributes" jq '.current_commission')%"
-          stake=$(<<<"$protected_event_attributes" jq '.stake' | xargs -I{} bash -c 'fmt_human_number "$@"' _ {})
           ;;
 
         *)
@@ -79,5 +78,5 @@ do
 
     
 
-    echo -e "$(printf "%44s" "$vote_account") $(printf "%15s" "☉$claims_amount") $(printf "%24s" "$reason") $(printf "%9s" "☉$stake") $(printf "%13s" "$funder_info")"
+    echo -e "$(printf "%44s" "$vote_account") $(printf "%15s" "☉$claims_amount") $(printf "%24s" "$reason") $(printf "%9s" "☉$protected_stake") $(printf "%13s" "$funder_info")"
 done < <(<"$settlement_collection_file" jq '.settlements | sort_by((.reason.ProtectedEvent | to_entries[0].value.actual_epr), (-.claims_amount)) | .[]' -c)
