@@ -24,5 +24,7 @@ done
 
 if [ -e "./package.json" ]; then
     pnpm install
+    pnpm cli --version
 fi
+
 echo "Done"

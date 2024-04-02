@@ -174,10 +174,6 @@ async function manageClaimWithdrawRequest({
   })
   signers.push(splitStakeAccount)
   tx.add(...instructions)
-  console.log(
-    'signers',
-    signers.map(s => s.publicKey.toBase58())
-  )
 
   logger.info(
     `Claiming withdraw request account ${withdrawRequestAccount.toBase58()} ` +

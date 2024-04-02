@@ -24,7 +24,7 @@ added 165 packages in 35s
 
 # to verify installed version
 validator-bonds --version
-1.2.0
+1.2.1
 ```
 
 To get info on available commands
@@ -288,7 +288,7 @@ validator-bonds -um configure-bond \
   <bond-account-address>
 ```
 
-The support for ledger came from (`@marinade.finance/ledger-utils` TS implementation wrapper)[https://github.com/marinade-finance/marinade-ts-cli/tree/main/packages/lib/ledger-utils] around `@ledgerhq/hw-app-solana`. The implementation tries to be compatible with way how (`solana` CLI)[https://github.com/solana-labs/solana/blob/v1.14.19/clap-utils/src/keypair.rs#L613] behaves.
+The support for ledger came from [`@marinade.finance/ledger-utils` TS implementation wrapper](https://github.com/marinade-finance/marinade-ts-cli/tree/main/packages/lib/ledger-utils) around `@ledgerhq/hw-app-solana`. The implementation tries to be compatible with way how [`solana` CLI](https://github.com/solana-labs/solana/blob/v1.14.19/clap-utils/src/keypair.rs#L613) behaves.
 
 
 
@@ -388,4 +388,13 @@ Commands:
   CLI shows error `the bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)`
   is caused by system configuration requirements from `@solana/web3.js` (details at https://solana.stackexchange.com/questions/4077/bigint-failed-to-load-bindings-pure-js-will-be-used-try-npm-run-rebuild-whe). No functionality issues with this error.
 
-  **Solution:** All works fine, nothing needed.
+  **Solution:**
+
+  All works fine.
+
+  To get rid of the warning, one can install packages `build-essential python3` and reinstall the cli package.
+  Relevant for Ubuntu/Debian systems, for other OS search appropriate packages on your own.
+  ```
+  apt-get install build-essential python3
+  npm i -g @marinade.finance/validator-bonds-cli@latest
+  ```
