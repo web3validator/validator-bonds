@@ -1,6 +1,7 @@
 use solana_program::pubkey::Pubkey;
 use {
     log::{error, info},
+    merkle_tree::serde_serialize::pubkey_string_conversion,
     serde::{Deserialize, Serialize},
     solana_program::stake_history::Epoch,
     solana_runtime::bank::Bank,
@@ -10,24 +11,11 @@ use {
 
 #[derive(Clone, Deserialize, Serialize, Debug, Eq, PartialEq)]
 pub struct ValidatorMeta {
+    #[serde(with = "pubkey_string_conversion")]
     pub vote_account: Pubkey,
     pub commission: u8,
     pub stake: u64,
     pub credits: u64,
-}
-
-impl ValidatorMeta {
-    pub fn estimated_stake_rewards_per_sol(
-        &self,
-        total_stake_weighted_credits: u128,
-        validator_rewards: u64,
-    ) -> f64 {
-        let rewards = (self.credits as u128 * self.stake as u128 * validator_rewards as u128)
-            / total_stake_weighted_credits;
-        let staker_rewards = rewards as f64 * (100.0 - self.commission as f64) / 100.0;
-
-        staker_rewards / self.stake as f64
-    }
 }
 
 impl Ord for ValidatorMeta {
@@ -42,7 +30,7 @@ impl PartialOrd<Self> for ValidatorMeta {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub struct ValidatorMetaCollection {
     pub epoch: Epoch,
     pub slot: u64,
@@ -65,14 +53,14 @@ impl ValidatorMetaCollection {
         self.validator_metas.iter().map(|v| v.stake).sum()
     }
 
-    pub fn expected_rewards_per_sol(&self) -> f64 {
+    pub fn expected_epr(&self) -> f64 {
         self.validator_rewards as f64 / self.total_stake() as f64
     }
 
-    pub fn expected_stake_rewards_per_sol_calculator(&self) -> impl Fn(u8) -> f64 {
-        let expected_rewards_per_sol = self.expected_rewards_per_sol();
+    pub fn expected_epr_calculator(&self) -> impl Fn(u8) -> f64 {
+        let expected_epr = self.expected_epr();
 
-        move |commission: u8| expected_rewards_per_sol * (100.0 - commission as f64) / 100.0
+        move |commission: u8| expected_epr * (100.0 - commission as f64) / 100.0
     }
 }
 
