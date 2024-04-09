@@ -23,7 +23,7 @@ security_txt! {
     policy: "https://docs.marinade.finance/marinade-protocol/security",
     preferred_languages: "en",
     source_code: "https://github.com/marinade-finance/validator-bonds",
-    auditors: "TODO",
+    auditors: "Neodyme",
     source_revision: default_env!("GIT_REV", "GIT_REV_MISSING"),
     source_release: default_env!("GIT_REV_NAME", "GIT_REV_NAME_MISSING")
 }
