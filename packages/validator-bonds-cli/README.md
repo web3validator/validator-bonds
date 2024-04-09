@@ -35,7 +35,7 @@ validator-bonds --help
 
 ### Creating a bond
 
-Any validator may create a bond account.
+A bond account can be created for any validator.
 
 The bond account is strictly coupled with a vote account.
 
@@ -184,8 +184,8 @@ The meanings of parameters are as follows:
 - `<bond-or-vote-account-address>`: bond account that will be funded by the amount of
   lamports from the stake account.
 - `--stake-account`: address of the stake account that will be assigned under the bonds program.
-- `--stake-authority`: signature of the stake account authority that permits changes to
-  stake account authorities under the Validator Bonds program.
+- `--stake-authority`: signature of the stake account authority that permits to change the
+  stake account authorities
 
 ### Withdrawing Bond Account
 
