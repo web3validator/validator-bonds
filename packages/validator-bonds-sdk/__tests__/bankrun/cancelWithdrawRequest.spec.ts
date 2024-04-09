@@ -263,7 +263,7 @@ describe('Validator Bonds cancel withdraw request', () => {
       bondAuthority
     )
     assertNotExist(provider, withdrawRequestAccount)
-    warpToNextEpoch(provider)
+    await warpToNextEpoch(provider)
     await executeInitWithdrawRequestInstruction({
       program,
       provider,

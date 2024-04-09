@@ -140,7 +140,7 @@ describe('Validator Bonds mint configure bond account', () => {
     bondData = await getBond(program, bondAccount)
     expect(bondData.authority).toEqual(user.publicKey)
 
-    warpToNextEpoch(provider)
+    await warpToNextEpoch(provider)
     await provider.sendIx([], ixMint)
     const { instruction: ixConfigure2 } =
       await configureBondWithMintInstruction({
@@ -221,7 +221,7 @@ describe('Validator Bonds mint configure bond account', () => {
       (await getVoteAccount(provider, voteAccount)).account.data.nodePubkey
     ).toEqual(validatorIdentityNew.publicKey)
 
-    warpToNextEpoch(provider)
+    await warpToNextEpoch(provider)
     try {
       await provider.sendIx([user], ixConfigure)
       throw new Error('failure expected; wrong validator identity')

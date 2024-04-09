@@ -338,7 +338,7 @@ describe('Validator Bonds claim settlement', () => {
       verifyError(e, Errors, 6035, 'has not enough lamports to cover')
     }
 
-    warpToNextEpoch(provider) // deactivate stake account
+    await warpToNextEpoch(provider) // deactivate stake account
 
     await provider.sendIx([signer(rentPayer)], instruction)
 
