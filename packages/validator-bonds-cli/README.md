@@ -117,7 +117,7 @@ When creating the bond account in a permission-ed manner (as described in [secti
 When `authority` is configure then use
 
 ```sh
-pnpm cli -um configure <bond-or-vote-account-address> \
+validator-bonds -um configure <bond-or-vote-account-address> \
   --authority <authority-or-validator-identity.keypair> \
   --bond-authority <new-bond-authority-pubkey>
 ```
@@ -127,7 +127,7 @@ pnpm cli -um configure <bond-or-vote-account-address> \
 The owner of the `validator identity` key has permission to configure the bond account. To verify the ownership of the validator identity key without requiring the CLI-generated transaction signature and sending it on-chain, one can use Bond's token minting. Use the command `mint-bond`:
 
 ```sh
-pnpm cli -um mint-bond <bond-or-vote-account-address>
+validator-bonds -um mint-bond <bond-or-vote-account-address>
 ```
 
 After execution of this command a Bond program creates a SPL token
@@ -150,81 +150,111 @@ The owner of the token signs the CLI generated transaction,
 and the Bonds program burns the Bond's SPL token, allowing configuration of the authority.
 
 ```sh
-pnpm cli -um configure <bond-or-vote-account-address> \
-  --authority <spl-token-owner.keypair> \
+validator-bonds -um configure-bond <bond-or-vote-account-address> \
+  --authority <spl-token-owner-keypair> \
   --bond-authority <new-bond-authority-pubkey> \
   --with-token
 ```
 
-
-### Funding bond account
+### Funding Bond Account
 
 The bond account exists to be funded, where the funds may be used to cover a protected event
 when a validator under-performs or experiences a serious issue.
-"Funding the bond" involves charging lamports to a stake account and
-then assigning ownership of the stake account to the Validator Bonds program using the `fund-bond` CLI command.
+"Funding the bond" consists of two steps:
 
-* The stake account **must be delegated** to the vote account belonging to the bond account.
-* The stake account **must be fully activated**.
+1. Charging lamports to a stake account.
+2. Assigning ownership of the stake account to the Validator Bonds program using
+   the `fund-bond` CLI command.
+
+The funded stake account:
+
+- **Must be delegated** to the vote account belonging to the bond account.
+- **Must be fully activated**.
 
 All lamports held in the stake accounts are considered part of the protected stake amount.
 
 ```sh
 validator-bonds -um fund-bond <bond-or-vote-account-address> \
   --stake-account <stake-account-address> \
-  --stake-authority <withdrawer-stake-account-authority>
+  --stake-authority <withdrawer-stake-account-authority-keypair>
 ```
 
-### Withdrawing bond account
+The meanings of parameters are as follows:
 
-When one does not want to participate in covering the [protected events](https://marinade.finance/blog/introducing-protected-staking-rewards/)
-she may withdraw the funds by assigning the ownership of the stake accounts
-back to the original owner.
+- `<bond-or-vote-account-address>`: bond account that will be funded by the amount of
+  lamports from the stake account.
+- `--stake-account`: address of the stake account that will be assigned under the bonds program.
+- `--stake-authority`: signature of the stake account authority that permits changes to
+  stake account authorities under the Validator Bonds program.
 
-When someone chooses not to participate in covering the [protected events](https://marinade.finance/blog/introducing-protected-staking-rewards/),
-they can withdraw the funds by transferring the ownership of the stake accounts back to the original owner.
+### Withdrawing Bond Account
 
-This process involves two steps. First, create an initial *withdraw request*, which is an on-chain ticket (an account) informing the protected event system
-about the intention to withdraw funds. Only after the lockup time elapses
-(a configuration property defined in the Bonds configuration),
-one can call to claim the *withdraw request* and regain ownership of the funds held within the stake account.
+When someone chooses to stop participating in covering the bonds for [protected events](https://marinade.finance/blog/introducing-protected-staking-rewards/),
+they can withdraw the funds by transferring the ownership of the stake accounts
+back to the (original) owner.
 
-NOTE: The amount declared in the *withdraw request* is no longer considered as part of the funded bond amount.
+This process involves two steps:
 
-To check the Bonds configuration data use `show-config` command.
-et Marinade config account address is `vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU`
-and verify the value 'withdrawLockupEpochs' to find required number of epochs to have the *withdraw request* claimable.
+1. Initialize a withdrawal request, which means creating an on-chain account (a ticket) informing the protected event system about the intention to withdraw funds.
+2. Only after the lockup time elapses (a program configuration property) can one call to claim the withdrawal request and regain ownership of the funds held within the stake account.
+
+**NOTE:** The amount declared in the withdrawal request ticket account is no longer
+          considered as part of the funded bond amount.
+
+To initialize the withdrawal request, one needs to define the maximum number of lamports
+that are requested to be withdrawn upon claiming.
+
+For claiming, one may define `--withdrawer` as the public key where the claimed
+stake accounts will be assigned (by withdrawer and staker authorities) to.
+When not defined, the default wallet keypair address is used (`~/.config/solana/id.json`)
+as the new owner of the stake accounts.
 
 ```sh
-pnpm cli -um show-config vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU
-```
-
-To initialize the *withdraw request* and later claim it,
-use the following CLI commands. Both commands require the signature of the Bond's authority.
-
-To initialize the *withdraw request*, one needs to define the maximum number of lamports that is requested to be withdrawn upon claiming.
-For claiming, one may define `--withdrawer` as the public key where the claimed stake accounts will be assigned
-(by withdrawer and staker authorities).
-
-```sh
-pnpm cli -um init-withdraw-request <bond-or-vote-account-address> \
-  --authority <bond-authority.keypair> \
+# 1) Initialize withdraw request
+validator-bonds -um init-withdraw-request <bond-or-vote-account-address> \
+  --authority <bond-authority-keypair> \
   --amount <number-of-requested-lamports-to-be-withdrawn>
 
-pnpm cli -um claim-withdraw-request <withdraw-request-or-bond-account-address> \
-  --authority <bond-authority.keypair> \
+# 2) Claim existing withdraw request
+validator-bonds -um claim-withdraw-request <withdraw-request-or-bond-account-address> \
+  --authority <bond-authority-keypair> \
   --withdrawer <user-pubkey>
 ```
 
+The meanings of parameters are as follows:
 
-The *withdraw request* can be cancelled at any time.
+- `<bond-or-vote-account-address>`: bond account from which funds will be withdrawn
+- `--stake-account`: address of the stake account that will be assigned under the bonds program
+- `--authority`: bond account authority with permission to make changes on the bond account,
+  either configured pubkey in the bonds account (see `configure-bond` above) or the validator
+  identity
+- `--amount`: amount of lamports required to be withdrawn from the bonds program
+- `--withdrawer`: new owner of the withdrawn stake accounts
 
-If the Bond owner desires to change the withdrawal amount or wishes to return the amount to be considered as funded bonds again,
-they need to cancel the existing request and potentially create a new withdrawal request later on.
+### Cancelling Withdraw Request Account
+
+The withdrawal request can be cancelled at any time.
+
+If the Bond owner desires to change the withdrawal amount or wishes to return the amount
+to be considered as funded bonds again, they need to cancel the existing request
+and potentially create a new withdrawal request later on.
 
 ```sh
-pnpm cli -um cancel-withdraw-request <withdraw-request-or-bond-account-address> \
-  --authority <bond-authority.keypair>
+validator-bonds -um cancel-withdraw-request <withdraw-request-or-bond-account-address> \
+  --authority <bond-authority-keypair>
+```
+
+### Show Validator Bonds Program Configuration
+
+To check the Validator Bonds program configuration data, use the `show-config` command.
+The Marinade config account address is `vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU`.
+
+To check the lockup period for the withdraw request ticket, verify the value of
+'withdrawLockupEpochs' to find the required number of epochs that must elapse after
+the withdrawal request is created.
+
+```sh
+validator-bonds -um show-config vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU
 ```
 
 ## Searching Bonds funded stake accounts
@@ -304,17 +334,15 @@ Options:
   -V, --version                                   output the version number
   -u, --cluster <cluster>                         solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                    alias for "-u, --cluster"
-  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the
-                                                  transaction fees and as default value for signers. (default: ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default:
+                                                  ~/.config/solana/id.json)
   --program-id <pubkey>                           Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                  Simulate (default: false)
-  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL
-                                                  Governance UI by hand. (default: false)
-  --skip-preflight                                |Transaction execution flag "skip-preflight", see
-                                                  https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
+  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
+  --skip-preflight                                |Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                       Commitment (default: "confirmed")
-  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized"
-                                                  stands for full cluster finality that takes ~8 seconds. (default: "confirmed")
+  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized" stands for full cluster finality that takes ~8 seconds.
+                                                  (default: "confirmed")
   --with-compute-unit-price <compute-unit-price>  Set compute unit price for transaction, in increments of 0.000001 lamports per compute unit. (default: 10)
   -d, --debug                                     Printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                   alias for --debug (default: false)
@@ -323,20 +351,17 @@ Options:
 Commands:
   init-config [options]                           Create a new config account.
   configure-config [options] [address]            Configure existing config account.
-  mint-bond [options] [address]                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain
-                                                  transaction. The workflow is as follows: first, use this "mint-bond" to mint a bond token to the validator identity public key.
-                                                  Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure the bond
-                                                  account.
+  mint-bond [options] [address]                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain transaction. The workflow is as follows: first, use this
+                                                  "mint-bond" to mint a bond token to the validator identity public key. Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure
+                                                  the bond account.
   init-bond [options]                             Create a new bond account.
   configure-bond [options] [address]              Configure existing bond account.
   merge-stake [options]                           Merging stake accounts belonging to validator bonds program.
   fund-bond [options] [address]                   Funding a bond account with amount of SOL within a stake account.
-  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the
-                                                  specified amount of lamports after the lockup period expires.
+  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the specified amount of lamports after the lockup period expires.
   cancel-withdraw-request [options] [address]     Cancelling the withdraw request account, which is the withdrawal request ticket, by removing the account from the chain.
-  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds
-                                                  involves transferring ownership of a funded stake account to the specified "--withdrawer" public key. To withdraw, the authority
-                                                  signature of the bond account is required, specified by the "--authority" parameter (default wallet).
+  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds involves transferring ownership of a funded stake account to the
+                                                  specified "--withdrawer" public key. To withdraw, the authority signature of the bond account is required, specified by the "--authority" parameter (default wallet).
   pause [options] [address]                       Pausing Validator Bond contract for config account
   resume [options] [address]                      Resuming Validator Bond contract for config account
   show-config [options] [address]                 Showing data of config account(s)
