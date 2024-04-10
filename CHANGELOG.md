@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## contract release v1.4.0 (2024-04-X)
+
+* address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
+* tag: [`contract-v1.4.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.4.0), commit: [`7e6d35e`](https://github.com/marinade-finance/validator-bonds/commit/7e6d35e8337174bfe6fcf2691914ac65427f6095),
+* tx: [`TODO`](https://explorer.solana.com/tx/TODO)
+* anchor verify command:
+  ```
+  git checkout 7e6d35e &&\
+  anchor verify  --provider.cluster mainnet -p validator_bonds \
+    --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.4.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
+  ```
+
+
+## TS CLI&SDK [1.2.1+1.2.2](https://github.com/marinade-finance/validator-bonds/compare/v1.2.0...v1.2.2) (2024-04-09)
+
+### Fixes
+
+* README updates
+* bumps of library dependencies
+* cli `show-config` to display bonds-withdrawer-authority calculated PDA
+
+
 ## TS CLI&SDK [1.2.0](https://github.com/marinade-finance/validator-bonds/compare/v1.1.12...v1.2.0) (2024-03-19)
 
 ### Updates
@@ -19,6 +41,7 @@ CLI and SDK aligned with contract release v1.3.0
 ### Fixes
 
 * on execution the error `Server responded with 429 Too Many Requests.  Retrying after 1000ms delay...` should not be failing the commands anymore
+
 
 ## contract release v1.3.0 (2024-03-08)
 
