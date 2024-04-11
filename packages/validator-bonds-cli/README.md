@@ -187,6 +187,26 @@ The meanings of parameters are as follows:
 - `--stake-authority`: signature of the stake account authority that permits to change the
   stake account authorities
 
+#### Bond Account initialization and funding SHOWCASE (credits to [Bored King](https://twitter.com/bape_SOL))
+
+```sh
+validator-bonds init-bond --vote-account ./vote-account.json \
+  --validator-identity ./identity.json --keypair ./identity.json
+> Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc of config vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 successfully created
+
+solana-keygen grind --starts-with bnd:1
+> bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json
+
+solana create-stake-account ./bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json 1
+
+solana delegate-stake ./bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json <Vote Pubkey>
+
+<wait for stake to activate in next epoch>
+
+validator-bonds fund-bond BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc \
+  --stake-account bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf --keypair ./identity.json
+```
+
 ### Withdrawing Bond Account
 
 When someone chooses to stop participating in covering the bonds for [protected events](https://marinade.finance/blog/introducing-protected-staking-rewards/),
