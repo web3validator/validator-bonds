@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
+## TS CLI&SDK [1.3.0](https://github.com/marinade-finance/validator-bonds/compare/v1.2.2...v1.3.0) (2024-XX-XX)
+
+### Updates
+
+CLI and SDK aligned with contract release v1.4.0
+
+### CLI Features
+
+* `cancel-settlement` command was added
+
+
 ## contract release v1.4.0 (2024-04-X)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)

@@ -117,7 +117,7 @@ When creating the bond account in a permission-ed manner (as described in [secti
 When `authority` is configure then use
 
 ```sh
-validator-bonds -um configure <bond-or-vote-account-address> \
+validator-bonds -um configure-bond <bond-or-vote-account-address> \
   --authority <authority-or-validator-identity.keypair> \
   --bond-authority <new-bond-authority-pubkey>
 ```
