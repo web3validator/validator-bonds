@@ -192,16 +192,17 @@ validator-bonds init-bond --vote-account ./vote-account.json \
 > Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc of config vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 successfully created
 
 solana-keygen grind --starts-with bnd:1
-> bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json
+> Optional: Grind is used to remind the key is for bond a bond.
+> bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json
 
-solana create-stake-account ./bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json 1
+solana create-stake-account ./bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json <Amount of SOL 1 for every 10,000 staked>
 
-solana delegate-stake ./bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf.json <Vote Pubkey>
+solana delegate-stake ./bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json <Vote Pubkey>
 
 <wait for stake to activate in next epoch>
 
 validator-bonds fund-bond BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc \
-  --stake-account bndyv7Wo8jficmCYF72fHTk2XvdiqbmNnAVRHvQuCwf --keypair ./identity.json
+  --stake-account bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba --keypair ./identity.json
 ```
 
 ### Withdrawing Bond Account
