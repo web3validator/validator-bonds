@@ -440,3 +440,27 @@ Commands:
   apt-get install build-essential python3
   npm i -g @marinade.finance/validator-bonds-cli@latest
   ```
+* **npm i -g @marinade.finance/validator-bonds-cli@latest** does not install the latest version
+
+  Regardless the command `npm i -g @marinade.finance/validator-bonds-cli@latest` should install the latest
+  CLI version on your system, the `validator-bonds --version` shows outdated version
+  that does not match with one listed at NPM registry
+  at https://www.npmjs.com/package/@marinade.finance/validator-bonds-cli
+
+  **Solution:**
+
+  Forcibly remove installed CLI nodejs package and reinstall.
+
+  ```
+  # get info on installed nodejs packages
+  npm list -g
+
+  > ~/.nvm/versions/node/v18.19.0/lib
+  > ├── @marinade.finance/validator-bonds-cli@1.1.10
+  > ├── ...
+
+  # remove marinade related
+  rm -rf ~/.nvm/versions/node/v18.19.0/lib/@marinade.finance
+  # reinstall
+  npm i -g @marinade.finance/validator-bonds-cli@latest
+  ```
