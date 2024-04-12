@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
-## TS CLI&SDK [1.3.0](https://github.com/marinade-finance/validator-bonds/compare/v1.2.2...v1.3.0) (2024-XX-XX)
+## TS CLI&SDK [1.3.0](https://github.com/marinade-finance/validator-bonds/compare/v1.2.2...v1.3.0) (2024-04-12)
 
 ### Updates
 
@@ -13,12 +13,16 @@ CLI and SDK aligned with contract release v1.4.0
 
 * `cancel-settlement` command was added
 
+### Fixes
 
-## contract release v1.4.0 (2024-04-X)
+* CLI considers solana config file when loading keypair
+
+
+## contract release v1.4.0 (2024-04-12)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
 * tag: [`contract-v1.4.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.4.0), commit: [`7e6d35e`](https://github.com/marinade-finance/validator-bonds/commit/7e6d35e8337174bfe6fcf2691914ac65427f6095),
-* tx: [`TODO`](https://explorer.solana.com/tx/TODO)
+* tx: [`BmsU9Zdjt1dPrRckvNknz9kUYQZVFKKWW91nFAoDPAWfEsuSVpZm7EQi6UD4dFJpKLXF4nGYEy6Z69c43qpApgx`](https://explorer.solana.com/tx/BmsU9Zdjt1dPrRckvNknz9kUYQZVFKKWW91nFAoDPAWfEsuSVpZm7EQi6UD4dFJpKLXF4nGYEy6Z69c43qpApgx)
 * anchor verify command:
   ```
   git checkout 7e6d35e &&\
