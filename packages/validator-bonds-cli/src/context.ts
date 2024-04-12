@@ -126,6 +126,9 @@ export function setValidatorBondsCliContext({
         commandName: command,
       })
     )
+    logger.debug(
+      `RPC url: ${clusterUrl}, keypair: ${wallet.publicKey.toBase58()}`
+    )
   } catch (e) {
     logger.debug(e)
     throw new Error(`Failed to connect Solana cluster at ${cluster}`)

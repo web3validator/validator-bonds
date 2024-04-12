@@ -6,13 +6,13 @@ import {
   configureLogger,
   parsePubkey,
   parseWalletFromOpts,
+  DEFAULT_KEYPAIR_PATH
 } from '@marinade.finance/cli-common'
 import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
 import { VALIDATOR_BONDS_PROGRAM_ID } from '@marinade.finance/validator-bonds-sdk'
 
-const DEFAULT_KEYPAIR_PATH = '~/.config/solana/id.json'
 export const logger: Logger = configureLogger()
 const program = new Command()
 
@@ -30,7 +30,7 @@ program
     '-k, --keypair <keypair-or-ledger>',
     'Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). ' +
       'Wallet keypair is used to pay for the transaction fees and as default value for signers. ' +
-      `(default: ${DEFAULT_KEYPAIR_PATH})`
+      `(default: loaded from solana config file or ${DEFAULT_KEYPAIR_PATH})`,
   )
   .option(
     '--program-id <pubkey>',
