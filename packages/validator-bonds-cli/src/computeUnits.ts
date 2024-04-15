@@ -10,7 +10,7 @@ export const CANCEL_WITHDRAW_REQUEST_LIMIT_UNITS = 27_000
 // this is the limit for the claim withdraw request + merge as it is within the same CLI command
 export const CLAIM_WITHDRAW_REQUEST_LIMIT_UNITS = 600_000
 export const CONFIGURE_BOND_LIMIT_UNITS = 24_000
-export const CONFIGURE_BOND_MINT_LIMIT_UNITS = 40_000
+export const CONFIGURE_BOND_MINT_LIMIT_UNITS = 60_000
 export const CONFIGURE_CONFIG_LIMIT_UNITS = 21_000
 export const EMERGENCY_LIMIT_UNITS = 19_000
 export const FUND_BOND_LIMIT_UNITS = 110_000
