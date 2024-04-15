@@ -19,6 +19,7 @@ const program = new Command()
 program
   .version('1.3.1')
   .allowExcessArguments(false)
+  .configureHelp({ showGlobalOptions: true })
   .option(
     '-u, --cluster <cluster>',
     'solana cluster URL or ' +
