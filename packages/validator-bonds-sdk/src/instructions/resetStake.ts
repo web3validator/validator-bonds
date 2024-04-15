@@ -35,7 +35,7 @@ export async function resetStakeInstruction({
   instruction: TransactionInstruction
 }> {
   if (voteAccount === undefined) {
-    const stakeAccountData = await getStakeAccount(program, stakeAccount)
+    const stakeAccountData = await getStakeAccount(program, stakeAccount, 0)
     if (stakeAccountData.voter === null) {
       throw new Error(
         `Cannot load vote account address from stake account ${stakeAccount.toBase58()}`

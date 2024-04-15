@@ -113,7 +113,7 @@ async function isVoteAccount({
   } catch (e) {
     // Ignore error, we will try to fetch the address as the bond account data
     logger.debug(
-      'Address is not a vote account, considering being it as a bond',
+      'Address is not a vote account, considering being it a bond',
       e
     )
   }

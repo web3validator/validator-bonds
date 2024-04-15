@@ -198,9 +198,11 @@ export async function findStakeAccountNoDataInfos({
 export async function loadStakeAccounts({
   connection,
   addresses,
+  currentEpoch,
 }: {
   connection: Provider | Connection | HasProvider
   addresses: PublicKey[] | ProgramAccountInfoNoData[]
+  currentEpoch?: number | BN
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   const innerConnection = getConnection(connection)
   if (addresses.length === 0) {
@@ -219,10 +221,14 @@ export async function loadStakeAccounts({
       return programAccountInfo(
         d.publicKey,
         d.account,
-        await parseStakeAccountData(innerConnection, {
-          publicKey: d.publicKey,
-          account: { ...d.account, data: stakeState },
-        })
+        await parseStakeAccountData(
+          innerConnection,
+          {
+            publicKey: d.publicKey,
+            account: { ...d.account, data: stakeState },
+          },
+          currentEpoch
+        )
       )
     })
   return Promise.all(accounts)
@@ -233,11 +239,13 @@ export async function findStakeAccounts({
   staker,
   withdrawer,
   voter,
+  currentEpoch,
 }: {
   connection: Provider | Connection | HasProvider
   staker?: PublicKey
   withdrawer?: PublicKey
   voter?: PublicKey
+  currentEpoch?: BN | number
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   const accountInfos = await findStakeAccountNoDataInfos({
     connection,
@@ -248,6 +256,7 @@ export async function findStakeAccounts({
   return await loadStakeAccounts({
     connection,
     addresses: accountInfos,
+    currentEpoch,
   })
 }
 

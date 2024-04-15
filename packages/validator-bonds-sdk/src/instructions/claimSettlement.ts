@@ -120,7 +120,7 @@ export async function claimSettlementInstruction({
     stakeAccountStaker === undefined ||
     stakeAccountWithdrawer === undefined
   ) {
-    const stakeAccountToData = await getStakeAccount(program, stakeAccountTo)
+    const stakeAccountToData = await getStakeAccount(program, stakeAccountTo, 0)
     if (
       stakeAccountToData.staker === null ||
       stakeAccountToData.withdrawer === null

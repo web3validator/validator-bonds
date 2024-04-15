@@ -113,6 +113,7 @@ export async function orchestrateWithdrawDeposit({
       connection: program,
       staker: bondWithdrawerAuthority,
       withdrawer: bondWithdrawerAuthority,
+      currentEpoch: 0,
     })
   )
     .sort((x, y) =>

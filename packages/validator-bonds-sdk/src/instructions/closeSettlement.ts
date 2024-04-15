@@ -129,6 +129,7 @@ export async function getCloseSettlementAccounts({
       staker: settlementAuth,
       withdrawer: bondsAuth,
       voter: voteAccount,
+      currentEpoch: 0,
     })
     if (stakeAccounts.length === 0) {
       throw new Error(

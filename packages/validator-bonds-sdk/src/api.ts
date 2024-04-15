@@ -46,8 +46,6 @@ const SETTLEMENT_CLAIM_ACCOUNT_DISCRIMINATOR = bs58.encode([
 
 const ZERO_BN = new BN(0)
 
-// TODO: CHECK about non-locked stake accounts!!!
-
 export async function getConfig(
   program: ValidatorBondsProgram,
   address: PublicKey
@@ -435,14 +433,18 @@ function parseNotLocked(
   )
 }
 
+export type RpcConfigApiCalls = { waitApiCallMs: number }
+
 export async function findConfigStakeAccounts({
   program,
   configAccount,
   withdrawer,
+  currentEpoch,
 }: {
   program: ValidatorBondsProgram
   configAccount?: PublicKey
   withdrawer?: PublicKey
+  currentEpoch?: number | BN
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   if (withdrawer === undefined && configAccount === undefined) {
     throw new Error(
@@ -453,9 +455,12 @@ export async function findConfigStakeAccounts({
     assert(configAccount !== undefined, 'configAccount is known here')
     ;[withdrawer] = bondsWithdrawerAuthority(configAccount, program.programId)
   }
+  currentEpoch =
+    currentEpoch ?? (await program.provider.connection.getEpochInfo()).epoch
   const stakeAccounts = await findStakeAccounts({
     connection: program.provider.connection,
     withdrawer,
+    currentEpoch,
   })
   // for stake accounts considered to be under the bond, we consider it cannot be locked
   return parseNotLocked(stakeAccounts)
@@ -468,6 +473,7 @@ async function findBondStakeAccountsHelper({
   voteAccount,
   withdrawer,
   staker,
+  currentEpoch,
 }: {
   program: ValidatorBondsProgram
   configAccount: PublicKey
@@ -475,6 +481,7 @@ async function findBondStakeAccountsHelper({
   voteAccount?: PublicKey
   withdrawer?: PublicKey
   staker?: PublicKey
+  currentEpoch?: number | BN
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   if (!bondAccount && voteAccount) {
     bondAccount = bondAddress(configAccount, voteAccount, program.programId)[0]
@@ -495,6 +502,7 @@ async function findBondStakeAccountsHelper({
     withdrawer,
     staker,
     voter: voteAccount,
+    currentEpoch,
   })
   // for stake accounts considered to be under the bond, we consider it cannot be locked
   return parseNotLocked(stakeAccounts)
@@ -505,6 +513,7 @@ export async function findBondStakeAccounts(args: {
   configAccount: PublicKey
   bondAccount?: PublicKey
   voteAccount?: PublicKey
+  currentEpoch?: number | BN
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   return findBondStakeAccountsHelper(args)
 }
@@ -514,6 +523,7 @@ export async function findBondNonSettlementStakeAccounts(args: {
   configAccount: PublicKey
   bondAccount?: PublicKey
   voteAccount?: PublicKey
+  currentEpoch?: number | BN
 }): Promise<ProgramAccountInfo<StakeAccountParsed>[]> {
   const [withdrawerAuthority] = bondsWithdrawerAuthority(
     args.configAccount,
