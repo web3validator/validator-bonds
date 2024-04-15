@@ -24,7 +24,7 @@ added 165 packages in 35s
 
 # to verify installed version
 validator-bonds --version
-1.3.1
+1.3.2
 ```
 
 To get info on available commands
