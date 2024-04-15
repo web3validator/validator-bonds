@@ -187,7 +187,7 @@ The meanings of parameters are as follows:
 #### Bond Account initialization and funding SHOWCASE (credits to [Bored King](https://twitter.com/bape_SOL))
 
 ```sh
-validator-bonds init-bond --vote-account ./vote-account.json \
+validator-bonds init-bond --vote-account <vote-account-address> \
   --validator-identity ./identity.json --keypair ./identity.json
 > Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc of config vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 successfully created
 
