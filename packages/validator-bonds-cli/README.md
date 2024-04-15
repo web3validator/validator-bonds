@@ -6,13 +6,12 @@ CLI for Validator Bonds contract.
 
 To install the CLI as global npm package
 
-**Requirements:** Node.js version 16 or higher.
-
-See
-
 ```sh
 npm i -g @marinade.finance/validator-bonds-cli@latest
 ```
+
+For detailed information on NPM packages installation and
+execution see section [NPM package installation](#npm-packages-installation-and-execution).
 
 Successful installation will be shown in similar fashion to this output
 
@@ -339,7 +338,69 @@ validator-bonds -um configure-bond \
 The support for ledger came from [`@marinade.finance/ledger-utils` TS implementation wrapper](https://github.com/marinade-finance/marinade-ts-cli/tree/main/packages/lib/ledger-utils) around `@ledgerhq/hw-app-solana`. The implementation tries to be compatible with way how [`solana` CLI](https://github.com/solana-labs/solana/blob/v1.14.19/clap-utils/src/keypair.rs#L613) behaves.
 
 
+## NPM packages installation and execution
 
+To verify the installation folders for NPM and to install the package globally,
+check the configuration.
+The default properties and potentially existing `.npmrc` configuration file can
+be checked with the command `npm config list`.
+
+To check where NPM packages are and will be installed:
+
+```sh
+# Get npm global installation folder
+npm list -g
+> /usr/lib
+> +-- @marinade.finance/validator-bonds-cli@1.3.2
+> ...
+# In this case, the `bin` folder is located at /usr/bin
+```
+
+To verify the configuration of paths, use:
+
+```sh
+npm config get cache
+npm config get prefix
+```
+
+If there are defined folders accessible only by the `root` account,
+configure the user workspace local configuration as follows:
+
+```sh
+npm config set cache ~/.cache/npm
+npm config set prefix ~/.local/share/npm
+```
+
+With this configuration, NPM packages will be installed under the `prefix` directory.
+
+```sh
+npm i -g @marinade.finance/validator-bonds-cli@latest
+npm list -g
+> /home/ochaloup/.local/share/npm/lib
+> `-- @marinade.finance/validator-bonds-cli@1.3.2
+```
+
+To execute the installed packages from any location,
+configure the `PATH` to place the newly defined user workspace local installation before others.
+
+```sh
+NPM_LIB=`npm list -g | head -n 1`
+export PATH=${NPM_LIB/%lib/bin}:$PATH
+```
+
+### NPM Exec From Local Directory
+
+One can use the `npm exec` command to install the NPM package into a local folder and execute it from there.
+
+```sh
+cd /tmp
+npm install @marinade.finance/validator-bonds-cli@latest
+
+# `node_modules` exists in the folder and contains the CLI and its dependencies
+ls node_modules
+# Execute from the local directory
+npm exec -- validator-bonds --version
+```
 
 ## `validator-bonds CLI Reference`
 
@@ -352,15 +413,17 @@ Options:
   -V, --version                                   output the version number
   -u, --cluster <cluster>                         solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                    alias for "-u, --cluster"
-  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default:
-                                                  ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the
+                                                  transaction fees and as default value for signers. (default: loaded from solana config file or ~/.config/solana/id.json)
   --program-id <pubkey>                           Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                  Simulate (default: false)
-  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
-  --skip-preflight                                |Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
+  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL
+                                                  Governance UI by hand. (default: false)
+  --skip-preflight                                Transaction execution flag "skip-preflight", see
+                                                  https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                       Commitment (default: "confirmed")
-  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized" stands for full cluster finality that takes ~8 seconds.
-                                                  (default: "confirmed")
+  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized"
+                                                  stands for full cluster finality that takes ~8 seconds. (default: "confirmed")
   --with-compute-unit-price <compute-unit-price>  Set compute unit price for transaction, in increments of 0.000001 lamports per compute unit. (default: 10)
   -d, --debug                                     Printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                   alias for --debug (default: false)
@@ -369,17 +432,20 @@ Options:
 Commands:
   init-config [options]                           Create a new config account.
   configure-config [options] [address]            Configure existing config account.
-  mint-bond [options] [address]                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain transaction. The workflow is as follows: first, use this
-                                                  "mint-bond" to mint a bond token to the validator identity public key. Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure
-                                                  the bond account.
+  mint-bond [options] [address]                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain
+                                                  transaction. The workflow is as follows: first, use this "mint-bond" to mint a bond token to the validator identity public key.
+                                                  Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure the bond
+                                                  account.
   init-bond [options]                             Create a new bond account.
   configure-bond [options] [address]              Configure existing bond account.
   merge-stake [options]                           Merging stake accounts belonging to validator bonds program.
   fund-bond [options] [address]                   Funding a bond account with amount of SOL within a stake account.
-  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the specified amount of lamports after the lockup period expires.
+  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the
+                                                  specified amount of lamports after the lockup period expires.
   cancel-withdraw-request [options] [address]     Cancelling the withdraw request account, which is the withdrawal request ticket, by removing the account from the chain.
-  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds involves transferring ownership of a funded stake account to the
-                                                  specified "--withdrawer" public key. To withdraw, the authority signature of the bond account is required, specified by the "--authority" parameter (default wallet).
+  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds
+                                                  involves transferring ownership of a funded stake account to the specified "--withdrawer" public key. To withdraw, the authority
+                                                  signature of the bond account is required, specified by the "--authority" parameter (default wallet).
   pause [options] [address]                       Pausing Validator Bond contract for config account
   resume [options] [address]                      Resuming Validator Bond contract for config account
   show-config [options] [address]                 Showing data of config account(s)
@@ -448,20 +514,32 @@ Commands:
   that does not match with one listed at NPM registry
   at https://www.npmjs.com/package/@marinade.finance/validator-bonds-cli
 
+  **Investigation:**
+
+  It's possible that there are two `validator-bonds` npm packages installed on your system.
+  One may be global (installed from the `root` account), and the other installed from the user workspace.
+  The `PATH` configuration may prioritize the global path installed by `root`,
+  and any package reinstallation within the user workspace may not make any change.
+
+  To investigate the state of your system, verify the global installation folder with the `npm list -g` command.
+  Then, check the location where the `validator-bonds` command is executed from with the `which` command.
+
+  ```sh
+  # Get npm global installation folder
+  npm list -g
+  > ~/.local/share/npm/lib
+  > `-- @marinade.finance/validator-bonds-cli@1.3.2
+  # In this case, the 'bin' folder is located at ~/.local/share/npm/bin
+
+  # Get validator-bonds binary folder
+  which validator-bonds
+  > /usr/bin/validator-bonds
+  ```
+
   **Solution:**
 
-  Forcibly remove installed CLI nodejs package and reinstall.
+  Apply one of the following suggestions:
 
-  ```
-  # get info on installed nodejs packages
-  npm list -g
-
-  > ~/.nvm/versions/node/v18.19.0/lib
-  > ├── @marinade.finance/validator-bonds-cli@1.1.10
-  > ├── ...
-
-  # remove marinade related
-  rm -rf ~/.nvm/versions/node/v18.19.0/lib/@marinade.finance
-  # reinstall
-  npm i -g @marinade.finance/validator-bonds-cli@latest
-  ```
+  * Remove the binary from the location reported by the `which` command, `sudo rm -f `which validator-bonds` `
+  * Change `PATH` to prioritize the `npm -g` folders, `NPM_LIB=`npm list -g | head -n 1`; export PATH=${NPM_LIB/%lib/bin}:$PATH`
+  * Use local `npm exec` execution instead of global installation (`npm i -g`), see the section [*NPM Package Installation*](#npm-packages-installation-and-execution)
