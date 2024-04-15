@@ -36,8 +36,6 @@ pnpm cli --help
 
 ![Solana Accounts used within the contract](./resources/diagram/accounts.png)
 
-// TODO: can we utilize the diagram from Notion referring to process that happens off-chain?
-
 ### Detailed description
 
 1. The `Config` account is managed by the administrator.
