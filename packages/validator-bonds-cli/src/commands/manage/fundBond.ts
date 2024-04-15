@@ -105,6 +105,7 @@ async function manageFundBond({
     wallet,
     confirmationFinality,
     confirmWaitTime,
+    skipPreflight,
   } = await setProgramIdByOwner(config)
 
   const tx = await transaction(provider)
@@ -152,6 +153,7 @@ async function manageFundBond({
     printOnly,
     confirmOpts: confirmationFinality,
     confirmWaitTime,
+    sendOpts: { skipPreflight },
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} successfully funded ` +

@@ -47,7 +47,7 @@ program
   )
   .option(
     '--skip-preflight',
-    '|Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight',
+    'Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight',
     false
   )
   .option('--commitment <commitment>', 'Commitment', 'confirmed')

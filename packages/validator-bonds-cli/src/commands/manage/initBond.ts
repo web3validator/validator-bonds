@@ -101,6 +101,7 @@ async function manageInitBond({
     wallet,
     confirmationFinality,
     confirmWaitTime,
+    skipPreflight,
   } = await setProgramIdByOwner(config)
 
   const tx = await transaction(provider)
@@ -149,6 +150,7 @@ async function manageInitBond({
     printOnly,
     confirmOpts: confirmationFinality,
     confirmWaitTime,
+    sendOpts: { skipPreflight },
   })
   logger.info(
     `Bond account ${bondAccount.toBase58()} of config ${config.toBase58()} successfully created`

@@ -125,6 +125,7 @@ async function manageClaimWithdrawRequest({
     wallet,
     confirmationFinality,
     confirmWaitTime,
+    skipPreflight,
   } = await setProgramIdByOwner(config)
 
   const tx = await transaction(provider)
@@ -191,6 +192,7 @@ async function manageClaimWithdrawRequest({
     printOnly,
     confirmOpts: confirmationFinality,
     confirmWaitTime,
+    sendOpts: { skipPreflight },
   })
   logger.info(
     `Withdraw request account ${withdrawRequestAccount.toBase58()} ` +

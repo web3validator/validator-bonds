@@ -101,6 +101,7 @@ async function manageEmergencyPauseAndResume({
     wallet,
     confirmationFinality,
     confirmWaitTime,
+    skipPreflight,
   } = await setProgramIdByOwner(address)
 
   const tx = await transaction(provider)
@@ -140,6 +141,7 @@ async function manageEmergencyPauseAndResume({
     printOnly,
     confirmOpts: confirmationFinality,
     confirmWaitTime,
+    sendOpts: { skipPreflight },
   })
   logger.info(
     `Succeeded to ${action} validator bonds config account ${address.toBase58()}`
