@@ -62,6 +62,8 @@ describe('Configure config account using CLI', () => {
           program.programId.toBase58(),
           'configure-config',
           configAccount.toBase58(),
+          '--admin-authority',
+          adminPath,
           '--confirmation-finality',
           'confirmed',
         ],

@@ -16,6 +16,7 @@ import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import {
   MARINADE_CONFIG_ADDRESS,
   configureConfigInstruction,
+  getConfig,
 } from '@marinade.finance/validator-bonds-sdk'
 import { CONFIGURE_CONFIG_LIMIT_UNITS } from '../../computeUnits'
 
@@ -144,7 +145,16 @@ async function manageConfigureConfig({
   const tx = await transaction(provider)
   const signers: (Signer | Wallet)[] = [wallet]
 
-  adminAuthority = adminAuthority ?? wallet.publicKey
+  if (adminAuthority === undefined) {
+    const configAccount = await getConfig(program, address)
+    adminAuthority = configAccount.adminAuthority
+    if (!printOnly && !adminAuthority.equals(wallet.publicKey)) {
+      throw new Error(
+        'Current wallet does not have permission to configure the config account. ' +
+          `Current admin authority: ${adminAuthority.toBase58()}`
+      )
+    }
+  }
   if (instanceOfWallet(adminAuthority)) {
     signers.push(adminAuthority)
     adminAuthority = adminAuthority.publicKey

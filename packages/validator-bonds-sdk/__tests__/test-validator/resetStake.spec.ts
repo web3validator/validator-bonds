@@ -15,7 +15,11 @@ import {
   executeInitBondInstruction,
   executeInitConfigInstruction,
 } from '../utils/testTransactions'
-import { executeTxSimple, transaction } from '@marinade.finance/web3js-common'
+import {
+  executeTxSimple,
+  transaction,
+  waitForNextEpoch,
+} from '@marinade.finance/web3js-common'
 import {
   createSettlementFundedDelegatedStake,
   createVoteAccount,
@@ -52,6 +56,10 @@ describe('Validator Bonds reset settlement stake account', () => {
   })
 
   it('reset stake', async () => {
+    // https://github.com/solana-labs/solana/blob/v1.18.11/sdk/program/src/stake/instruction.rs#L23
+    // 0x3 = TooSoonToRedelegate,
+    await waitForNextEpoch(provider.connection, 15)
+
     const fakeSettlement = Keypair.generate().publicKey
     const stakeAccount = await createSettlementFundedDelegatedStake({
       program,
