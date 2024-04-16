@@ -378,7 +378,7 @@ With this configuration, NPM packages will be installed under the `prefix` direc
 ```sh
 npm i -g @marinade.finance/validator-bonds-cli@latest
 npm list -g
-> /home/ochaloup/.local/share/npm/lib
+> ~/.local/share/npm/lib
 > `-- @marinade.finance/validator-bonds-cli@1.3.2
 ```
 
@@ -386,6 +386,7 @@ To execute the installed packages from any location,
 configure the `PATH` to place the newly defined user workspace local installation before others.
 
 ```sh
+# the nodejs binaries reside in '~/.local/share/npm/bin' for this particular case
 NPM_LIB=`npm list -g | head -n 1`
 export PATH=${NPM_LIB/%lib/bin}:$PATH
 ```
