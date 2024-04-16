@@ -32,6 +32,8 @@ To get info on available commands
 validator-bonds --help
 ```
 
+**Requirements:** Node.js version 16 or higher.
+
 ### Creating a bond
 
 A bond account can be created for any validator.
@@ -489,7 +491,7 @@ Commands:
   **Solution:** Verify if the transaction `XYX` is at blockchain with a transaction explorer,
   e.g., https://explorer.solana.com/.
   Verify with the CLI. For example when bond should be initialized (`init-bond`)
-  you can run search with CLI `validator-bonds -um show-bond --validator-vote-account <vote-account>`
+  you can run search with CLI `validator-bonds -um show-bond <bond-or-vote-account>`
   to check if account was created.
 
 * **bigint: Failed to load bindings, ...**
@@ -543,3 +545,24 @@ Commands:
   * Remove the binary from the location reported by the `which` command, `sudo rm -f `which validator-bonds` `
   * Change `PATH` to prioritize the `npm -g` folders, `NPM_LIB=`npm list -g | head -n 1`; export PATH=${NPM_LIB/%lib/bin}:$PATH`
   * Use local `npm exec` execution instead of global installation (`npm i -g`), see the section [*NPM Package Installation*](#npm-packages-installation-and-execution)
+
+* **Command yields `The RPC call or parameters have been disabled`**
+
+  The command (most probably `show-` command) finishes with an error:
+
+  ```
+  Error: 410 Gone:  {"jsonrpc":"2.0","error":{"code": 410, "message":"The RPC call or parameters have been disabled."}
+  ```
+
+  This is caused by the public RPC API endpoint https://api.mainnet-beta.solana.com
+  blocks the RPC method [getProgramAccounts](https://solana.com/docs/rpc/http/getprogramaccounts) to prevent overload.
+  When the command uses `-um` (i.e., `--url mainnet`) the public RPC API endpoint is used.
+
+  The `show-*` commands sometimes require loading and filtering multiple accounts
+  where the `getProgramAccounts` method is needed.
+
+  **Solution:**
+
+  * To retrieve printed data about one particular bond account, this error should not be seen. Use a simple call of `show-bond <vote-account>`
+  and **DO NOT** use filter arguments like `show-bond --vote-account <address>`.
+  * Use a private RPC endpoint. Most providers offer free plans that can be easily used here. `export RPC_URL=<private-rpc-http-endpoint>; show-bond -u$RPC_URL...`
