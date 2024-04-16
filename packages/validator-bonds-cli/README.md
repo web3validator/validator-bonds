@@ -545,7 +545,7 @@ Commands:
 
   * Remove the binary from the location reported by the `which` command, ``sudo rm -f `which validator-bonds` ``
   * Change `PATH` to prioritize the `npm -g` folders, ``NPM_LIB=`npm list -g | head -n 1`; export PATH=${NPM_LIB/%lib/bin}:$PATH``
-  * Use local `npm exec` execution instead of global installation (`npm i -g`), see the section [*NPM Package Installation*](#npm-packages-installation-and-execution)
+  * Use local `npm exec` execution instead of global installation, see the section [*NPM Exec From Local Directory*](#npm-exec-from-local-directory)
 
 * **Command yields `The RPC call or parameters have been disabled`**
 
