@@ -258,8 +258,8 @@ describe('Show command using CLI', () => {
       amountActive: 0,
       amountAtSettlements: 0,
       amountToWithdraw: 0,
-      amountActiveStakeAccounts: 0,
-      amountSettlementStakeAccounts: 0,
+      numberActiveStakeAccounts: 0,
+      numberSettlementStakeAccounts: 0,
       withdrawRequest: '<NOT EXISTING>',
     }
 
@@ -520,8 +520,8 @@ describe('Show command using CLI', () => {
       amountActive: 0,
       amountAtSettlements: 0,
       amountToWithdraw: 0,
-      amountActiveStakeAccounts: stakeAccountLamports.length,
-      amountSettlementStakeAccounts: 0,
+      numberActiveStakeAccounts: stakeAccountLamports.length,
+      numberSettlementStakeAccounts: 0,
       withdrawRequest: '<NOT EXISTING>',
     }
 

@@ -106,7 +106,7 @@ describe('Claim withdraw request using CLI', () => {
       bondAccounts: [bondAccount],
     })
     expect(bondsFunding.length).toEqual(1)
-    expect(bondsFunding[0].amountActiveStakeAccounts).toEqual(
+    expect(bondsFunding[0].numberActiveStakeAccounts).toEqual(
       stakeAccountNumber
     )
     expect(stakeAccountSumBalance).toEqual(toFund.muln(stakeAccountNumber))

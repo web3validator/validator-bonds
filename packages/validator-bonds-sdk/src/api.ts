@@ -538,8 +538,8 @@ export type BondFunding = {
   amountActive: BN
   amountAtSettlements: BN
   amountToWithdraw: BN
-  amountActiveStakeAccounts: number
-  amountSettlementStakeAccounts: number
+  numberActiveStakeAccounts: number
+  numberSettlementStakeAccounts: number
   withdrawRequest: ProgramAccount<WithdrawRequest> | undefined
 }
 
@@ -719,8 +719,8 @@ export async function getBondsFunding({
         amountActive,
         amountAtSettlements,
         amountToWithdraw,
-        amountActiveStakeAccounts: bondFunded.length,
-        amountSettlementStakeAccounts: settlementFunded.length,
+        numberActiveStakeAccounts: bondFunded.length,
+        numberSettlementStakeAccounts: settlementFunded.length,
         withdrawRequest,
       }
     }
