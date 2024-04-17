@@ -206,6 +206,15 @@ validator-bonds fund-bond BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc \
   --stake-account bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba --keypair ./identity.json
 ```
 
+#### How to add more funds under the bond?
+
+It's as simple as creating a new stake account and funding it into the bond program.
+The amounts of SOLs delegated to the same validator are summed together.
+The validator bonds program may merge or split the accounts delegated to the same validator.
+It's not guaranteed to maintain the same stake accounts in the bond,
+but the amount of SOLs is always associated with the validator.
+
+
 ### Withdrawing Bond Account
 
 When someone chooses to stop participating in covering the bonds for [protected events](https://marinade.finance/blog/introducing-protected-staking-rewards/),
