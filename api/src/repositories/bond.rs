@@ -25,6 +25,7 @@ pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBond
             pubkey: row.get("pubkey"),
             vote_account: row.get("vote_account"),
             authority: row.get("authority"),
+            funds: row.get::<_, i32>("funds").try_into()?,
             epoch: row.get::<_, i32>("epoch").try_into()?,
             cpmpe: row.get::<_, Decimal>("cpmpe"),
             updated_at: row.get("updated_at"),
