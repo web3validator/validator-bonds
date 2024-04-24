@@ -13,7 +13,7 @@ pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBond
             "
             WITH cluster AS (SELECT MAX(epoch) as last_epoch FROM bonds)
             SELECT
-                pubkey, vote_account, authority, cpmpe, updated_at, epoch
+                pubkey, vote_account, authority, cpmpe, funds, updated_at, epoch
             FROM bonds, cluster WHERE epoch = cluster.last_epoch",
             &[],
         )
@@ -37,7 +37,7 @@ pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBond
 
 pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
     const CHUNK_SIZE: usize = 512;
-    const PARAMS_PER_INSERT: usize = 6;
+    const PARAMS_PER_INSERT: usize = 7;
 
     let (psql_client, psql_conn) = tokio_postgres::connect(&options.postgres_url, NoTls).await?;
 
@@ -86,7 +86,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
 
         let query = format!(
             "
-            INSERT INTO bonds (pubkey, vote_account, authority, epoch, updated_at, cpmpe)
+            INSERT INTO bonds (pubkey, vote_account, authority, epoch, updated_at, funds, cpmpe)
             VALUES {}
             ON CONFLICT (pubkey, epoch) DO UPDATE
             SET vote_account = EXCLUDED.vote_account,
