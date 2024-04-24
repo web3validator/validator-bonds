@@ -70,7 +70,7 @@ pub async fn collect_bonds(options: CommonCollectOptions) -> anyhow::Result<()> 
             vote_account: bond.vote_account.to_string(),
             authority: bond.authority.to_string(),
             cpmpe: bond.cpmpe.try_into().unwrap(),
-            funds: funding,
+            funds: funding.try_into().unwrap(),
             epoch,
             updated_at,
         })

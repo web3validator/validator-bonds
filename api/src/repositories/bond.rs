@@ -25,7 +25,7 @@ pub async fn get_bonds(psql_client: &Client) -> anyhow::Result<Vec<ValidatorBond
             pubkey: row.get("pubkey"),
             vote_account: row.get("vote_account"),
             authority: row.get("authority"),
-            funds: row.get::<_, i32>("funds").try_into()?,
+            funds: row.get::<_, Decimal>("funds"),
             epoch: row.get::<_, i32>("epoch").try_into()?,
             cpmpe: row.get::<_, Decimal>("cpmpe"),
             updated_at: row.get("updated_at"),
@@ -78,6 +78,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
             params.push(Box::new(&bond.authority));
             params.push(Box::new(epoch));
             params.push(Box::new(bond.updated_at));
+            params.push(Box::new(bond.funds));
             params.push(Box::new(bond.cpmpe));
         }
 
@@ -91,6 +92,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
             SET vote_account = EXCLUDED.vote_account,
                 authority = EXCLUDED.authority,
                 updated_at = EXCLUDED.updated_at,
+                funds = EXCLUDED.funds,
                 cpmpe = EXCLUDED.cpmpe
             ",
             insert_values
