@@ -102,7 +102,7 @@ pub async fn store_bonds(options: CommonStoreOptions) -> anyhow::Result<()> {
             SET vote_account = EXCLUDED.vote_account,
                 authority = EXCLUDED.authority,
                 updated_at = EXCLUDED.updated_at,
-                cpmpe = EXCLUDED.cpmpe
+                cpmpe = EXCLUDED.cpmpe,
                 funded_amount = EXCLUDED.funded_amount,
                 effective_amount = EXCLUDED.effective_amount,
                 remaining_witdraw_request_amount = EXCLUDED.remaining_witdraw_request_amount,
