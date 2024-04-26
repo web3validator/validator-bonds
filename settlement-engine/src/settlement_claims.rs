@@ -26,20 +26,20 @@ pub struct SettlementClaim {
     pub claim_amount: u64,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug, utoipa::ToSchema)]
 pub enum SettlementReason {
     ProtectedEvent(ProtectedEvent),
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug, Eq, PartialEq, Hash, utoipa::ToSchema)]
 pub enum SettlementFunder {
     ValidatorBond,
     Marinade,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug, Eq, PartialEq, Hash, utoipa::ToSchema)]
 pub struct SettlementMeta {
-    funder: SettlementFunder,
+    pub funder: SettlementFunder,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug)]
