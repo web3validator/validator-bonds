@@ -532,7 +532,7 @@ export async function findBondNonSettlementStakeAccounts(args: {
   return findBondStakeAccountsHelper({ ...args, staker: withdrawerAuthority })
 }
 
-export type BondFunding = {
+export type BondDataWithFunding = {
   bondAccount: PublicKey
   voteAccount: PublicKey
   amountActive: BN
@@ -569,7 +569,7 @@ export async function getBondsFunding({
   configAccount: PublicKey
   bondAccounts?: (PublicKey | undefined)[]
   voteAccounts?: (PublicKey | undefined)[]
-}): Promise<BondFunding[]> {
+}): Promise<BondDataWithFunding[]> {
   const maxLength = Math.max(
     bondAccounts?.length ?? 0,
     voteAccounts?.length ?? 0

@@ -20,7 +20,7 @@ import {
   findConfigs,
   getConfig,
   getBondsFunding,
-  BondFunding,
+  BondDataWithFunding,
   bondsWithdrawerAuthority,
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
@@ -83,18 +83,19 @@ export function installShowBond(program: Command) {
     .description('Showing data of bond account(s)')
     .argument(
       '[address]',
-      'Address of the bond account or vote account. It will show bond account data (when the argument is provided other filter options are ignored)',
+      'Address of the bond account or vote account. ' +
+        'It will show bond account data (when the argument is provided other filter options are ignored)',
       parsePubkey
     )
     .option(
       '--config <pubkey>',
-      'Config account to filter the bond accounts with ' +
-        `(NO default, e.g., the Marinade config is: ${MARINADE_CONFIG_ADDRESS.toBase58()})`,
+      'Config account to filter bonds accounts ' +
+        `(no default, note: the Marinade config is: ${MARINADE_CONFIG_ADDRESS.toBase58()})`,
       parsePubkey
     )
     .option(
       '--bond-authority <pubkey>',
-      'Bond authority to filter the bond accounts with',
+      'Bond authority to filter bonds accounts',
       parsePubkeyOrPubkeyFromWallet
     )
     .option(
@@ -219,7 +220,7 @@ async function showConfig({
 }
 
 export type BondShow<T> = ProgramAccountWithProgramId<T> &
-  Partial<Omit<BondFunding, 'voteAccount' | 'bondAccount'>>
+  Partial<Omit<BondDataWithFunding, 'voteAccount' | 'bondAccount'>>
 
 async function showBond({
   address,
@@ -321,7 +322,7 @@ async function showBond({
       }
     } catch (err) {
       throw new CliCommandError({
-        valueName: '--config|--vote-account|--bond-authority',
+        valueName: '--config|--bond-authority',
         value: `${config?.toBase58()}}|${voteAccount?.toBase58()}|${bondAuthority?.toBase58()}}`,
         msg: 'Error while fetching bond account based on filter parameters',
         cause: err as Error,

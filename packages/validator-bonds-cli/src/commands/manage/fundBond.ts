@@ -27,22 +27,16 @@ export function installFundBond(program: Command) {
       'Funding a bond account with amount of SOL within a stake account.'
     )
     .argument(
-      '[address]',
-      'Address of the bond account to be funded. Provide: bond or vote account address. ' +
-        'When the [address] is not provided, both the --config and --vote-account options are required.',
+      '<address>',
+      'Address of the bond account or vote account.',
       parsePubkey
     )
     .option(
       '--config <pubkey>',
-      '(optional when the argument bond-account-address is NOT provided, used to derive the bond address) ' +
-        `The config account that the bond is created under (default: ${MARINADE_CONFIG_ADDRESS.toBase58()})`,
+      'The config account that the bond account is created under ' +
+        '(optional; to derive bond address from vote account address) ' +
+        `(default: ${MARINADE_CONFIG_ADDRESS.toBase58()})`,
       parsePubkey
-    )
-    .option(
-      '--vote-account <pubkey>',
-      '(optional when the argument bond-account-address is NOT provided, used to derive the bond address) ' +
-        'Validator vote account that the bond is bound to',
-      parsePubkeyOrPubkeyFromWallet
     )
     .requiredOption(
       '--stake-account <pubkey>',
@@ -58,15 +52,13 @@ export function installFundBond(program: Command) {
     )
     .action(
       async (
-        address: Promise<PublicKey | undefined>,
+        address: Promise<PublicKey>,
         {
           config,
-          voteAccount,
           stakeAccount,
           stakeAuthority,
         }: {
           config?: Promise<PublicKey>
-          voteAccount?: Promise<PublicKey>
           stakeAccount: Promise<PublicKey>
           stakeAuthority?: Promise<WalletInterface | PublicKey>
         }
@@ -74,7 +66,6 @@ export function installFundBond(program: Command) {
         await manageFundBond({
           address: await address,
           config: await config,
-          voteAccount: await voteAccount,
           stakeAccount: await stakeAccount,
           stakeAuthority: await stakeAuthority,
         })
@@ -85,13 +76,11 @@ export function installFundBond(program: Command) {
 async function manageFundBond({
   address,
   config,
-  voteAccount,
   stakeAccount,
   stakeAuthority,
 }: {
-  address?: PublicKey
+  address: PublicKey
   config?: PublicKey
-  voteAccount?: PublicKey
   stakeAccount: PublicKey
   stakeAuthority?: WalletInterface | PublicKey
 }) {
@@ -117,18 +106,15 @@ async function manageFundBond({
     stakeAuthority = stakeAuthority.publicKey
   }
 
-  let bondAccountAddress = address
-  if (address !== undefined) {
-    const bondAccountData = await getBondFromAddress({
-      program,
-      address: address,
-      config,
-      logger,
-    })
-    bondAccountAddress = bondAccountData.publicKey
-    config = bondAccountData.account.data.config
-    voteAccount = bondAccountData.account.data.voteAccount
-  }
+  const bondAccountData = await getBondFromAddress({
+    program,
+    address,
+    config,
+    logger,
+  })
+  const bondAccountAddress = bondAccountData.publicKey
+  config = bondAccountData.account.data.config
+  const voteAccount = bondAccountData.account.data.voteAccount
 
   const { instruction, bondAccount } = await fundBondInstruction({
     program,

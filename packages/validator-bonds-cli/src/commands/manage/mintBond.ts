@@ -27,32 +27,25 @@ export function installMintBond(program: Command) {
         'Finally, utilize the command "configure-bond --with-token" to configure the bond account.'
     )
     .argument(
-      '[address]',
-      'Address of the bond account to configure. Provide: bond or vote account address. ' +
-        'When the [address] is not provided, both the --config and --vote-account options are required.',
+      '<address>',
+      'Address of the bond account or vote account.',
       parsePubkey
     )
     .option(
       '--config <pubkey>',
-      '(optional when the argument bond-account-address is provided) ' +
-        'The config account that the bond is created under ' +
+      'The config account that the bond account is created under ' +
+        '(optional; to derive bond address from vote account address) ' +
         `(default: ${MARINADE_CONFIG_ADDRESS.toBase58()})`,
       parsePubkey
     )
     .option(
-      '--vote-account <pubkey>',
-      '(optional when the argument bond-account-address is provided) ' +
-        'Validator vote account that the bond is bound to',
-      parsePubkey
-    )
-    .option(
-      '--rent-payer <keypair_or_ledger_or_pubkey>',
+      '--rent-payer <keypair_or_ledger_orl_pubkey>',
       'Rent payer for the mint token account creation (default: wallet keypair)',
       parseWalletOrPubkey
     )
     .action(
       async (
-        address: Promise<PublicKey | undefined>,
+        address: Promise<PublicKey>,
         {
           config,
           voteAccount,
@@ -79,7 +72,7 @@ async function manageMintBond({
   voteAccount,
   rentPayer,
 }: {
-  address?: PublicKey
+  address: PublicKey
   config?: PublicKey
   voteAccount?: PublicKey
   rentPayer?: WalletInterface | PublicKey
@@ -106,18 +99,15 @@ async function manageMintBond({
     rentPayer = rentPayer.publicKey
   }
 
-  let bondAccountAddress = address
-  if (address !== undefined) {
-    const bondAccountData = await getBondFromAddress({
-      program,
-      address: address,
-      config,
-      logger,
-    })
-    bondAccountAddress = bondAccountData.publicKey
-    config = bondAccountData.account.data.config
-    voteAccount = bondAccountData.account.data.voteAccount
-  }
+  const bondAccountData = await getBondFromAddress({
+    program,
+    address,
+    config,
+    logger,
+  })
+  const bondAccountAddress = bondAccountData.publicKey
+  config = bondAccountData.account.data.config
+  voteAccount = bondAccountData.account.data.voteAccount
 
   const { instruction, bondAccount, validatorIdentity, bondMint } =
     await mintBondInstruction({

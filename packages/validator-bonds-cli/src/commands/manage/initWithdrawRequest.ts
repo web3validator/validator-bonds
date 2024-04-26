@@ -140,7 +140,7 @@ async function manageInitWithdrawRequest({
   if (address !== undefined) {
     const bondAccountData = await getBondFromAddress({
       program,
-      address: address,
+      address,
       config,
       logger,
     })

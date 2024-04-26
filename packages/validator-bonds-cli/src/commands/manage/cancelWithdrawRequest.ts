@@ -126,7 +126,7 @@ async function manageCancelWithdrawRequest({
   if (address !== undefined) {
     const withdrawRequestAccountData = await getWithdrawRequestFromAddress({
       program,
-      address: address,
+      address,
       config,
       logger,
     })
