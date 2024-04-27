@@ -23,7 +23,7 @@ added 165 packages in 35s
 
 # to verify installed version
 validator-bonds --version
-1.3.2
+1.3.3
 ```
 
 To get info on available commands
@@ -377,7 +377,7 @@ To check where NPM packages are and will be installed:
 # Get npm global installation folder
 npm list -g
 > /usr/lib
-> +-- @marinade.finance/validator-bonds-cli@1.3.2
+> +-- @marinade.finance/validator-bonds-cli@1.3.3
 > ...
 # In this case, the `bin` folder is located at /usr/bin
 ```
@@ -403,7 +403,7 @@ With this configuration, NPM packages will be installed under the `prefix` direc
 npm i -g @marinade.finance/validator-bonds-cli@latest
 npm list -g
 > ~/.local/share/npm/lib
-> `-- @marinade.finance/validator-bonds-cli@1.3.2
+> `-- @marinade.finance/validator-bonds-cli@1.3.3
 ```
 
 To execute the installed packages from any location,
@@ -440,17 +440,16 @@ Options:
   -V, --version                                   output the version number
   -u, --cluster <cluster>                         solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                    alias for "-u, --cluster"
-  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the
-                                                  transaction fees and as default value for signers. (default: loaded from solana config file or ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default
+                                                  value for signers. (default: loaded from solana config file or ~/.config/solana/id.json)
   --program-id <pubkey>                           Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                  Simulate (default: false)
-  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL
-                                                  Governance UI by hand. (default: false)
-  --skip-preflight                                Transaction execution flag "skip-preflight", see
-                                                  https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
+  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand.
+                                                  (default: false)
+  --skip-preflight                                Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                       Commitment (default: "confirmed")
-  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized"
-                                                  stands for full cluster finality that takes ~8 seconds. (default: "confirmed")
+  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized" stands for full cluster
+                                                  finality that takes ~8 seconds. (default: "confirmed")
   --with-compute-unit-price <compute-unit-price>  Set compute unit price for transaction, in increments of 0.000001 lamports per compute unit. (default: 10)
   -d, --debug                                     Printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                   alias for --debug (default: false)
@@ -459,20 +458,19 @@ Options:
 Commands:
   init-config [options]                           Create a new config account.
   configure-config [options] [address]            Configure existing config account.
-  mint-bond [options] [address]                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain
-                                                  transaction. The workflow is as follows: first, use this "mint-bond" to mint a bond token to the validator identity public key.
-                                                  Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure the bond
-                                                  account.
+  mint-bond [options] <address>                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain transaction. The workflow is as
+                                                  follows: first, use this "mint-bond" to mint a bond token to the validator identity public key. Next, transfer the token to any account desired. Finally, utilize
+                                                  the command "configure-bond --with-token" to configure the bond account.
   init-bond [options]                             Create a new bond account.
-  configure-bond [options] [address]              Configure existing bond account.
+  configure-bond [options] <address>              Configure existing bond account.
   merge-stake [options]                           Merging stake accounts belonging to validator bonds program.
-  fund-bond [options] [address]                   Funding a bond account with amount of SOL within a stake account.
-  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the
-                                                  specified amount of lamports after the lockup period expires.
+  fund-bond [options] <address>                   Funding a bond account with amount of SOL within a stake account.
+  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the specified amount of lamports
+                                                  after the lockup period expires.
   cancel-withdraw-request [options] [address]     Cancelling the withdraw request account, which is the withdrawal request ticket, by removing the account from the chain.
-  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds
-                                                  involves transferring ownership of a funded stake account to the specified "--withdrawer" public key. To withdraw, the authority
-                                                  signature of the bond account is required, specified by the "--authority" parameter (default wallet).
+  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds involves transferring ownership
+                                                  of a funded stake account to the specified "--withdrawer" public key. To withdraw, the authority signature of the bond account is required, specified by the
+                                                  "--authority" parameter (default wallet).
   pause [options] [address]                       Pausing Validator Bond contract for config account
   resume [options] [address]                      Resuming Validator Bond contract for config account
   show-config [options] [address]                 Showing data of config account(s)
@@ -555,7 +553,7 @@ Commands:
   # Get npm global installation folder
   npm list -g
   > ~/.local/share/npm/lib
-  > `-- @marinade.finance/validator-bonds-cli@1.3.2
+  > `-- @marinade.finance/validator-bonds-cli@1.3.3
   # In this case, the 'bin' folder is located at ~/.local/share/npm/bin
 
   # Get validator-bonds binary folder
