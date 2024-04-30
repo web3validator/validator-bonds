@@ -63,7 +63,7 @@ steps:
     artifact_paths:
       - "./settlement-merkle-trees.json"
       - "./settlements.json"
-  
+
   - wait: ~
 
   - label: ":campfire: Create settlements"
@@ -83,11 +83,10 @@ steps:
     - 'buildkite-agent artifact download --include-retried-jobs settlement-merkle-trees.json .'
     - 'buildkite-agent artifact download --include-retried-jobs settlements.json .'
     - 'chmod +x target/release/init-settlement'
-    # TODO: MOVE api from devnet to rpc url
     - 'echo "#ATTEMPT $$BUILDKITE_RETRY_COUNT" | tee -a "./build-report.$$BUILDKITE_RETRY_COUNT"'
     - |
       report=$(./target/release/init-settlement \
-        --rpc-url https://api.devnet.solana.com \
+        --rpc-url $$RPC_URL \
         --input-merkle-tree-collection "./settlement-merkle-trees.json" \
         --input-settlement-collection "./settlements.json" \
         --operator-authority "$$VALIDATOR_BONDS_OPERATOR_AUTHORITY" \
