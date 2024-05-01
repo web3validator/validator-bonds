@@ -22,6 +22,8 @@ import {
   getBondsFunding,
   BondDataWithFunding,
   bondsWithdrawerAuthority,
+  getSettlement,
+  findSettlements,
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { getBondFromAddress } from './utils'
@@ -130,6 +132,53 @@ export function installShowBond(program: Command) {
           config: await config,
           bondAuthority: await bondAuthority,
           withFunding,
+          format,
+        })
+      }
+    )
+}
+
+export function installShowSettlement(program: Command) {
+  program
+    .command('show-settlement')
+    .description('Showing data of settlement account(s)')
+    .argument(
+      '[address]',
+      'Address of the settlement account' +
+      parsePubkey
+    )
+    .option(
+      '--bond <pubkey>',
+      'Bond account to filter settlements accounts. Provide bond account or vote account address.',
+      parsePubkey
+    )
+    .option(
+      '--epoch <number>',
+      'Epoch number to filter the settlements for.',
+      parseFloat
+    )
+    .option(
+      `-f, --format <${FORMAT_TYPE_DEF.join('|')}>`,
+      'Format of output',
+      'text'
+    )
+    .action(
+      async (
+        address: Promise<PublicKey | undefined>,
+        {
+          bond,
+          epoch,
+          format,
+        }: {
+          bond?: Promise<PublicKey>
+          epoch?: number,
+          format: FormatType
+        }
+      ) => {
+        await showSettlement({
+          address: await address,
+          bond: await bond,
+          epoch,
           format,
         })
       }
@@ -325,6 +374,67 @@ async function showBond({
         valueName: '--config|--bond-authority',
         value: `${config?.toBase58()}}|${voteAccount?.toBase58()}|${bondAuthority?.toBase58()}}`,
         msg: 'Error while fetching bond account based on filter parameters',
+        cause: err as Error,
+      })
+    }
+  }
+
+  const reformatted = reformat(data, reformatBond)
+  print_data(reformatted, format)
+}
+
+async function showSettlement({
+  address,
+  bond,
+  epoch,
+  format,
+}: {
+  address?: PublicKey
+  bond?: PublicKey
+  epoch?: number
+  format: FormatType
+}) {
+  const cliContext = getCliContext()
+  const program = cliContext.program
+  const logger = cliContext.logger
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let data: any | any[]
+
+  if (address !== undefined) {
+    const settlementData = await getSettlement(program, address)
+    data = {
+      programId: program.programId,
+      publicKey: address,
+      account: settlementData
+    }
+  } else {
+    try {
+      if (bond !== undefined) {
+        const bondData = await getBondFromAddress({
+          program,
+          address: bond,
+          logger,
+          config: undefined,
+        })
+        bond = bondData.publicKey
+      }
+      const settlementDataArray = await findSettlements({
+        program,
+        bond,
+        epoch,
+      })
+
+      data = settlementDataArray.map(settlementData => ({
+        programId: program.programId,
+        publicKey: settlementData.publicKey,
+        account: settlementData.account,
+      }))
+    } catch (err) {
+      throw new CliCommandError({
+        valueName: '--bond|--epoch',
+        value: `${bond?.toBase58()}|${epoch}`,
+        msg: 'Error while fetching settlement accounts based on filter parameters',
         cause: err as Error,
       })
     }
