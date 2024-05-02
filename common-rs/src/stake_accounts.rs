@@ -206,6 +206,7 @@ pub async fn get_stake_account_slices(
     rpc_client: Arc<RpcClient>,
     stake_authority: Option<Pubkey>,
     slice: Option<(usize, usize)>,
+    fetch_pause_millis: Option<u64>,
 ) -> anyhow::Result<Vec<(Pubkey, StakeStateV2)>> {
     info!(
         "Fetching stake account slices {:?} with stake authority: {:?}",
@@ -243,6 +244,11 @@ pub async fn get_stake_account_slices(
             },
         );
         futures.push(future);
+
+        // pause between fetches to not overhelming the RPC with many requests
+        if let Some(fetch_pause) = fetch_pause_millis {
+            tokio::time::sleep(tokio::time::Duration::from_millis(fetch_pause)).await;
+        }
     }
 
     let results = join_all(futures).await;

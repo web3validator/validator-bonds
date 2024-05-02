@@ -61,6 +61,10 @@ struct Args {
     #[arg(long)]
     epoch: Option<u64>,
 
+    /// Pause between stake accounts fetches in milliseconds
+    #[clap(long)]
+    fetch_pause_millis: Option<u64>,
+
     #[clap(flatten)]
     priority_fee_policy_opts: PriorityFeePolicyOpts,
 
@@ -358,6 +362,7 @@ async fn main() -> anyhow::Result<()> {
                     rpc_client.clone(),
                     Some(tree_node.stake_authority),
                     None,
+                    args.fetch_pause_millis,
                 )
                 .await
                 {
@@ -461,11 +466,7 @@ async fn main() -> anyhow::Result<()> {
             error!("{}", error_msg);
             claim_settlement_errors.push(error_msg);
         });
-    println!(
-        "ClaimSettlement instructions {} succeeded, {} errors",
-        claim_ix_count,
-        claim_settlement_errors.len(),
-    );
+    println!("ClaimSettlement instructions {} executed", claim_ix_count,);
 
     if !claim_settlement_errors.is_empty() {
         serde_json::to_writer(io::stdout(), &claim_settlement_errors)?;
