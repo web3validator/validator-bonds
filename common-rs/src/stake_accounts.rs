@@ -264,19 +264,21 @@ pub async fn get_stake_account_slices(
             4 + 8 + 32,
             vec![page],
         )));
-        let result = rpc_client.get_program_accounts_with_config(
-            &stake::program::ID,
-            RpcProgramAccountsConfig {
-                filters: Some(filters.clone()),
-                account_config: RpcAccountInfoConfig {
-                    encoding: Some(UiAccountEncoding::Base64),
-                    commitment: Some(rpc_client.commitment()),
-                    data_slice,
-                    min_context_slot: None,
+        let result = rpc_client
+            .get_program_accounts_with_config(
+                &stake::program::ID,
+                RpcProgramAccountsConfig {
+                    filters: Some(filters.clone()),
+                    account_config: RpcAccountInfoConfig {
+                        encoding: Some(UiAccountEncoding::Base64),
+                        commitment: Some(rpc_client.commitment()),
+                        data_slice,
+                        min_context_slot: None,
+                    },
+                    with_context: None,
                 },
-                with_context: None,
-            },
-        ).await;
+            )
+            .await;
         match result {
             Ok(accounts) => {
                 stake_accounts_count += accounts.len();
