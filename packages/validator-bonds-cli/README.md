@@ -589,3 +589,43 @@ Commands:
   * To retrieve printed data about one particular bond account, this error should not be seen. Use a simple call of `show-bond <vote-account>`
   and **DO NOT** use filter arguments like `show-bond --vote-account <address>`.
   * Use a private RPC endpoint. Most providers offer free plans that can be easily used here. `export RPC_URL=<private-rpc-http-endpoint>; show-bond -u$RPC_URL...`
+
+* **node_modules/@solana/webljs/lib/index.cjs.js:643 keyMeta.isSigner ||= accountMeta.isSigner**
+
+  ```
+  SyntaxError: Unexpected token '='
+  ```
+
+  This is likely caused by an outdated version of Node.js on the machine.
+
+  **Solution:**
+
+  Upgrade Node.js to version 16 or later.
+
+* **Segmentation fault (core dumped)**
+
+  This could be caused by the system containing two different versions of Node.js,
+  one installed at the system level (e.g., via `apt`) and the other installed via `npm`.
+
+  **Solution:**
+
+  Remove Node.js from the system and use the version from `npm`. For `apt`, use the following commands:
+
+  ```sh
+  sudo apt remove nodejs
+  sudo apt autoremove
+  node --version
+  ```
+
+* **WithdrawRequestNotReady ... Withdraw request has not elapsed the epoch lockup period yet.**
+
+  ```
+  "Program log: AnchorError caused by account: withdraw_request. Error Code: WithdrawRequestNotReady. Error Number: 6021. Error Message: Withdraw request has not elapsed the epoch lockup period yet."
+  ```
+
+  **Explanation**
+  
+  This error occurs with the `claim-withdraw-request` CLI command and means that the withdrawal request is not yet ready.
+  The bonds program allows funds to be withdrawn only after a specified time defined in the `Config` account.
+  Wait for a few `epochs` for the request to become available for claiming.
+  More information can be found in the [Withdrawing Bond Account](#withdrawing-bond-account) section.
