@@ -283,7 +283,12 @@ async fn main() -> anyhow::Result<()> {
         &mut transaction_builder,
         Some(priority_fee_policy.clone()),
     );
-    execute_transactions_in_parallel(transaction_executor.clone(), execution_data).await?;
+    execute_transactions_in_parallel(
+        transaction_executor.clone(),
+        execution_data,
+        Some(100_usize),
+    )
+    .await?;
     info!(
         "InitSettlement instructions {} executed successfully of vote accounts [{}]",
         init_execution_count,
@@ -305,7 +310,7 @@ async fn main() -> anyhow::Result<()> {
     // let's check how we are about settlement funding
     let (withdrawer_authority, _) = find_bonds_withdrawer_authority(&config_address);
     let stake_accounts =
-        collect_stake_accounts(rpc_client.clone(), Some(withdrawer_authority), None).await?;
+        collect_stake_accounts(rpc_client.clone(), Some(&withdrawer_authority), None).await?;
     let non_funded: CollectedStakeAccounts = stake_accounts
         .clone()
         .into_iter()

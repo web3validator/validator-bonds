@@ -12,12 +12,11 @@ use settlement_pipelines::arguments::{
 use settlement_pipelines::init::init_log;
 use settlement_pipelines::json_data::resolve_combined_optional;
 use settlement_pipelines::settlements::list_claimable_settlements;
+use settlement_pipelines::stake_accounts::pick_stake_for_claiming;
+use settlement_pipelines::stake_accounts_cache::StakeAccountsCache;
 use settlement_pipelines::STAKE_ACCOUNT_RENT_EXEMPTION;
-use solana_account_decoder::UiDataSliceConfig;
-use solana_client::rpc_config::RpcAccountInfoConfig;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::stake::program::ID as stake_program_id;
-use solana_sdk::stake::state::StakeStateV2;
 use solana_sdk::system_program;
 use solana_sdk::sysvar::{clock::ID as clock_id, stake_history::ID as stake_history_id};
 use solana_transaction_builder::TransactionBuilder;
@@ -38,7 +37,9 @@ use validator_bonds::state::settlement::find_settlement_address;
 use validator_bonds::state::settlement_claim::find_settlement_claim_address;
 use validator_bonds::ID as validator_bonds_id;
 use validator_bonds_common::constants::find_event_authority;
-use validator_bonds_common::stake_accounts::get_stake_account_slices;
+use validator_bonds_common::settlement_claims::collect_existence_settlement_claims_from_addresses;
+use validator_bonds_common::stake_accounts::{get_stake_history, CollectedStakeAccounts};
+use validator_bonds_common::utils::get_sysvar_clock;
 
 const SETTLEMENT_MERKLE_TREES_SUFFIX: &str = "settlement-merkle-trees.json";
 const SETTLEMENTS_SUFFIX: &str = "settlements.json";
@@ -61,10 +62,6 @@ struct Args {
     /// mostly useful for testing purposes
     #[arg(long)]
     epoch: Option<u64>,
-
-    /// Pause between stake accounts fetches in milliseconds
-    #[clap(long)]
-    fetch_pause_millis: Option<u64>,
 
     #[clap(flatten)]
     priority_fee_policy_opts: PriorityFeePolicyOpts,
@@ -177,10 +174,13 @@ async fn main() -> anyhow::Result<()> {
 
     let mut transaction_builder = TransactionBuilder::limited(fee_payer_keypair.clone());
 
+    let clock = get_sysvar_clock(rpc_client.clone()).await?;
+    let stake_history = get_stake_history(rpc_client.clone()).await?;
+
     // Assigning for each settlement the merkle tree data
     let mut claimed_stake_amounts: HashMap<Pubkey, u64> = HashMap::new();
-    let mut stake_accounts_per_staker_cache: HashMap<Pubkey, Vec<(Pubkey, StakeStateV2)>> =
-        HashMap::new();
+    let mut stake_accounts_to_cache = StakeAccountsCache::default();
+
     for claimable_settlement in claimable_settlements {
         let settlement_epoch = claimable_settlement.settlement.epoch_created_for;
         let settlement_merkle_tree =
@@ -251,39 +251,18 @@ async fn main() -> anyhow::Result<()> {
                 .0
             })
             .collect::<Vec<Pubkey>>();
-        let settlement_claim_addresses_chunked = settlement_claim_addresses
-            .chunks(100)
-            .collect::<Vec<&[Pubkey]>>();
-        let mut settlement_claims: Vec<(Pubkey, bool)> = vec![];
-        for address_chunk in settlement_claim_addresses_chunked.iter() {
-            let accounts = rpc_client
-                .clone()
-                .get_multiple_accounts_with_config(
-                    address_chunk,
-                    RpcAccountInfoConfig {
-                        data_slice: Some(UiDataSliceConfig {
-                            offset: 0,
-                            length: 0,
-                        }),
-                        ..RpcAccountInfoConfig::default()
-                    },
-                )
-                .await
-                .map_err(|e| {
-                    anyhow!(
-                        "Error fetching settlement claim accounts for settlement {}: {:?}",
-                        matching_settlement.settlement_address.clone(),
-                        e
-                    )
-                })?;
-            accounts
-                .value
-                .iter()
-                .zip(address_chunk.iter())
-                .for_each(|(a, p)| {
-                    settlement_claims.push((*p, a.is_some()));
-                });
-        }
+        let settlement_claims = collect_existence_settlement_claims_from_addresses(
+            rpc_client.clone(),
+            &settlement_claim_addresses,
+        )
+        .await
+        .map_err(|e| {
+            anyhow!(
+                "Error fetching settlement claim accounts for settlement {}: {:?}",
+                matching_settlement.settlement_address,
+                e
+            )
+        })?;
         let already_claimed_count = settlement_claims.iter().filter(|(_, b)| *b).count();
 
         // let's claim it
@@ -358,59 +337,38 @@ async fn main() -> anyhow::Result<()> {
                 }
             };
 
-            if stake_accounts_per_staker_cache
-                .get(&tree_node.stake_authority)
-                .is_none()
-            {
-                // it could be not all stake accounts were loaded here we can wait for next execution of script
-                let (stake_accounts, fetch_errors) = get_stake_account_slices(
+            let empty_stake_acounts: CollectedStakeAccounts = vec![];
+            let stake_accounts_to = stake_accounts_to_cache
+                .get(
                     rpc_client.clone(),
-                    Some(tree_node.stake_authority),
-                    None,
-                    args.fetch_pause_millis,
+                    &tree_node.withdraw_authority,
+                    &tree_node.stake_authority,
                 )
-                .await;
-                stake_accounts_per_staker_cache.insert(tree_node.stake_authority, stake_accounts);
-                if let Some(fetch_errors) = fetch_errors {
-                    let error_msg = format!(
-                                "Error fetching stake accounts for staker {} for settlement {}, epoch {}: {}",
-                                tree_node.stake_authority,
-                                matching_settlement.settlement_address,
-                                settlement_epoch,
-                                fetch_errors
-                            );
-                    error!("{}", error_msg);
-                    claim_settlement_errors.push(error_msg);
-                }
-            }
-            let stake_account_to = if let Some(stake_accounts) =
-                stake_accounts_per_staker_cache.get(&tree_node.stake_authority)
-            {
-                let stake_account_to = stake_accounts
-                    .iter()
-                    .find(|(_, s)| {
-                        if let Some(authorized) = s.authorized() {
-                            authorized.withdrawer == tree_node.withdraw_authority
-                        } else {
-                            false
-                        }
-                    })
-                    .map(|(p, _)| *p);
-                if let Some(stake_account_to) = stake_account_to {
-                    stake_account_to
-                } else {
-                    let error_msg = format!(
-                        "No stake account found as target for claiming stake:{}/withdrawer:{} for settlement {}, epoch {}",
-                        tree_node.stake_authority, tree_node.withdraw_authority,
-                        matching_settlement.settlement_address,
-                        settlement_epoch
-                    );
-                    error!("{}", error_msg);
-                    claim_settlement_errors.push(error_msg);
-                    continue;
-                }
+                .await
+                .map_or_else(
+                    |e| {
+                        claim_settlement_errors.push(format!("{:?}", e));
+                        &empty_stake_acounts
+                    },
+                    |v| v,
+                );
+            let stake_account_to = pick_stake_for_claiming(
+                stake_accounts_to,
+                &clock,
+                &stake_history,
+            ).map_or_else(|e| {
+                let error_msg = format!(
+                    "No available stake account for claiming of staker/withdraw authorities {}/{}: {}",
+                    tree_node.stake_authority, tree_node.withdraw_authority, e
+                );
+                error!("{}", error_msg);
+                claim_settlement_errors.push(error_msg);
+                None
+            }, |v| v);
+            let stake_account_to: Pubkey = if let Some(stake_account_to) = stake_account_to {
+                stake_account_to
             } else {
-                // error on fetching or similar, already reported
+                // stake accounts for these authorities were not found in this or some prior run
                 continue;
             };
 
@@ -459,13 +417,17 @@ async fn main() -> anyhow::Result<()> {
         &mut transaction_builder,
         Some(priority_fee_policy.clone()),
     );
-    execute_transactions_in_parallel(transaction_executor.clone(), execution_data)
-        .await
-        .unwrap_or_else(|e| {
-            let error_msg = format!("Error executing claim settlement instructions: {:?}", e);
-            error!("{}", error_msg);
-            claim_settlement_errors.push(error_msg);
-        });
+    execute_transactions_in_parallel(
+        transaction_executor.clone(),
+        execution_data,
+        Some(100_usize),
+    )
+    .await
+    .unwrap_or_else(|e| {
+        let error_msg = format!("Error executing claim settlement instructions: {:?}", e);
+        error!("{}", error_msg);
+        claim_settlement_errors.push(error_msg);
+    });
     println!("ClaimSettlement instructions {} executed", claim_ix_count,);
 
     if !claim_settlement_errors.is_empty() {
