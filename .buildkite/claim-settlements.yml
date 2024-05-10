@@ -80,16 +80,14 @@ steps:
     continue_on_failure: true
 
   - label: ":mega: Notification settlements claiming"
-    env:
-      DISCORD_WEBHOOK: $$DISCORD_WEBHOOK_VALIDATOR_BONDS
     commands:
     - 'buildkite-agent artifact download --include-retried-jobs claiming-report.txt .'
     - 'claimable_epochs_json=$(buildkite-agent meta-data get claimable_epochs_json)'
-    - 'claimable_epochs=$(echo "$$claimable_epochs_json" | jq ".[]")'
     - |
-      curl "$$DISCORD_WEBHOOK" \
+      claimable_epochs=$(echo "$$claimable_epochs_json" | jq ". | join(\",\")" | tr -d '"')
+      curl "$$DISCORD_WEBHOOK_VALIDATOR_BONDS" \
         -F 'payload_json={
-            "content": "Claimed Settlements for epochs: '"$$claimable_epochs"'",
+            "content": "Claim Settlements for epochs: '"$$claimable_epochs"'",
             "url": "'"$$BUILDKITE_BUILD_URL"'",
             "color": "8388863"
         }' \

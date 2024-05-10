@@ -16,14 +16,12 @@ steps:
   - wait: ~
 
   - label: ":mega: Notification initializing settlements"
-    env:
-      DISCORD_WEBHOOK: $$DISCORD_WEBHOOK_VALIDATOR_BONDS
     commands:
     - 'epoch=${EPOCH:-$(buildkite-agent meta-data get epoch)}'
     - 'buildkite-agent meta-data set epoch "$$epoch"'
     - 'echo "Epoch: $$epoch"'
     - |
-      curl "$$DISCORD_WEBHOOK" -H "Content-Type: application/json" -d '{
+      curl "$$DISCORD_WEBHOOK_VALIDATOR_BONDS" -H "Content-Type: application/json" -d '{
         "embeds": [
           {
             "title": "Confirm Settlements Initialization for Validator Bonds ('"$$epoch"').",
@@ -132,7 +130,7 @@ steps:
      - 'report_path="./reports/$(ls -v1 reports/ | tail -n 1)"'
      - '[ -f "$$report_path" ] || echo "UNKNOWN ERROR" >> "$$report_path"'
      - 'cp "$$report_path" ./init-settlement-report.txt'
-     - 'gcloud storage cp ./init-settlement-report.txt "$$gs_bucket/$$epoch/init-settlement-report.txt"'
+     - 'gcloud storage cp ./init-settlement-report.txt "$$gs_bucket/$$epoch/init-settlement-report.$(date +%s).txt"'
      - 'buildkite-agent meta-data set attempts_count "$(grep -c "#ATTEMPT" "$$report_path")"'
     artifact_paths:
     - "./init-settlement-report.txt"
@@ -143,8 +141,6 @@ steps:
     continue_on_failure: true
 
   - label: ":mega: Notification settlements initialized"
-    env:
-      DISCORD_WEBHOOK: $$DISCORD_WEBHOOK_VALIDATOR_BONDS
     commands:
     - 'epoch=$(buildkite-agent meta-data get epoch)'
     - 'notification_result=$(buildkite-agent meta-data get notification_result)'
@@ -152,9 +148,9 @@ steps:
     - 'attempts_count=$(buildkite-agent meta-data get attempts_count)'
     - 'buildkite-agent artifact download --include-retried-jobs init-settlement-report.txt .'
     - |
-        curl "$$DISCORD_WEBHOOK" \
+        curl "$$DISCORD_WEBHOOK_VALIDATOR_BONDS" \
         -F 'payload_json={
-            "content": "Initializing Settlements for Validator Bonds ('"$$epoch"') after '"$$attempts_count"' attempts.",
+            "content": "Init Settlements for Validator Bonds ('"$$epoch"') after '"$$attempts_count"' attempts.",
             "url": "'"$$BUILDKITE_BUILD_URL"'",
             "color": "8388863"
         }' \
