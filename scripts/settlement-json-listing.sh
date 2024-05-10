@@ -5,11 +5,13 @@
 ### ----
 
 solsdecimal() {
+  DECIMALS=9
   N="$@"
-  if [ ${#N} -lt 9 ]; then
-    echo ".${N}"
+  if [ ${#N} -lt $DECIMALS ]; then
+    FILLING_ZEROS=$(printf "%0.s0" $(seq 1 $((9-${#N}))))
+    echo "0.${FILLING_ZEROS}${N}"
   else
-    SOLS="${N::-9}"
+    SOLS="${N::-$DECIMALS}"
     echo "${SOLS:-0}.${N:${#SOLS}}"
   fi
 }
@@ -24,10 +26,9 @@ CLAIM_ACCOUNT_DATA_RENT=0.002784
 echo -n "Sum of max total claim at '$JSON_FILE': "
 LAMPORTS=$(jq '.merkle_trees[].max_total_claim_sum' "$JSON_FILE" | paste -s -d+ | bc)
 solsdecimal $LAMPORTS
-echo -n "Number of all claims in file + expected rent: "
 NUMBER_OF_CLAIMS=$(jq '.merkle_trees[].tree_nodes | length'  "$JSON_FILE" |  paste -s -d+ | bc)
 RENT=$(echo "scale=4; $NUMBER_OF_CLAIMS * $CLAIM_ACCOUNT_DATA_RENT" | bc)
-echo "$NUMBER_OF_CLAIMS, expected rent for newly created: $RENT"
+echo "Number of all claims: $NUMBER_OF_CLAIMS, expected rent for newly created: $RENT"
 
 echo 'Data of vote account and max total sum claim:'
 grep "$JSON_FILE" -e 'vote_account' -e 'max_total_claim_sum'
@@ -52,6 +53,7 @@ for I in $(seq 0 $((COUNT-1)) ); do
   solsdecimal $LAMPORTS
   echo '----------------'
 done
+
 
 # TODO: utilize nodejs CLI to get the data
 # get settlement
