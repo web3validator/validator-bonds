@@ -174,9 +174,7 @@ describe('Init withdraw request using CLI', () => {
       withdrawRequestAddr
     )
     expect(withdrawRequestDataAll.bond).toEqual(bondAccount)
-    expect(withdrawRequestDataAll.requestedAmount).toEqual(
-      U64_MAX
-    )
+    expect(withdrawRequestDataAll.requestedAmount).toEqual(U64_MAX)
   })
 
   it('init withdraw request in print-only mode', async () => {
