@@ -85,7 +85,7 @@ export function installShowBond(program: Command) {
     .description('Showing data of bond account(s)')
     .argument(
       '[address]',
-      'Address of the bond account or vote account. ' +
+      'Address of the bond account or vote account or withdraw request. ' +
         'It will show bond account data (when the argument is provided other filter options are ignored)',
       parsePubkey
     )
@@ -322,6 +322,12 @@ async function showBond({
       numberSettlementStakeAccounts:
         bondFunding[0].numberSettlementStakeAccounts,
       withdrawRequest: bondFunding[0].withdrawRequest,
+      bondFundedStakeAccounts: cliContext.logger.isLevelEnabled('debug')
+        ? bondFunding[0].bondFundedStakeAccounts
+        : undefined,
+      settlementFundedStakeAccounts: cliContext.logger.isLevelEnabled('debug')
+        ? bondFunding[0].settlementFundedStakeAccounts
+        : undefined,
     }
   } else {
     // CLI did not provide an address, we will search for accounts based on filter parameters
@@ -363,6 +369,12 @@ async function showBond({
             (data[i].numberSettlementStakeAccounts =
               bondFunding?.numberSettlementStakeAccounts),
             (data[i].withdrawRequest = bondFunding?.withdrawRequest)
+          if (cliContext.logger.isLevelEnabled('debug')) {
+            data[i].bondFundedStakeAccounts =
+              bondFunding?.bondFundedStakeAccounts
+            data[i].settlementFundedStakeAccounts =
+              bondFunding?.settlementFundedStakeAccounts
+          }
         }
       }
     } catch (err) {
@@ -465,6 +477,9 @@ function reformatBond(key: string, value: any): ReformatAction {
       type: 'UseExclusively',
       records: [{ key, value: '<NOT EXISTING>' }],
     }
+  }
+  if (value === undefined) {
+    return { type: 'Remove' }
   }
   return { type: 'UsePassThrough' }
 }

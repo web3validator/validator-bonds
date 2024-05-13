@@ -437,7 +437,8 @@ describe('Show command using CLI', () => {
       code: 1,
       signal: '',
       // stderr: '',
-      stdout: /Account of type bond or voteAccount was not found/,
+      stdout:
+        /Account of type bond or voteAccount or withdrawRequest was not found/,
     })
   })
 

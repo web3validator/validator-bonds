@@ -36,7 +36,7 @@ export async function getBondFromAddress({
     accountInfo = await checkAccountExistence(
       program.provider.connection,
       address,
-      'Account of type bond or voteAccount was not found'
+      'Account of type bond or voteAccount or withdrawRequest was not found'
     )
   } else {
     accountInfo = address.account
@@ -48,6 +48,31 @@ export async function getBondFromAddress({
     accountInfo,
     logger,
   })
+
+  if (voteAccountAddress === null) {
+    // it could be withdraw request address or bond, let's try to decode it as withdraw request
+    let withdrawRequestData: WithdrawRequest | undefined = undefined
+    const withdrawRequestAddress = address
+    try {
+      withdrawRequestData = decodeWithdrawRequest({ program, accountInfo })
+      address = withdrawRequestData.bond
+    } catch (e) {
+      logger.debug(`Failed to decode account ${address} as withdraw request`, e)
+    }
+    // we found the provided address as the withdraw request, let's check the bond account
+    if (withdrawRequestData !== undefined) {
+      const bondAccountInfo =
+        await program.provider.connection.getAccountInfo(address)
+      if (bondAccountInfo === null) {
+        throw new CliCommandError({
+          valueName: '[withdraw request address]:[bond account address]',
+          value: withdrawRequestAddress.toBase58() + ':' + address.toBase58(),
+          msg: 'Bond account address taken from provided withdraw request was not found',
+        })
+      }
+      accountInfo = bondAccountInfo
+    }
+  }
 
   // If the address is a vote account, derive the bond account address from it
   if (voteAccountAddress !== null) {
@@ -121,6 +146,23 @@ async function isVoteAccount({
 }
 
 /**
+ * Check if the address and data is a withdraw request.
+ * If not throwing exception, returns the withdraw request data.
+ */
+function decodeWithdrawRequest({
+  program,
+  accountInfo,
+}: {
+  program: ValidatorBondsProgram
+  accountInfo: AccountInfo<Buffer>
+}): WithdrawRequest {
+  return program.coder.accounts.decode<WithdrawRequest>(
+    program.account.withdrawRequest.idlAccount.name,
+    accountInfo.data
+  )
+}
+
+/**
  * Expecting the provided address is a withdraw request or bond or vote account,
  * returns the account info of the (derived) bond account.
  */
@@ -135,17 +177,14 @@ export async function getWithdrawRequestFromAddress({
   logger: Logger
   config: PublicKey | undefined
 }): Promise<ProgramAccountInfo<WithdrawRequest>> {
-  let accountInfo = await checkAccountExistence(
+  let accountInfo: AccountInfo<Buffer> = await checkAccountExistence(
     program.provider.connection,
     address,
     'Account of type withdrawRequest or bond or voteAccount was not found'
   )
 
   try {
-    const withdrawRequestData = program.coder.accounts.decode<WithdrawRequest>(
-      program.account.withdrawRequest.idlAccount.name,
-      accountInfo.data
-    )
+    const withdrawRequestData = decodeWithdrawRequest({ program, accountInfo })
     return programAccountInfo(address, accountInfo, withdrawRequestData)
   } catch (e) {
     logger.debug(`Failed to decode account ${address} as withdraw request`, e)

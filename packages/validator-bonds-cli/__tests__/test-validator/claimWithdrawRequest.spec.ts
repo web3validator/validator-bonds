@@ -17,12 +17,12 @@ import {
   executeInitBondInstruction,
   executeInitConfigInstruction,
   executeInitWithdrawRequestInstruction,
-} from '@marinade.finance/validator-bonds-sdk/__tests__/utils/testTransactions'
-import { initTest } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
+} from '../../../validator-bonds-sdk/__tests__/utils/testTransactions'
+import { initTest } from '../../../validator-bonds-sdk/__tests__/test-validator/testValidator'
 import {
   createBondsFundedStakeAccount,
   createVoteAccount,
-} from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
+} from '../../../validator-bonds-sdk/__tests__/utils/staking'
 import { rand } from '@marinade.finance/ts-common'
 import { AnchorExtendedProvider } from '@marinade.finance/anchor-common'
 import BN from 'bn.js'

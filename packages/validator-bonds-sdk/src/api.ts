@@ -541,6 +541,8 @@ export type BondDataWithFunding = {
   numberActiveStakeAccounts: number
   numberSettlementStakeAccounts: number
   withdrawRequest: ProgramAccount<WithdrawRequest> | undefined
+  bondFundedStakeAccounts: ProgramAccountInfo<StakeAccountParsed>[]
+  settlementFundedStakeAccounts: ProgramAccountInfo<StakeAccountParsed>[]
 }
 
 function calculateFundedAmount(
@@ -723,6 +725,8 @@ export async function getBondsFunding({
         numberActiveStakeAccounts: bondFunded.length,
         numberSettlementStakeAccounts: settlementFunded.length,
         withdrawRequest,
+        bondFundedStakeAccounts: bondFunded,
+        settlementFundedStakeAccounts: settlementFunded,
       }
     }
   )
