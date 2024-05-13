@@ -1,6 +1,5 @@
 import {
   Errors,
-  U64_MAX,
   ValidatorBondsProgram,
   resetStakeInstruction,
   bondsWithdrawerAuthority,
@@ -25,6 +24,7 @@ import {
 } from '../utils/staking'
 import { verifyError } from '@marinade.finance/anchor-common'
 import { initBankrunTest } from './bankrun'
+import { U64_MAX } from '@marinade.finance/web3js-common'
 
 describe('Validator Bonds reset stake', () => {
   let provider: BankrunExtendedProvider

@@ -1,7 +1,6 @@
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import {
   RESET_STAKE_EVENT,
-  U64_MAX,
   ValidatorBondsProgram,
   getStakeAccount,
   resetStakeInstruction,
@@ -16,6 +15,7 @@ import {
   executeInitConfigInstruction,
 } from '../utils/testTransactions'
 import {
+  U64_MAX,
   executeTxSimple,
   transaction,
   waitForNextEpoch,

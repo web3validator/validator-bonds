@@ -25,6 +25,16 @@ Mono repository for Validator Bonds product
 
 ![Validator Bonds Workflow](./resources/diagram/validator-bonds-workflow.svg)
 
+The system works with flow of data.
+The flow is encoded in code within [`buildkite` pipelines](./.buildkite)
+
+- `scheduler` checks the epoch and makes processing happens each one
+- `fetch-snapshot` gets data from [`gs://jito-mainnet`](./scripts/fetch-jito-snapshot.bash#L23)
+- `prepare-claims` creates JSON data that reflects the protected events based on the performance of validators, the data is stored at GCloud (data is publicly available but google login is required) at https://console.cloud.google.com/storage/browser/marinade-validator-bonds-mainnet
+- `init-settlements` the [`Settlement`](./programs/validator-bonds/src/state/settlement.rs) accounts are created based on the generated JSON data, settlements are created by public key `bnwBM3RBrvnVmEJJAWEGXe81wtkzGvb9MMWjXcu99KR`
+- `claim-settlements` claiming the `Settlement accounts` to provides SOLs to holders affected by protected events
+
+
 ## Development
 
 ### User related CLI from source

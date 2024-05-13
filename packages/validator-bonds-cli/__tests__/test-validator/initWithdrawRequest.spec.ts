@@ -1,4 +1,5 @@
 import {
+  U64_MAX,
   createTempFileKeypair,
   createUserAndFund,
 } from '@marinade.finance/web3js-common'
@@ -10,6 +11,7 @@ import {
   withdrawRequestAddress,
 } from '@marinade.finance/validator-bonds-sdk'
 import {
+  executeCancelWithdrawRequestInstruction,
   executeInitBondInstruction,
   executeInitConfigInstruction,
 } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/testTransactions'
@@ -129,6 +131,52 @@ describe('Init withdraw request using CLI', () => {
       (await provider.connection.getAccountInfo(rentPayerKeypair.publicKey))
         ?.lamports
     ).toEqual(userFunding - rentExempt!)
+
+    await executeCancelWithdrawRequestInstruction(
+      program,
+      provider,
+      withdrawRequestAddr,
+      validatorIdentityKeypair
+    )
+    expect(
+      provider.connection.getAccountInfo(withdrawRequestAddr)
+    ).resolves.toBeNull()
+
+    await (
+      expect([
+        'pnpm',
+        [
+          'cli',
+          '-u',
+          provider.connection.rpcEndpoint,
+          '--program-id',
+          program.programId.toBase58(),
+          'init-withdraw-request',
+          bondAccount.toBase58(),
+          '--config',
+          configAccount.toBase58(),
+          '--authority',
+          validatorIdentityPath,
+          '--amount',
+          'ALL',
+          '--confirmation-finality',
+          'confirmed',
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ]) as any
+    ).toHaveMatchingSpawnOutput({
+      code: 0,
+      // stderr: '',
+      stdout: /successfully initialized/,
+    })
+    const withdrawRequestDataAll = await getWithdrawRequest(
+      program,
+      withdrawRequestAddr
+    )
+    expect(withdrawRequestDataAll.bond).toEqual(bondAccount)
+    expect(withdrawRequestDataAll.requestedAmount).toEqual(
+      U64_MAX
+    )
   })
 
   it('init withdraw request in print-only mode', async () => {

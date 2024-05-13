@@ -17,6 +17,10 @@ NEW_VERSION=${1:-$NEW_VERSION}
 echo "Updating CLI version $VERSION to $NEW_VERSION"
 read -p "Press enter to continue"
 
+# A fix/hack of issue on pnpm publish that does not comply with npm publishing and usage
+# https://github.com/pnpm/pnpm/issues/4348
+sed -i 's/workspace://' "$CLI_PACKAGE_JSON"
+
 for I in "$SDK_PACKAGE_JSON" "$CLI_PACKAGE_JSON" "$PIPELINES_PACKAGE_JSON" "$CLI_INDEX" "$README" "$README_CLI"; do
     UPDATE_FILE=`readlink -f "$I"`
     echo "Updating ${UPDATE_FILE}"

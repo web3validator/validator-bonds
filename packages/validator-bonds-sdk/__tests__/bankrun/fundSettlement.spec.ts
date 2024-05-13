@@ -1,6 +1,5 @@
 import {
   Errors,
-  U64_MAX,
   ValidatorBondsProgram,
   closeSettlementInstruction,
   fundSettlementInstruction,
@@ -40,6 +39,7 @@ import {
   getRentExemptStake,
 } from '../utils/staking'
 import {
+  U64_MAX,
   createUserAndFund,
   pubkey,
   signer,

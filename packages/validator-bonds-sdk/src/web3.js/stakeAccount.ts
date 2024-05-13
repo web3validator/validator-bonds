@@ -9,6 +9,7 @@ import {
   ProgramAccountInfo,
   ProgramAccountInfoNoData,
   Provider,
+  U64_MAX,
   getAccountInfoNoData,
   getConnection,
   getMultipleAccounts,
@@ -23,8 +24,6 @@ import {
 } from '@marinade.finance/marinade-ts-sdk/dist/src/marinade-state/borsh/stake-state'
 import assert from 'assert'
 import BN from 'bn.js'
-
-export const U64_MAX = new BN('ffffffffffffffff', 16)
 
 // borrowed from https://github.com/marinade-finance/marinade-ts-sdk/blob/v5.0.6/src/marinade-state/marinade-state.ts#L234
 export function deserializeStakeState(data: Buffer | undefined): StakeState {

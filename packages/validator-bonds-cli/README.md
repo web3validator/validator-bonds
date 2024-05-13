@@ -246,6 +246,10 @@ This process involves two steps:
 
 To initialize the withdrawal request, one needs to define the maximum number of lamports
 that are requested to be withdrawn upon claiming.
+The amount defined on creating withdraw request can be _bigger_ than amount funded to bond.
+
+**IMPORTANT:** If you want to withdraw all SOLs from the funded bond **ALL**
+               as value for `--amount` argument.
 
 For claiming, one may define `--withdrawer` as the public key where the claimed
 stake accounts will be assigned (by withdrawer and staker authorities) to.
@@ -256,7 +260,7 @@ as the new owner of the stake accounts.
 # 1) Initialize withdraw request
 validator-bonds -um init-withdraw-request <bond-or-vote-account-address> \
   --authority <bond-authority-keypair> \
-  --amount <number-of-requested-lamports-to-be-withdrawn>
+  --amount <number-of-requested-lamports-to-be-withdrawn __OR__ "ALL">
 
 # 2) Claim existing withdraw request
 validator-bonds -um claim-withdraw-request <withdraw-request-or-bond-account-address> \
@@ -273,6 +277,26 @@ The meanings of parameters are as follows:
   identity
 - `--amount`: amount of lamports required to be withdrawn from the bonds program
 - `--withdrawer`: new owner of the withdrawn stake accounts
+
+#### Technical details on creating withdraw request and claiming
+
+When creating a withdraw request, a specific number of lamports is designated for withdrawal after the delayed claiming period.
+This represents the maximum amount that can be withdrawn once the period elapses.
+However, during this time, staking rewards may accrue, resulting in a discrepancy between the requested withdrawal amount
+and the actual available lamports in stake accounts.
+The system only allows withdrawal of the specified amount in the withdraw request.
+
+At time of withdrawal (`claim-withdraw-request`), one must specify the stake account from which the amount
+will be taken. This typically results in __splitting the stake account__,
+where one portion of lamports is transferred to the withdrawer,
+while the remaining portion is retained in the validator bonds contract.
+
+However, a split stake account issue may arise if the requested withdrawal amount is not conducive to creating viable stake accounts.
+A viable stake account requires a defined amount of `1` SOL + rent amount (`~0.002282880` SOL).
+Failure to meet this criteria may result in the `claim-withdraw-request` operation failing.
+Refer to [FAQ, section Failed to claim withdraw request](#faq-and-issues)
+for more information on issues related to failed withdrawal requests.
+
 
 ### Cancelling Withdraw Request Account
 
@@ -629,3 +653,64 @@ Commands:
   The bonds program allows funds to be withdrawn only after a specified time defined in the `Config` account.
   Wait for a few `epochs` for the request to become available for claiming.
   More information can be found in the [Withdrawing Bond Account](#withdrawing-bond-account) section.
+
+* **Error processing Instruction 0: custom program error: 0xbbd**
+
+ ```
+ Anchor error 3005 (0xbbd), AccountNotEnoughKeys. Not enough account keys given to the instruction
+ ```
+
+ After updating the contract to the audited version, auditors requested using the CPI logging method,
+ which causes the old CLI to fail with error `3005 (0xbbd)`.
+ This error occurs due to insufficient account keys provided by old version of CLI to the instruction,
+ as the [`emit cpi`](https://book.anchor-lang.com/anchor_in_depth/events.html#cpi-events)
+ functionality requires specialized PDA at the call.
+
+ **Solution:**
+
+ Update version of CLI to most up-to-date.
+
+ ```
+ npm i -g @marinade.finance/validator-bonds-cli@latest
+ ```
+
+* **Failed to claim withdraw request ...***
+
+  ```
+  custom program error: 0x178f
+
+   "Program log: AnchorError caused by account: stake_account. Error Code: StakeAccountNotBigEnoughToSplit.
+   Error Number: 6031. Error Message: Stake account is not big enough to be split.",
+        "Program log: Left: stake_account_lamports - amount_to_fulfill_withdraw < minimal_stake_size",
+        "Program log: Right: 4030090170 - 4020836040 < 1002282880",
+  ```
+
+  See [at technical details on claiming process](#technical-details-on-creating-withdraw-request-and-claiming).
+
+  **Solution:**
+
+  Send `1.002282880` SOLs (usual SOL transfer to stake accoun public key address)
+  to the stake account bonded to your bond account.
+  This will ensure that the overflow amount available in the stake account is sufficient for splitting.
+  Then, you can withdraw the requested SOLs (in this case amount of 4020836040 lamports, i.e., ~ 4 SOLs)
+  from the bonds program.
+  The rest of `1.002282880` can be withdrawn by cancelling the fulfilled withdraw request
+  and creating new withdraw request for the particular amount.
+
+  Or, cancel the current withdraw request and create a new one that will specify large enough `--amount`
+  to cover additional staking rewards gained by stake accounts during delayed period until claiming is permitted.
+  For example in this the new withdraw request could define `--amount` to be 5 SOLS instead of 4 SOLs,
+  or use `--amount ALL` to declare that everything from bond should be withdrawn regardless
+  of rewards or whatever.
+
+  Send `1.002282880` SOLs (by usual means of transfer SOL to stake account public key address)
+  to the stake account bonded to your bond account. That way the sufficient overflow for splitting is ensured.
+  Then, withdraw the requested SOLs (for this particular example it's approximately 4 SOLs, i.e., 4020836040 lamports)
+  by use of `claim-withdraw-request` CLI command.
+  The remaining `1.002282880` can be withdrawn by canceling the fulfilled withdrawal request
+  and then creating a new one for that specific amount (needed to wait until new withdraw request elapses).
+
+  Alternatively, cancel the current withdrawal request and create a new one with a larger `--amount` to cover
+  additional staking rewards earned by stake accounts during the delayed period until claiming is permitted.
+  For example, the new withdrawal request could specify `--amount` as 5 SOLs instead of 4 SOLs for this particular example,
+  or use term `"ALL"` (`--amount ALL`) to declare the desire to withdraw everything from the bond regardless of anything.

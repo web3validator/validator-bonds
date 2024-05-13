@@ -6,6 +6,7 @@ import {
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
 import {
+  U64_MAX,
   Wallet,
   executeTx,
   instanceOfWallet,
@@ -56,9 +57,10 @@ export function installInitWithdrawRequest(program: Command) {
       parseWalletOrPubkey
     )
     .requiredOption(
-      '--amount <lamports_number>',
-      'Number of lamports to withdraw from the bond.',
-      v => new BN(v)
+      '--amount <lamports_number | ALL>',
+      'Maximal number of lamports to withdraw from the bond ' +
+        '(NOTE: consider staking rewards can be added to stake accounts during the time the withdraw request claiming time is elapsing). ' +
+        'If the bond should be fully withdrawn, use "ALL" instead of the amount.'
     )
     .option(
       '--rent-payer <keypair_or_ledger_or_pubkey>',
@@ -78,7 +80,7 @@ export function installInitWithdrawRequest(program: Command) {
           config?: Promise<PublicKey>
           voteAccount?: Promise<PublicKey>
           authority?: Promise<WalletInterface | PublicKey>
-          amount: BN
+          amount: string
           rentPayer?: Promise<WalletInterface | PublicKey>
         }
       ) => {
@@ -106,7 +108,7 @@ async function manageInitWithdrawRequest({
   config?: PublicKey
   voteAccount?: PublicKey
   authority?: WalletInterface | PublicKey
-  amount: BN
+  amount: string
   rentPayer?: WalletInterface | PublicKey
 }) {
   const {
@@ -149,6 +151,13 @@ async function manageInitWithdrawRequest({
     voteAccount = bondAccountData.account.data.voteAccount
   }
 
+  let amountBN: BN
+  if (amount === 'ALL') {
+    amountBN = U64_MAX
+  } else {
+    amountBN = new BN(amount)
+  }
+
   const { instruction, bondAccount, withdrawRequestAccount } =
     await initWithdrawRequestInstruction({
       program,
@@ -156,7 +165,7 @@ async function manageInitWithdrawRequest({
       configAccount: config,
       voteAccount,
       authority,
-      amount,
+      amount: amountBN,
       rentPayer,
     })
   tx.add(instruction)
