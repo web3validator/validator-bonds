@@ -21,7 +21,8 @@ steps:
     - 'buildkite-agent meta-data set epoch "$$epoch"'
     - 'echo "Epoch: $$epoch"'
     - |
-      curl "$$DISCORD_WEBHOOK_VALIDATOR_BONDS" -H "Content-Type: application/json" -d '{
+      curl "$$DISCORD_WEBHOOK_VALIDATOR_BONDS" \
+        -H "Content-Type: application/json" -d '{
         "embeds": [
           {
             "title": "Confirm Settlements Initialization for Validator Bonds ('"$$epoch"').",
@@ -55,8 +56,8 @@ steps:
   - label: "Settlement JSON listing"
     commands:
      - 'buildkite-agent artifact download --include-retried-jobs settlement-merkle-trees.json .'
-     - 'chmod uog+x ./scripts/settlement-json-listing.sh'
-     - './scripts/settlement-json-listing.sh settlement-merkle-trees.json'
+     - 'buildkite-agent artifact download --include-retried-jobs settlements.json .'
+     - 'bash ./scripts/settlement-json-listing.sh --settlements settlements.json --merkle-trees settlement-merkle-trees.json'
     depends_on: "download-json"
   
   - wait: ~
