@@ -9,6 +9,7 @@ import {
 } from '../../src'
 import { initTest } from './testValidator'
 import {
+  executeConfigureConfigInstruction,
   executeInitBondInstruction,
   executeInitConfigInstruction,
 } from '../utils/testTransactions'
@@ -31,10 +32,19 @@ describe('Validator Bonds configure bond', () => {
   })
 
   beforeEach(async () => {
-    ;({ configAccount } = await executeInitConfigInstruction({
+    const { configAccount: ca, adminAuthority } =
+      await executeInitConfigInstruction({
+        program,
+        provider,
+      })
+    configAccount = ca
+    await executeConfigureConfigInstruction({
       program,
       provider,
-    }))
+      configAccount,
+      adminAuthority,
+      newMinBondMaxStakeWanted: 9999,
+    })
   })
 
   it('configure bond', async () => {
@@ -55,6 +65,7 @@ describe('Validator Bonds configure bond', () => {
       authority: bondAuthority,
       newBondAuthority: newBondAuthority.publicKey,
       newCpmpe: 31,
+      newMaxStakeWanted: 1_000_001,
     })
     tx.add(instruction)
     const executionReturn = await executeTxSimple(provider.connection, tx, [
@@ -67,6 +78,7 @@ describe('Validator Bonds configure bond', () => {
     expect(bondData.config).toEqual(configAccount)
     expect(bondData.cpmpe).toEqual(31)
     expect(bondData.authority).toEqual(newBondAuthority.publicKey)
+    expect(bondData.maxStakeWanted).toEqual(1_000_001)
 
     const events = parseCpiEvents(program, executionReturn?.response)
     const e = assertEvent(events, CONFIGURE_BOND_EVENT)
@@ -79,6 +91,10 @@ describe('Validator Bonds configure bond', () => {
     expect(e.cpmpe).toEqual({
       old: 22,
       new: 31,
+    })
+    expect(e.maxStakeWanted).toEqual({
+      old: 0,
+      new: 1_000_001,
     })
   })
 })

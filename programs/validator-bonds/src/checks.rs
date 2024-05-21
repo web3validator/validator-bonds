@@ -252,7 +252,8 @@ mod tests {
             authority,
             cpmpe: 0,
             bump: 0,
-            reserved: [0; 142],
+            max_stake_wanted: 0,
+            reserved: [0; 134],
         }
     }
 

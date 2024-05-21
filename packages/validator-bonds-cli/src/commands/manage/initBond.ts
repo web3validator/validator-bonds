@@ -19,6 +19,7 @@ import {
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import { INIT_BOND_LIMIT_UNITS } from '../../computeUnits'
+import BN from 'bn.js'
 
 export function installInitBond(program: Command) {
   program
@@ -53,6 +54,16 @@ export function installInitBond(program: Command) {
       'Rent payer for the account creation (default: wallet keypair)',
       parseWalletOrPubkey
     )
+    .option(
+      '--cpmpe <number>',
+      'Cost per mille per epoch (default: 0)',
+      value => new BN(value, 10)
+    )
+    .option(
+      '--max-stake-wanted <number>',
+      'Maximal value of stake for PSR bidding (default: 0)',
+      value => new BN(value, 10)
+    )
     .action(
       async ({
         config,
@@ -60,12 +71,16 @@ export function installInitBond(program: Command) {
         validatorIdentity,
         bondAuthority,
         rentPayer,
+        cpmpe = new BN(0),
+        maxStakeWanted = new BN(0),
       }: {
         config?: Promise<PublicKey>
         voteAccount: Promise<PublicKey>
         validatorIdentity?: Promise<WalletInterface | PublicKey>
         bondAuthority: Promise<PublicKey>
         rentPayer?: Promise<WalletInterface | PublicKey>
+        cpmpe: BN
+        maxStakeWanted: BN
       }) => {
         await manageInitBond({
           config: await config,
@@ -73,6 +88,8 @@ export function installInitBond(program: Command) {
           validatorIdentity: await validatorIdentity,
           bondAuthority: await bondAuthority,
           rentPayer: await rentPayer,
+          cpmpe,
+          maxStakeWanted,
         })
       }
     )
@@ -84,12 +101,16 @@ async function manageInitBond({
   validatorIdentity,
   bondAuthority,
   rentPayer,
+  cpmpe,
+  maxStakeWanted,
 }: {
   config?: PublicKey
   voteAccount: PublicKey
   validatorIdentity?: WalletInterface | PublicKey
   bondAuthority: PublicKey
   rentPayer?: WalletInterface | PublicKey
+  cpmpe: BN
+  maxStakeWanted: BN
 }) {
   const {
     program,
@@ -130,6 +151,8 @@ async function manageInitBond({
     voteAccount,
     validatorIdentity,
     rentPayer,
+    cpmpe,
+    maxStakeWanted,
   })
   tx.add(instruction)
 

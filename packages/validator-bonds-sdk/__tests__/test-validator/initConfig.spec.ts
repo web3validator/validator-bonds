@@ -76,6 +76,7 @@ describe('Validator Bonds init config', () => {
     expect(configData.epochsToClaimSettlement).toEqual(1)
     expect(configData.withdrawLockupEpochs).toEqual(2)
     expect(configData.slotsToStartSettlementClaiming).toEqual(3)
+    expect(configData.minBondMaxStakeWanted).toEqual(0)
 
     const events = parseCpiEvents(program, executionReturn?.response)
     const e = assertEvent(events, INIT_CONFIG_EVENT)

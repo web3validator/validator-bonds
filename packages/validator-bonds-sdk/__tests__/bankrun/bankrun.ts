@@ -20,7 +20,7 @@ export async function initBankrunTest(programId?: PublicKey): Promise<{
   program: ValidatorBondsProgram
   provider: BankrunExtendedProvider
 }> {
-  const provider = await testInit(['./fixtures/accounts/'])
+  const provider = await testInit({ accountDirs: ['./fixtures/accounts/'] })
   return {
     program: getProgram({ connection: provider, programId }),
     provider,

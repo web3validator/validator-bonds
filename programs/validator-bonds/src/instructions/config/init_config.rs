@@ -56,7 +56,8 @@ impl<'info> InitConfig<'info> {
             pause_authority: admin_authority,
             paused: false,
             slots_to_start_settlement_claiming,
-            reserved: [0; 471],
+            min_bond_max_stake_wanted: 0,
+            reserved: [0; 463],
         });
 
         emit_cpi!(InitConfigEvent {

@@ -2398,7 +2398,13 @@ export type ValidatorBonds = {
           {
             "name": "cpmpe",
             "docs": [
-              "Cost per mille per epoch"
+              "Cost per mille per epoch.",
+              "This field represents the bid the bond (vote) account owner is willing to pay",
+              "for up to the `max_stake_wanted` being delegated.",
+              "The bid is in cost per mille per epoch similar to Google ads cpm system.",
+              "---",
+              "The actual amount of lamports deducted from the bond account for the processed bid",
+              "is based on the actual delegated lamports during the epoch."
             ],
             "type": "u64"
           },
@@ -2410,6 +2416,17 @@ export type ValidatorBonds = {
             "type": "u8"
           },
           {
+            "name": "maxStakeWanted",
+            "docs": [
+              "Maximum stake (in lamports) that the bond (vote) account owner requests.",
+              "This is the maximum stake that will be distributed to the vote account",
+              "when all other constraints are fulfilled (managed off-chain).",
+              "The vote account owner then goes to auction to obtain up to that maximum.",
+              "Use the `cpmpe` field to define the bid for this purpose."
+            ],
+            "type": "u64"
+          },
+          {
             "name": "reserved",
             "docs": [
               "reserve space for future extensions"
@@ -2417,7 +2434,7 @@ export type ValidatorBonds = {
             "type": {
               "array": [
                 "u8",
-                142
+                134
               ]
             }
           }
@@ -2493,6 +2510,13 @@ export type ValidatorBonds = {
             "type": "u64"
           },
           {
+            "name": "minBondMaxStakeWanted",
+            "docs": [
+              "Minimum value of max_stake_wanted to be configured by vote account owners at bond."
+            ],
+            "type": "u64"
+          },
+          {
             "name": "reserved",
             "docs": [
               "reserved space for future changes"
@@ -2500,7 +2524,7 @@ export type ValidatorBonds = {
             "type": {
               "array": [
                 "u8",
-                471
+                463
               ]
             }
           }
@@ -2869,9 +2893,16 @@ export type ValidatorBonds = {
         "kind": "struct",
         "fields": [
           {
+            "name": "validatorIdentity",
+            "docs": [
+              "Validator identity configured within the vote account."
+            ],
+            "type": "publicKey"
+          },
+          {
             "name": "bondAuthority",
             "docs": [
-              "new bond authority"
+              "New bond authority that can manage the bond account."
             ],
             "type": {
               "option": "publicKey"
@@ -2880,18 +2911,22 @@ export type ValidatorBonds = {
           {
             "name": "cpmpe",
             "docs": [
-              "new cpmpe value"
+              "New `cpmpe` value (cost per mille per epoch).",
+              "It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports."
             ],
             "type": {
               "option": "u64"
             }
           },
           {
-            "name": "validatorIdentity",
+            "name": "maxStakeWanted",
             "docs": [
-              "validator identity configured within the vote account"
+              "new max_stake_wanted value that vote account owner declares",
+              "as the maximum delegated stake wanted"
             ],
-            "type": "publicKey"
+            "type": {
+              "option": "u64"
+            }
           }
         ]
       }
@@ -2903,12 +2938,29 @@ export type ValidatorBonds = {
         "fields": [
           {
             "name": "bondAuthority",
+            "docs": [
+              "New bond authority that can manage the bond account."
+            ],
             "type": {
               "option": "publicKey"
             }
           },
           {
             "name": "cpmpe",
+            "docs": [
+              "New `cpmpe` value (cost per mille per epoch).",
+              "It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports."
+            ],
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "maxStakeWanted",
+            "docs": [
+              "New `max_stake_wanted` value that the vote account owner declares",
+              "as the maximum delegated stake desired."
+            ],
             "type": {
               "option": "u64"
             }
@@ -2927,6 +2979,10 @@ export type ValidatorBonds = {
           },
           {
             "name": "cpmpe",
+            "type": "u64"
+          },
+          {
+            "name": "maxStakeWanted",
             "type": "u64"
           }
         ]
@@ -2975,6 +3031,12 @@ export type ValidatorBonds = {
           },
           {
             "name": "slotsToStartSettlementClaiming",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "minBondMaxStakeWanted",
             "type": {
               "option": "u64"
             }
@@ -3185,6 +3247,11 @@ export type ValidatorBonds = {
           "name": "cpmpe",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "maxStakeWanted",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -3202,6 +3269,15 @@ export type ValidatorBonds = {
         },
         {
           "name": "cpmpe",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "maxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -3230,6 +3306,15 @@ export type ValidatorBonds = {
         },
         {
           "name": "cpmpe",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "maxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -3398,6 +3483,15 @@ export type ValidatorBonds = {
         },
         {
           "name": "slotsToStartSettlementClaiming",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "minBondMaxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -4373,6 +4467,11 @@ export type ValidatorBonds = {
       "code": 6062,
       "name": "InvalidVoteAccountType",
       "msg": "Unsupported vote account type to deserialize"
+    },
+    {
+      "code": 6063,
+      "name": "MaxStakeWantedTooLow",
+      "msg": "Max stake wanted value is lower to minimum configured value"
     }
   ]
 };
@@ -6777,7 +6876,13 @@ export const IDL: ValidatorBonds = {
           {
             "name": "cpmpe",
             "docs": [
-              "Cost per mille per epoch"
+              "Cost per mille per epoch.",
+              "This field represents the bid the bond (vote) account owner is willing to pay",
+              "for up to the `max_stake_wanted` being delegated.",
+              "The bid is in cost per mille per epoch similar to Google ads cpm system.",
+              "---",
+              "The actual amount of lamports deducted from the bond account for the processed bid",
+              "is based on the actual delegated lamports during the epoch."
             ],
             "type": "u64"
           },
@@ -6789,6 +6894,17 @@ export const IDL: ValidatorBonds = {
             "type": "u8"
           },
           {
+            "name": "maxStakeWanted",
+            "docs": [
+              "Maximum stake (in lamports) that the bond (vote) account owner requests.",
+              "This is the maximum stake that will be distributed to the vote account",
+              "when all other constraints are fulfilled (managed off-chain).",
+              "The vote account owner then goes to auction to obtain up to that maximum.",
+              "Use the `cpmpe` field to define the bid for this purpose."
+            ],
+            "type": "u64"
+          },
+          {
             "name": "reserved",
             "docs": [
               "reserve space for future extensions"
@@ -6796,7 +6912,7 @@ export const IDL: ValidatorBonds = {
             "type": {
               "array": [
                 "u8",
-                142
+                134
               ]
             }
           }
@@ -6872,6 +6988,13 @@ export const IDL: ValidatorBonds = {
             "type": "u64"
           },
           {
+            "name": "minBondMaxStakeWanted",
+            "docs": [
+              "Minimum value of max_stake_wanted to be configured by vote account owners at bond."
+            ],
+            "type": "u64"
+          },
+          {
             "name": "reserved",
             "docs": [
               "reserved space for future changes"
@@ -6879,7 +7002,7 @@ export const IDL: ValidatorBonds = {
             "type": {
               "array": [
                 "u8",
-                471
+                463
               ]
             }
           }
@@ -7248,9 +7371,16 @@ export const IDL: ValidatorBonds = {
         "kind": "struct",
         "fields": [
           {
+            "name": "validatorIdentity",
+            "docs": [
+              "Validator identity configured within the vote account."
+            ],
+            "type": "publicKey"
+          },
+          {
             "name": "bondAuthority",
             "docs": [
-              "new bond authority"
+              "New bond authority that can manage the bond account."
             ],
             "type": {
               "option": "publicKey"
@@ -7259,18 +7389,22 @@ export const IDL: ValidatorBonds = {
           {
             "name": "cpmpe",
             "docs": [
-              "new cpmpe value"
+              "New `cpmpe` value (cost per mille per epoch).",
+              "It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports."
             ],
             "type": {
               "option": "u64"
             }
           },
           {
-            "name": "validatorIdentity",
+            "name": "maxStakeWanted",
             "docs": [
-              "validator identity configured within the vote account"
+              "new max_stake_wanted value that vote account owner declares",
+              "as the maximum delegated stake wanted"
             ],
-            "type": "publicKey"
+            "type": {
+              "option": "u64"
+            }
           }
         ]
       }
@@ -7282,12 +7416,29 @@ export const IDL: ValidatorBonds = {
         "fields": [
           {
             "name": "bondAuthority",
+            "docs": [
+              "New bond authority that can manage the bond account."
+            ],
             "type": {
               "option": "publicKey"
             }
           },
           {
             "name": "cpmpe",
+            "docs": [
+              "New `cpmpe` value (cost per mille per epoch).",
+              "It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports."
+            ],
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "maxStakeWanted",
+            "docs": [
+              "New `max_stake_wanted` value that the vote account owner declares",
+              "as the maximum delegated stake desired."
+            ],
             "type": {
               "option": "u64"
             }
@@ -7306,6 +7457,10 @@ export const IDL: ValidatorBonds = {
           },
           {
             "name": "cpmpe",
+            "type": "u64"
+          },
+          {
+            "name": "maxStakeWanted",
             "type": "u64"
           }
         ]
@@ -7354,6 +7509,12 @@ export const IDL: ValidatorBonds = {
           },
           {
             "name": "slotsToStartSettlementClaiming",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "minBondMaxStakeWanted",
             "type": {
               "option": "u64"
             }
@@ -7564,6 +7725,11 @@ export const IDL: ValidatorBonds = {
           "name": "cpmpe",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "maxStakeWanted",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -7581,6 +7747,15 @@ export const IDL: ValidatorBonds = {
         },
         {
           "name": "cpmpe",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "maxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -7609,6 +7784,15 @@ export const IDL: ValidatorBonds = {
         },
         {
           "name": "cpmpe",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "maxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -7777,6 +7961,15 @@ export const IDL: ValidatorBonds = {
         },
         {
           "name": "slotsToStartSettlementClaiming",
+          "type": {
+            "option": {
+              "defined": "U64ValueChange"
+            }
+          },
+          "index": false
+        },
+        {
+          "name": "minBondMaxStakeWanted",
           "type": {
             "option": {
               "defined": "U64ValueChange"
@@ -8752,6 +8945,11 @@ export const IDL: ValidatorBonds = {
       "code": 6062,
       "name": "InvalidVoteAccountType",
       "msg": "Unsupported vote account type to deserialize"
+    },
+    {
+      "code": 6063,
+      "name": "MaxStakeWantedTooLow",
+      "msg": "Max stake wanted value is lower to minimum configured value"
     }
   ]
 };

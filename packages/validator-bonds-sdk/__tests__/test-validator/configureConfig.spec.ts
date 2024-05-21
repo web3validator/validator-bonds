@@ -61,6 +61,7 @@ describe('Validator Bonds configure config', () => {
       newEpochsToClaimSettlement: 100,
       newWithdrawLockupEpochs: 103,
       newMinimumStakeLamports: 1001,
+      newMinBondMaxStakeWanted: 1002,
     })
     tx.add(instruction)
     const executionReturn = await executeTxSimple(provider.connection, tx, [
@@ -76,6 +77,7 @@ describe('Validator Bonds configure config', () => {
     expect(configData.epochsToClaimSettlement).toEqual(100)
     expect(configData.withdrawLockupEpochs).toEqual(103)
     expect(configData.minimumStakeLamports).toEqual(1001)
+    expect(configData.minBondMaxStakeWanted).toEqual(1002)
 
     const events = parseCpiEvents(program, executionReturn?.response)
     const e = assertEvent(events, CONFIGURE_CONFIG_EVENT)
@@ -104,6 +106,10 @@ describe('Validator Bonds configure config', () => {
     expect(e.minimumStakeLamports).toEqual({
       old: LAMPORTS_PER_SOL,
       new: 1001,
+    })
+    expect(e.minBondMaxStakeWanted).toEqual({
+      old: 0,
+      new: 1002,
     })
   })
 })

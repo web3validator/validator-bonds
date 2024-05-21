@@ -8,6 +8,7 @@ import {
   initSettlementInstruction,
   initWithdrawRequestInstruction,
   bondsWithdrawerAuthority,
+  configureConfigInstruction,
 } from '../../src'
 import {
   ComputeBudgetProgram,
@@ -88,7 +89,6 @@ export async function executeInitConfigInstruction({
     configAccount: configAccountKeypair,
     admin: adminAuthority.publicKey,
     operator: operatorAuthority.publicKey,
-
     epochsToClaimSettlement,
     slotsToStartSettlementClaiming,
     withdrawLockupEpochs,
@@ -115,6 +115,64 @@ export async function executeInitConfigInstruction({
   }
 }
 
+export async function executeConfigureConfigInstruction({
+  program,
+  provider,
+  configAccount,
+  adminAuthority,
+  newAdmin,
+  newOperator,
+  newPauseAuthority,
+  newEpochsToClaimSettlement,
+  newSlotsToStartSettlementClaiming,
+  newWithdrawLockupEpochs,
+  newMinimumStakeLamports,
+  newMinBondMaxStakeWanted,
+}: {
+  program: ValidatorBondsProgram
+  provider: ExtendedProvider
+  configAccount: PublicKey
+  adminAuthority: Keypair
+  newAdmin?: PublicKey
+  newOperator?: PublicKey
+  newPauseAuthority?: PublicKey
+  newEpochsToClaimSettlement?: BN | number
+  newSlotsToStartSettlementClaiming?: BN | number
+  newWithdrawLockupEpochs?: BN | number
+  newMinimumStakeLamports?: BN | number
+  newMinBondMaxStakeWanted?: BN | number
+}): Promise<{
+  configAccount: PublicKey
+}> {
+  const { instruction } = await configureConfigInstruction({
+    program,
+    configAccount: configAccount,
+    adminAuthority: adminAuthority.publicKey,
+    newAdmin,
+    newOperator,
+    newPauseAuthority,
+    newEpochsToClaimSettlement,
+    newSlotsToStartSettlementClaiming,
+    newWithdrawLockupEpochs,
+    newMinimumStakeLamports,
+    newMinBondMaxStakeWanted,
+  })
+  try {
+    await provider.sendIx([adminAuthority], instruction)
+  } catch (e) {
+    console.error(
+      `executeConfigureConfigInstruction: config account ${configAccount.toBase58()}, ` +
+        `admin: ${adminAuthority.publicKey.toBase58()}`,
+      e
+    )
+    throw e
+  }
+
+  return {
+    configAccount,
+  }
+}
+
 export async function executeInitBondInstruction({
   program,
   provider,
@@ -123,6 +181,7 @@ export async function executeInitBondInstruction({
   voteAccount,
   validatorIdentity,
   cpmpe = Math.floor(Math.random() * 100) + 1,
+  maxStakeWanted = 0,
 }: {
   program: ValidatorBondsProgram
   provider: ExtendedProvider
@@ -131,6 +190,7 @@ export async function executeInitBondInstruction({
   voteAccount?: PublicKey
   validatorIdentity?: Keypair
   cpmpe?: BN | number
+  maxStakeWanted?: BN | number
 }): Promise<{
   bondAccount: PublicKey
   bondAuthority: Keypair
@@ -157,6 +217,7 @@ export async function executeInitBondInstruction({
     cpmpe,
     voteAccount,
     validatorIdentity: validatorIdentity?.publicKey,
+    maxStakeWanted,
   })
   try {
     await provider.sendIx(

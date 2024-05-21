@@ -19,12 +19,24 @@ pub struct Bond {
     /// The same powers has got the owner of the validator vote account
     // https://github.com/solana-labs/solana/blob/master/vote/src/vote_account.rs
     pub authority: Pubkey,
-    /// Cost per mille per epoch
+    /// Cost per mille per epoch.
+    /// This field represents the bid the bond (vote) account owner is willing to pay
+    /// for up to the `max_stake_wanted` being delegated.
+    /// The bid is in cost per mille per epoch similar to Google ads cpm system.
+    /// ---
+    /// The actual amount of lamports deducted from the bond account for the processed bid
+    /// is based on the actual delegated lamports during the epoch.
     pub cpmpe: u64,
     /// PDA Bond address bump seed
     pub bump: u8,
+    /// Maximum stake (in lamports) that the bond (vote) account owner requests.
+    /// This is the maximum stake that will be distributed to the vote account
+    /// when all other constraints are fulfilled (managed off-chain).
+    /// The vote account owner then goes to auction to obtain up to that maximum.
+    /// Use the `cpmpe` field to define the bid for this purpose.
+    pub max_stake_wanted: u64,
     /// reserve space for future extensions
-    pub reserved: [u8; 142],
+    pub reserved: [u8; 134],
 }
 
 impl Bond {

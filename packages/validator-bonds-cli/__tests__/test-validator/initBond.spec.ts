@@ -99,6 +99,10 @@ describe('Init bond account using CLI', () => {
           bondAuthority.publicKey.toBase58(),
           '--rent-payer',
           rentPayerPath,
+          '--cpmpe',
+          33,
+          '--max-stake-wanted',
+          1000,
           '--confirmation-finality',
           'confirmed',
         ],
@@ -119,7 +123,8 @@ describe('Init bond account using CLI', () => {
     expect(bondsData.config).toEqual(configAccount)
     expect(bondsData.voteAccount).toEqual(voteAccount)
     expect(bondsData.authority).toEqual(bondAuthority.publicKey)
-    expect(bondsData.cpmpe).toEqual(0)
+    expect(bondsData.cpmpe).toEqual(33)
+    expect(bondsData.maxStakeWanted).toEqual(1000)
     expect(bondsData.bump).toEqual(bump)
     await expect(
       provider.connection.getBalance(rentPayerKeypair.publicKey)
@@ -141,6 +146,8 @@ describe('Init bond account using CLI', () => {
           configAccount.toBase58(),
           '--vote-account',
           voteAccount.toBase58(),
+          '--max-stake-wanted',
+          1000,
           '--confirmation-finality',
           'confirmed',
         ],
@@ -162,6 +169,7 @@ describe('Init bond account using CLI', () => {
     expect(bondsData.voteAccount).toEqual(voteAccount)
     expect(bondsData.authority).toEqual(validatorIdentity.publicKey)
     expect(bondsData.cpmpe).toEqual(0)
+    expect(bondsData.maxStakeWanted).toEqual(0)
     expect(bondsData.bump).toEqual(bump)
   })
 

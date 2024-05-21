@@ -22,6 +22,7 @@ pub struct ConfigureConfigEvent {
     pub minimum_stake_lamports: Option<U64ValueChange>,
     pub withdraw_lockup_epochs: Option<U64ValueChange>,
     pub slots_to_start_settlement_claiming: Option<U64ValueChange>,
+    pub min_bond_max_stake_wanted: Option<U64ValueChange>,
 }
 
 #[event]
