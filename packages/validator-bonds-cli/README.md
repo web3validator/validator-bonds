@@ -38,6 +38,8 @@ validator-bonds --help
 
 * [creating a bond](#creating-a-bond)
 * [funding the bond](#funding-bond-account)
+# TODO: bidding requires more detailed description
+* [bidding for the stake](#bond-account-configuration)
 * [during the time of tracking, the bond is sufficiently funded](#show-the-bond-account)
 
 
@@ -88,6 +90,18 @@ The parameters and their meanings are explained in detail below:
 * `--bond-authority`: Refers to any public key with ownership rights. It is recommended to use a ledger or multisig. This key does not necessarily need to correspond to an existing on-chain account (SOL preloading is unnecessary).
 * `--rent-payer`: This account covers the creation cost of the Solana bond account, and it is expected to be the same as the fee payer (default).
    The rent cost is `0.00270048` SOL. Note that the `--rent-payer` is unrelated to bond security or "funding," which is addressed through a separate instruction. The bond's security is established by providing a stake account. The lamports in the stake account then corresponds to the SOL amount added to the security of the bond account. There is no direct payment of SOLs to the bond; it is accomplished solely by allocating stake accounts.
+* `--cpmpe`: cost per mille per epoch. In lamports. It configures the bid that the `Bond` owner
+  wish to pay for receiving delegated stake. The maximum provided delegated stake is defined
+  by `max-stake-wanted`. The actual amount of delegated stake is influenced by constraints defined by
+  [delegation strategy](https://docs.marinade.finance/marinade-protocol/validators).
+  The value of of `cpmpe` goes into the auction and based on the other
+  bids the delegation strategy then delegates the actual amount of stake to the vote account
+  coupled with the `Bond` account.
+  The funded bond is charged only for amount of stake that was really delegated.
+  When nothing is delegated to the vote account, then nothing is charged from the `Bond` account.
+* `--max-stake-wanted`: In lamports. The maximum number of stake the `Bond` owner desires
+  to get delegated from
+  [delegation strategy](https://docs.marinade.finance/marinade-protocol/validators).
 
 ### Show the bond account
 
@@ -105,6 +119,9 @@ Expected output on created bond is like
     config: 'vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU',
     voteAccount: '...',
     authority: '...'
+    costPerMillePerEpoch: 0,
+    maxStakeWanted: 0
+
   },
   amountActive: 10024261277,
   amountAtSettlements: 0,
@@ -117,9 +134,20 @@ Expected output on created bond is like
 
 ### Bond account configuration
 
-The bond account configures the authority public key.
-To both fund the bond and withdraw the funds, either the authority signature
-or the validator identity (linked to the bond account's vote account) is required.
+The `Bond` owner may configure following properties of the account:
+
+* `--bond-authority`: authority that when it signs the configuration transaction
+  then it permits to change the `Bond` account configuration and to withdraw funds.
+  The same ability to configure the `Bond` has got the signature 
+  of validator identity keypair of the coupled `vote account`,
+  or owner of the [SPL minted configuration token](#permission-less-mint---configure-workflow).
+* `--cpmpe`: cost per mille per epoch (in lamports). It's a bid used in delegation strategy auction.
+  The `Bond` owner defines his attitude to pay that amount in lamports to get stake delegated
+  to vote account for one epoch.
+* `--max-stake-wanted`: the maximum amount stake that the `Bond` owner desired
+  to get delegated to his vote account.
+
+#### Permission-ed Configure workflow
 
 When creating the bond account in a permission-ed manner (as described in [section Creating a Bond](#creating-a-bond)), the authority can be defined upfront. If one prefers not to sign the CLI transaction with the validator `identity key`, they can utilize the [*mint-configure*](#permission-less-mint---configure-workflow) workflow.
 
@@ -135,7 +163,7 @@ validator-bonds -um configure-bond <bond-or-vote-account-address> \
 
 **An alternative step**, the permission-less mint workflow is available only for special
 purposes. For configuration, it is typically recommended to use the validator identity
-signature, as described in [bond account configuration](#bond-account-configuration).
+signature, as described in [permission-ed configure workflow](#permission-ed-configure-workflow).
 
 The owner of the `validator identity` key has permission to configure the bond account. To verify the ownership of the validator identity key without requiring the CLI-generated transaction signature and sending it on-chain, one can use Bond's token minting. Use the command `mint-bond`:
 
@@ -168,6 +196,20 @@ validator-bonds -um configure-bond <bond-or-vote-account-address> \
   --bond-authority <new-bond-authority-pubkey> \
   --with-token
 ```
+
+#### Bond configuration
+
+The `Bond` owner may configure following properties of the account:
+
+* `--bond-authority`: authority that when it signs the configuration transaction
+  then it permits to change the `Bond` account configuration and to withdraw funds.
+  The same ability has got the `vote account` withdraw authority coupled with the `Bond`
+  or owner of the [SPL minted configuration token](#permission-less-mint---configure-workflow).
+* `--cpmpe`: cost per mille per epoch (in lamports). It's a bid used in delegation strategy auction.
+  The `Bond` owner defines his attitude to pay that amount in lamports to get stake delegated
+  to vote account for one epoch.
+* `--max-stake-wanted`: the maximum amount stake that the `Bond` owner desired
+  to get delegated to his vote account.
 
 ### Funding Bond Account
 
@@ -466,16 +508,14 @@ Options:
   -V, --version                                   output the version number
   -u, --cluster <cluster>                         solana cluster URL or a moniker (m/mainnet/mainnet-beta, d/devnet, t/testnet, l/localhost) (default: "mainnet")
   -c <cluster>                                    alias for "-u, --cluster"
-  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default
-                                                  value for signers. (default: loaded from solana config file or ~/.config/solana/id.json)
+  -k, --keypair <keypair-or-ledger>               Wallet keypair (path or ledger url in format usb://ledger/[<pubkey>][?key=<derivedPath>]). Wallet keypair is used to pay for the transaction fees and as default value for signers. (default: loaded from solana
+                                                  config file or ~/.config/solana/id.json)
   --program-id <pubkey>                           Program id of validator bonds contract (default: vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
   -s, --simulate                                  Simulate (default: false)
-  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand.
-                                                  (default: false)
+  -p, --print-only                                Print only mode, no execution, instructions are printed in base64 to output. This can be used for placing the admin commands to SPL Governance UI by hand. (default: false)
   --skip-preflight                                Transaction execution flag "skip-preflight", see https://solanacookbook.com/guides/retrying-transactions.html#the-cost-of-skipping-preflight (default: false)
   --commitment <commitment>                       Commitment (default: "confirmed")
-  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized" stands for full cluster
-                                                  finality that takes ~8 seconds. (default: "confirmed")
+  --confirmation-finality <confirmed|finalized>   Confirmation finality of sent transaction. Default is "confirmed" that means for majority of nodes confirms in cluster. "finalized" stands for full cluster finality that takes ~8 seconds. (default: "confirmed")
   --with-compute-unit-price <compute-unit-price>  Set compute unit price for transaction, in increments of 0.000001 lamports per compute unit. (default: 10)
   -d, --debug                                     Printing more detailed information of the CLI execution (default: false)
   -v, --verbose                                   alias for --debug (default: false)
@@ -484,24 +524,22 @@ Options:
 Commands:
   init-config [options]                           Create a new config account.
   configure-config [options] [address]            Configure existing config account.
-  mint-bond [options] <address>                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain transaction. The workflow is as
-                                                  follows: first, use this "mint-bond" to mint a bond token to the validator identity public key. Next, transfer the token to any account desired. Finally, utilize
-                                                  the command "configure-bond --with-token" to configure the bond account.
+  mint-bond [options] <address>                   Mint a Validator Bond token, providing a means to configure the bond account without requiring a direct signature for the on-chain transaction. The workflow is as follows: first, use this "mint-bond" to mint a
+                                                  bond token to the validator identity public key. Next, transfer the token to any account desired. Finally, utilize the command "configure-bond --with-token" to configure the bond account.
   init-bond [options]                             Create a new bond account.
   configure-bond [options] <address>              Configure existing bond account.
   merge-stake [options]                           Merging stake accounts belonging to validator bonds program.
   fund-bond [options] <address>                   Funding a bond account with amount of SOL within a stake account.
-  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the specified amount of lamports
-                                                  after the lockup period expires.
+  init-withdraw-request [options] [address]       Initializing withdrawal by creating a request ticket. The withdrawal request ticket is used to indicate a desire to withdraw the specified amount of lamports after the lockup period expires.
   cancel-withdraw-request [options] [address]     Cancelling the withdraw request account, which is the withdrawal request ticket, by removing the account from the chain.
-  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds involves transferring ownership
-                                                  of a funded stake account to the specified "--withdrawer" public key. To withdraw, the authority signature of the bond account is required, specified by the
-                                                  "--authority" parameter (default wallet).
+  claim-withdraw-request [options] [address]      Claiming an existing withdrawal request for an existing on-chain account, where the lockup period has expired. Withdrawing funds involves transferring ownership of a funded stake account to the specified
+                                                  "--withdrawer" public key. To withdraw, the authority signature of the bond account is required, specified by the "--authority" parameter (default wallet).
   pause [options] [address]                       Pausing Validator Bond contract for config account
   resume [options] [address]                      Resuming Validator Bond contract for config account
   show-config [options] [address]                 Showing data of config account(s)
   show-event [options] <event-data>               Showing data of anchor event
   show-bond [options] [address]                   Showing data of bond account(s)
+  show-settlement [options] [address]             Showing data of settlement account(s)
   help [command]                                  display help for command
 ```
 

@@ -1,7 +1,7 @@
 use crate::checks::get_validator_vote_account_validator_identity;
 use crate::error::ErrorCode;
 use crate::events::bond::ConfigureBondWithMintEvent;
-use crate::instructions::{configure_bond, ConfigureBondArgs};
+use crate::instructions::{configure_bond, ConfigureBondArgs, ConfigureBondChanges};
 use crate::state::bond::Bond;
 use crate::state::config::Config;
 use anchor_lang::prelude::*;
@@ -11,12 +11,16 @@ use anchor_spl::token::{burn, Burn, Token, TokenAccount};
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct ConfigureBondWithMintArgs {
-    /// new bond authority
-    pub bond_authority: Option<Pubkey>,
-    /// new cpmpe value
-    pub cpmpe: Option<u64>,
-    /// validator identity configured within the vote account
+    /// Validator identity configured within the vote account.
     pub validator_identity: Pubkey,
+    /// New bond authority that can manage the bond account.
+    pub bond_authority: Option<Pubkey>,
+    /// New `cpmpe` value (cost per mille per epoch).
+    /// It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports.
+    pub cpmpe: Option<u64>,
+    /// new max_stake_wanted value that vote account owner declares
+    /// as the maximum delegated stake wanted
+    pub max_stake_wanted: Option<u64>,
 }
 
 /// Change parameters of validator bond account with token burning
@@ -73,25 +77,31 @@ pub struct ConfigureBondWithMint<'info> {
 impl<'info> ConfigureBondWithMint<'info> {
     pub fn process(
         ctx: Context<ConfigureBondWithMint>,
-        args: ConfigureBondWithMintArgs,
+        configure_bond_mint_args: ConfigureBondWithMintArgs,
     ) -> Result<()> {
         require!(!ctx.accounts.config.paused, ErrorCode::ProgramIsPaused);
 
         let validator_identity_vote_account =
             get_validator_vote_account_validator_identity(&ctx.accounts.vote_account)?;
         require_keys_eq!(
-            args.validator_identity,
+            configure_bond_mint_args.validator_identity,
             validator_identity_vote_account,
             ErrorCode::ValidatorIdentityBondMintMismatch
         );
 
-        let (bond_authority_change, cpmpe_change) = configure_bond(
+        let ConfigureBondChanges {
+            bond_authority_change,
+            cpmpe_change,
+            max_stake_wanted_change,
+        } = configure_bond(
             &mut ctx.accounts.bond,
+            ctx.accounts.config.min_bond_max_stake_wanted,
             ConfigureBondArgs {
-                bond_authority: args.bond_authority,
-                cpmpe: args.cpmpe,
+                bond_authority: configure_bond_mint_args.bond_authority,
+                cpmpe: configure_bond_mint_args.cpmpe,
+                max_stake_wanted: configure_bond_mint_args.max_stake_wanted,
             },
-        );
+        )?;
 
         burn(
             CpiContext::new(
@@ -106,9 +116,10 @@ impl<'info> ConfigureBondWithMint<'info> {
         )?;
 
         emit_cpi!(ConfigureBondWithMintEvent {
-            validator_identity: args.validator_identity,
+            validator_identity: configure_bond_mint_args.validator_identity,
             bond_authority: bond_authority_change,
             cpmpe: cpmpe_change,
+            max_stake_wanted: max_stake_wanted_change,
         });
 
         Ok(())

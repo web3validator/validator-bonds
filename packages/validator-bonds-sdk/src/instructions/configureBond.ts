@@ -22,6 +22,7 @@ export async function configureBondInstruction({
   authority = anchorProgramWalletPubkey(program),
   newBondAuthority,
   newCpmpe,
+  newMaxStakeWanted,
 }: {
   program: ValidatorBondsProgram
   bondAccount?: PublicKey
@@ -30,6 +31,7 @@ export async function configureBondInstruction({
   authority?: PublicKey | Keypair | Signer | WalletInterface | WalletInterface // signer
   newBondAuthority?: PublicKey
   newCpmpe?: BN | number
+  newMaxStakeWanted?: BN | number
 }): Promise<{
   bondAccount: PublicKey
   instruction: TransactionInstruction
@@ -50,6 +52,8 @@ export async function configureBondInstruction({
     .configureBond({
       bondAuthority: newBondAuthority === undefined ? null : newBondAuthority,
       cpmpe: newCpmpe === undefined ? null : new BN(newCpmpe),
+      maxStakeWanted:
+        newMaxStakeWanted === undefined ? null : new BN(newMaxStakeWanted),
     })
     .accounts({
       bond: bondAccount,

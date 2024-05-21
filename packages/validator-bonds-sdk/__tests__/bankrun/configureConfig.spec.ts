@@ -12,8 +12,16 @@ import {
   bankrunTransaction,
 } from '@marinade.finance/bankrun-utils'
 import { ProgramAccount } from '@coral-xyz/anchor'
-import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
-import { executeInitConfigInstruction } from '../utils/testTransactions'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from '@solana/web3.js'
+import {
+  executeConfigureConfigInstruction,
+  executeInitConfigInstruction,
+} from '../utils/testTransactions'
 import { verifyError } from '@marinade.finance/anchor-common'
 import { initBankrunTest } from './bankrun'
 
@@ -54,19 +62,16 @@ describe('Validator Bonds configure config tests', () => {
 
   it('configure config', async () => {
     const newAdminAuthority = Keypair.generate()
-    const { instruction } = await configureConfigInstruction({
+    await executeConfigureConfigInstruction({
       program,
-      configAccount: configInitialized.publicKey,
-      adminAuthority: configInitialized.account.adminAuthority,
-      newEpochsToClaimSettlement: 3,
-      newAdmin: newAdminAuthority.publicKey,
-      newSlotsToStartSettlementClaiming: 10,
-    })
-    await bankrunExecuteIx(
       provider,
-      [provider.wallet, adminAuthority],
-      instruction
-    )
+      configAccount: configInitialized.publicKey,
+      adminAuthority,
+      newAdmin: newAdminAuthority.publicKey,
+      newEpochsToClaimSettlement: 3,
+      newSlotsToStartSettlementClaiming: 10,
+      newMinBondMaxStakeWanted: LAMPORTS_PER_SOL * 10_000,
+    })
     const config = await getConfig(program, configInitialized.publicKey)
     expect(config.adminAuthority).toEqual(newAdminAuthority.publicKey)
     expect(config.operatorAuthority).toEqual(
@@ -77,6 +82,7 @@ describe('Validator Bonds configure config tests', () => {
     expect(config.withdrawLockupEpochs).toEqual(
       configInitialized.account.withdrawLockupEpochs
     )
+    expect(config.minBondMaxStakeWanted).toEqual(LAMPORTS_PER_SOL * 10_000)
 
     const pauseAuthority = PublicKey.unique()
     const { instruction: instruction2 } = await configureConfigInstruction({
@@ -100,6 +106,7 @@ describe('Validator Bonds configure config tests', () => {
     expect(config2.epochsToClaimSettlement).toEqual(3)
     expect(config2.slotsToStartSettlementClaiming).toEqual(10)
     expect(config2.withdrawLockupEpochs).toEqual(4)
+    expect(config.minBondMaxStakeWanted).toEqual(LAMPORTS_PER_SOL * 10_000)
   })
 
   it('configure config wrong keys', async () => {

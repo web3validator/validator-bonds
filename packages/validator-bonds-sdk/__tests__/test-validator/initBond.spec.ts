@@ -17,7 +17,10 @@ import {
   splitAndExecuteTx,
   transaction,
 } from '@marinade.finance/web3js-common'
-import { executeInitConfigInstruction } from '../utils/testTransactions'
+import {
+  executeConfigureConfigInstruction,
+  executeInitConfigInstruction,
+} from '../utils/testTransactions'
 import { createVoteAccountWithIdentity } from '../utils/staking'
 
 import {
@@ -38,10 +41,19 @@ describe('Validator Bonds init bond', () => {
   })
 
   beforeEach(async () => {
-    ;({ configAccount } = await executeInitConfigInstruction({
+    const { configAccount: ca, adminAuthority } =
+      await executeInitConfigInstruction({
+        program,
+        provider,
+      })
+    configAccount = ca
+    await executeConfigureConfigInstruction({
       program,
       provider,
-    }))
+      configAccount,
+      adminAuthority,
+      newMinBondMaxStakeWanted: 10_000,
+    })
   })
 
   it('init bond', async () => {
@@ -60,6 +72,7 @@ describe('Validator Bonds init bond', () => {
       cpmpe: 22,
       voteAccount,
       validatorIdentity: validatorIdentity.publicKey,
+      maxStakeWanted: 1_000_000,
     })
     tx.add(instruction)
     const executionReturn = await executeTxSimple(provider.connection, tx, [
@@ -88,6 +101,7 @@ describe('Validator Bonds init bond', () => {
     expect(bondData.config).toEqual(configAccount)
     expect(bondData.cpmpe).toEqual(22)
     expect(bondData.voteAccount).toEqual(voteAccount)
+    expect(bondData.maxStakeWanted).toEqual(1_000_000)
 
     const events = parseCpiEvents(program, executionReturn?.response)
     const e = assertEvent(events, INIT_BOND_EVENT)
@@ -99,6 +113,7 @@ describe('Validator Bonds init bond', () => {
     expect(e.cpmpe).toEqual(22)
     expect(e.voteAccount).toEqual(voteAccount)
     expect(e.validatorIdentity).toEqual(validatorIdentity.publicKey)
+    expect(e.maxStakeWanted).toEqual(1_000_000)
   })
 
   it('find bonds', async () => {

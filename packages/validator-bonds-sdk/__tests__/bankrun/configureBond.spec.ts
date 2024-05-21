@@ -4,10 +4,12 @@ import {
   ValidatorBondsProgram,
   configureBondInstruction,
   getBond,
+  getConfig,
   initBondInstruction,
 } from '../../src'
 import { BankrunExtendedProvider } from '@marinade.finance/bankrun-utils'
 import {
+  executeConfigureConfigInstruction,
   executeInitBondInstruction,
   executeInitConfigInstruction,
 } from '../utils/testTransactions'
@@ -21,6 +23,7 @@ describe('Validator Bonds configure bond account', () => {
   let provider: BankrunExtendedProvider
   let program: ValidatorBondsProgram
   let configAccount: PublicKey
+  let adminAuthority: Keypair
   let bond: ProgramAccount<Bond>
   let bondAuthority: Keypair
   let validatorIdentity: Keypair
@@ -31,7 +34,7 @@ describe('Validator Bonds configure bond account', () => {
   })
 
   beforeEach(async () => {
-    ;({ configAccount } = await executeInitConfigInstruction({
+    ;({ configAccount, adminAuthority } = await executeInitConfigInstruction({
       program,
       provider,
     }))
@@ -50,6 +53,13 @@ describe('Validator Bonds configure bond account', () => {
       validatorIdentity: nodePubkey,
       cpmpe: 123,
     })
+    await executeConfigureConfigInstruction({
+      program,
+      provider,
+      configAccount,
+      adminAuthority,
+      newMinBondMaxStakeWanted: 1000,
+    })
     bond = {
       publicKey: bondAccount,
       account: await getBond(program, bondAccount),
@@ -66,6 +76,7 @@ describe('Validator Bonds configure bond account', () => {
       authority: bondAuthority,
       newBondAuthority: newBondAuthority.publicKey,
       newCpmpe: 321,
+      newMaxStakeWanted: 10123,
     })
     await provider.sendIx([bondAuthority], ix1)
 
@@ -73,6 +84,7 @@ describe('Validator Bonds configure bond account', () => {
     expect(bondData.config).toEqual(configAccount)
     expect(bondData.authority).toEqual(newBondAuthority.publicKey)
     expect(bondData.cpmpe).toEqual(321)
+    expect(bondData.maxStakeWanted).toEqual(10123)
 
     const { instruction: ix2 } = await configureBondInstruction({
       program,
@@ -174,5 +186,48 @@ describe('Validator Bonds configure bond account', () => {
     await provider.sendIx([validatorIdentity], instruction)
     bondsData = await getBond(program, permissionLessBondAccount)
     expect(bondsData.authority).toEqual(PublicKey.default)
+  })
+
+  it('configures bond max stake wanted', async () => {
+    let bondData = await getBond(program, bond.publicKey)
+    expect(bondData.maxStakeWanted).toEqual(0)
+
+    const { instruction: ix2 } = await configureBondInstruction({
+      program,
+      bondAccount: bond.publicKey,
+      authority: validatorIdentity,
+      newMaxStakeWanted: 999,
+    })
+    try {
+      await provider.sendIx([validatorIdentity], ix2)
+      throw new Error('failure expected as min stake goes below limit')
+    } catch (e) {
+      verifyError(e, Errors, 6063, 'Max stake wanted value is lower')
+    }
+    bondData = await getBond(program, bond.publicKey)
+    expect(bondData.maxStakeWanted).toEqual(0)
+
+    // value 0 can be set in whatever case
+    const { instruction: ix3 } = await configureBondInstruction({
+      program,
+      bondAccount: bond.publicKey,
+      authority: bondAuthority,
+      newMaxStakeWanted: 0,
+    })
+    await provider.sendIx([bondAuthority], ix3)
+    bondData = await getBond(program, bond.publicKey)
+    expect(bondData.maxStakeWanted).toEqual(0)
+
+    // min and max can be the same
+    const configData = await getConfig(program, configAccount)
+    const { instruction: ix4 } = await configureBondInstruction({
+      program,
+      bondAccount: bond.publicKey,
+      authority: bondAuthority,
+      newMaxStakeWanted: configData.minBondMaxStakeWanted,
+    })
+    await provider.sendIx([bondAuthority], ix4)
+    bondData = await getBond(program, bond.publicKey)
+    expect(bondData.maxStakeWanted).toEqual(configData.minBondMaxStakeWanted)
   })
 })

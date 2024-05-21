@@ -23,6 +23,7 @@ import {
   CONFIGURE_BOND_LIMIT_UNITS,
   CONFIGURE_BOND_MINT_LIMIT_UNITS,
 } from '../../computeUnits'
+import BN from 'bn.js'
 
 export function installConfigureBond(program: Command) {
   program
@@ -59,7 +60,16 @@ export function installConfigureBond(program: Command) {
       'New value of "bond authority" that is permitted to operate with the bond account.',
       parsePubkeyOrPubkeyFromWallet
     )
-
+    .option(
+      '--cpmpe <number>',
+      'Nev value of cost per mille per epoch',
+      value => new BN(value, 10)
+    )
+    .option(
+      '--max-stake-wanted <number>',
+      'New maximal value of stake for PSR bidding',
+      value => new BN(value, 10)
+    )
     .action(
       async (
         address: Promise<PublicKey>,
@@ -69,12 +79,16 @@ export function installConfigureBond(program: Command) {
           authority,
           withToken,
           bondAuthority,
+          cpmpe,
+          maxStakeWanted,
         }: {
           config?: Promise<PublicKey>
           voteAccount?: Promise<PublicKey>
           authority?: Promise<WalletInterface | PublicKey>
           withToken: boolean
           bondAuthority?: Promise<PublicKey>
+          cpmpe?: BN
+          maxStakeWanted?: BN
         }
       ) => {
         await manageConfigureBond({
@@ -84,6 +98,8 @@ export function installConfigureBond(program: Command) {
           authority: await authority,
           withToken,
           newBondAuthority: await bondAuthority,
+          cpmpe,
+          maxStakeWanted,
         })
       }
     )
@@ -96,6 +112,8 @@ async function manageConfigureBond({
   authority,
   withToken,
   newBondAuthority,
+  cpmpe,
+  maxStakeWanted,
 }: {
   address: PublicKey
   config?: PublicKey
@@ -103,6 +121,8 @@ async function manageConfigureBond({
   authority?: WalletInterface | PublicKey
   withToken: boolean
   newBondAuthority?: PublicKey
+  cpmpe?: BN
+  maxStakeWanted?: BN
 }) {
   const {
     program,
@@ -149,6 +169,8 @@ async function manageConfigureBond({
       voteAccount,
       tokenAuthority: authority,
       newBondAuthority,
+      newCpmpe: cpmpe,
+      newMaxStakeWanted: maxStakeWanted,
     }))
   } else {
     computeUnitLimit = CONFIGURE_BOND_LIMIT_UNITS
@@ -159,6 +181,8 @@ async function manageConfigureBond({
       voteAccount,
       authority,
       newBondAuthority,
+      newCpmpe: cpmpe,
+      newMaxStakeWanted: maxStakeWanted,
     }))
   }
   tx.add(instruction)

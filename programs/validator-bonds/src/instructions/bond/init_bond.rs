@@ -12,6 +12,7 @@ use anchor_lang::solana_program::vote::program::ID as vote_program_id;
 pub struct InitBondArgs {
     pub bond_authority: Pubkey,
     pub cpmpe: u64,
+    pub max_stake_wanted: u64,
 }
 
 /// Creates new validator bond account based on the validator vote address
@@ -60,12 +61,14 @@ impl<'info> InitBond<'info> {
         InitBondArgs {
             bond_authority,
             cpmpe,
+            max_stake_wanted,
         }: InitBondArgs,
     ) -> Result<()> {
         require!(!ctx.accounts.config.paused, ErrorCode::ProgramIsPaused);
 
         let mut cpmpe = cpmpe;
         let mut bond_authority = bond_authority;
+        let mut max_stake_wanted = max_stake_wanted;
         let validator_identity =
             if let Some(validator_identity_info) = &ctx.accounts.validator_identity {
                 // permission-ed: validator identity is signer, configuration is possible
@@ -73,10 +76,17 @@ impl<'info> InitBond<'info> {
                     &ctx.accounts.vote_account,
                     &validator_identity_info.key(),
                 )?;
+                verify_max_stake_wanted(
+                    max_stake_wanted,
+                    ctx.accounts.config.min_bond_max_stake_wanted,
+                )?;
                 validator_identity_info.key()
             } else {
                 // permission-less: not possible to configure bond account
                 cpmpe = 0;
+                // TODO: not clear if min_stake == 0 means no bidding or if it's invalid value, maybe min_stake/max_stake should be Optional?
+                //       in the same way it's not clear if the validator may set it up as 0 or not
+                max_stake_wanted = 0;
                 let validator_identity =
                     get_validator_vote_account_validator_identity(&ctx.accounts.vote_account)?;
                 bond_authority = validator_identity;
@@ -88,8 +98,9 @@ impl<'info> InitBond<'info> {
             vote_account: ctx.accounts.vote_account.key(),
             authority: bond_authority,
             cpmpe,
+            max_stake_wanted,
             bump: ctx.bumps.bond,
-            reserved: [0; 142],
+            reserved: [0; 134],
         });
         emit_cpi!(InitBondEvent {
             bond: ctx.accounts.bond.key(),
@@ -98,8 +109,25 @@ impl<'info> InitBond<'info> {
             validator_identity,
             authority: ctx.accounts.bond.authority,
             cpmpe: ctx.accounts.bond.cpmpe,
+            max_stake_wanted: ctx.accounts.bond.max_stake_wanted,
         });
 
         Ok(())
     }
+}
+
+pub fn verify_max_stake_wanted(
+    max_stake_wanted: u64,
+    min_bond_max_stake_wanted: u64,
+) -> Result<()> {
+    // considering the max stake wanted as "unset" when it is 0
+    // when it is set, it must be greater than the minimum
+    if max_stake_wanted != 0_u64 {
+        require_gte!(
+            max_stake_wanted,
+            min_bond_max_stake_wanted,
+            ErrorCode::MaxStakeWantedTooLow
+        );
+    }
+    Ok(())
 }

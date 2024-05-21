@@ -8,6 +8,7 @@ import {
 } from '../../src'
 import { BankrunExtendedProvider } from '@marinade.finance/bankrun-utils'
 import {
+  executeConfigureConfigInstruction,
   executeInitBondInstruction,
   executeInitConfigInstruction,
 } from '../utils/testTransactions'
@@ -25,13 +26,14 @@ describe('Validator Bonds init bond account', () => {
   let provider: BankrunExtendedProvider
   let program: ValidatorBondsProgram
   let configAccount: PublicKey
+  let adminAuthority: Keypair
 
   beforeAll(async () => {
     ;({ provider, program } = await initBankrunTest())
   })
 
   beforeEach(async () => {
-    ;({ configAccount } = await executeInitConfigInstruction({
+    ;({ configAccount, adminAuthority } = await executeInitConfigInstruction({
       program,
       provider,
       epochsToClaimSettlement: 1,
@@ -59,6 +61,7 @@ describe('Validator Bonds init bond account', () => {
       voteAccount,
       validatorIdentity: validatorIdentity.publicKey,
       rentPayer: pubkey(rentWallet),
+      maxStakeWanted: 0,
     })
     await provider.sendIx([signer(rentWallet), validatorIdentity], instruction)
 
@@ -87,6 +90,7 @@ describe('Validator Bonds init bond account', () => {
     expect(bondData.config).toEqual(configAccount)
     expect(bondData.cpmpe).toEqual(30)
     expect(bondData.voteAccount).toEqual(voteAccount)
+    expect(bondData.maxStakeWanted).toEqual(0)
   })
 
   it('init bond permission-less', async () => {
@@ -100,6 +104,7 @@ describe('Validator Bonds init bond account', () => {
       bondAuthority: bondAuthority.publicKey,
       cpmpe: 88,
       voteAccount,
+      maxStakeWanted: 112233,
     })
     await provider.sendIx([], instruction)
 
@@ -110,6 +115,7 @@ describe('Validator Bonds init bond account', () => {
     )
     expect(bondData.config).toEqual(configAccount)
     expect(bondData.cpmpe).toEqual(0)
+    expect(bondData.maxStakeWanted).toEqual(0)
     expect(bondData.voteAccount).toEqual(voteAccount)
   })
 
@@ -171,6 +177,58 @@ describe('Validator Bonds init bond account', () => {
         throw e
       }
     }
+  })
+
+  it('cannot init with wrong min-max stake', async () => {
+    const bondAuthority = Keypair.generate()
+    const { voteAccount, validatorIdentity } = await createVoteAccount({
+      provider,
+    })
+    const rentWallet = await createUserAndFund({
+      provider,
+      lamports: LAMPORTS_PER_SOL,
+    })
+
+    executeConfigureConfigInstruction({
+      program,
+      provider,
+      configAccount,
+      adminAuthority,
+      newMinBondMaxStakeWanted: LAMPORTS_PER_SOL,
+    })
+
+    const { instruction: initLowerToConfigIx } = await initBondInstruction({
+      program,
+      configAccount,
+      bondAuthority: bondAuthority.publicKey,
+      voteAccount,
+      validatorIdentity: validatorIdentity.publicKey,
+      rentPayer: pubkey(rentWallet),
+      maxStakeWanted: 11,
+    })
+    try {
+      await provider.sendIx(
+        [signer(rentWallet), validatorIdentity],
+        initLowerToConfigIx
+      )
+      throw new Error('failure expected as minimum stake under config value')
+    } catch (e) {
+      verifyError(e, Errors, 6063, 'Max stake wanted value is lower')
+    }
+
+    // still possible to init with min-max stake set to 0 despite config is set
+    const { instruction: initToZero, bondAccount } = await initBondInstruction({
+      program,
+      configAccount,
+      bondAuthority: bondAuthority.publicKey,
+      voteAccount,
+      validatorIdentity: validatorIdentity.publicKey,
+      rentPayer: pubkey(rentWallet),
+      maxStakeWanted: 0,
+    })
+    await provider.sendIx([signer(rentWallet), validatorIdentity], initToZero)
+    const bondData = await getBond(program, bondAccount)
+    expect(bondData.maxStakeWanted).toEqual(0)
   })
 
   it('init bond for downloaded fixtures/accounts', async () => {

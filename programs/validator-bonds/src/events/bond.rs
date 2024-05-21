@@ -9,12 +9,14 @@ pub struct InitBondEvent {
     pub validator_identity: Pubkey,
     pub authority: Pubkey,
     pub cpmpe: u64,
+    pub max_stake_wanted: u64,
 }
 
 #[event]
 pub struct ConfigureBondEvent {
     pub bond_authority: Option<PubkeyValueChange>,
     pub cpmpe: Option<U64ValueChange>,
+    pub max_stake_wanted: Option<U64ValueChange>,
 }
 
 #[event]
@@ -22,6 +24,7 @@ pub struct ConfigureBondWithMintEvent {
     pub validator_identity: Pubkey,
     pub bond_authority: Option<PubkeyValueChange>,
     pub cpmpe: Option<U64ValueChange>,
+    pub max_stake_wanted: Option<U64ValueChange>,
 }
 
 #[event]

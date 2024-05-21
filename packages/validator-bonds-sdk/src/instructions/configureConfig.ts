@@ -41,6 +41,7 @@ export async function configureConfigInstruction({
   newSlotsToStartSettlementClaiming,
   newWithdrawLockupEpochs,
   newMinimumStakeLamports,
+  newMinBondMaxStakeWanted,
 }: {
   program: ValidatorBondsProgram
   configAccount?: PublicKey
@@ -52,6 +53,7 @@ export async function configureConfigInstruction({
   newSlotsToStartSettlementClaiming?: BN | number
   newWithdrawLockupEpochs?: BN | number
   newMinimumStakeLamports?: BN | number
+  newMinBondMaxStakeWanted?: BN | number
 }): Promise<{
   instruction: TransactionInstruction
 }> {
@@ -79,6 +81,9 @@ export async function configureConfigInstruction({
       : null,
     minimumStakeLamports: newMinimumStakeLamports
       ? new BN(newMinimumStakeLamports)
+      : null,
+    minBondMaxStakeWanted: newMinBondMaxStakeWanted
+      ? new BN(newMinBondMaxStakeWanted)
       : null,
   }
 

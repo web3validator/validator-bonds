@@ -19,6 +19,7 @@ import {
   getConfig,
 } from '@marinade.finance/validator-bonds-sdk'
 import { CONFIGURE_CONFIG_LIMIT_UNITS } from '../../computeUnits'
+import BN from 'bn.js'
 
 export function installConfigureConfig(program: Command) {
   program
@@ -68,7 +69,12 @@ export function installConfigureConfig(program: Command) {
     .option(
       '--minimum-stake-lamports <number>',
       'New value of minimum stake lamports used when program do splitting of stake',
-      parseFloat
+      value => new BN(value, 10)
+    )
+    .option(
+      '--min-bond-max-stake-wanted <number>',
+      'New value of minimum for max-stake-wanted field configured by validators in bond.',
+      value => new BN(value, 10)
     )
     .action(
       async (
@@ -82,6 +88,7 @@ export function installConfigureConfig(program: Command) {
           slotsToStartSettlementClaiming,
           withdrawLockupEpochs,
           minimumStakeLamports,
+          minBondMaxStakeWanted,
         }: {
           adminAuthority?: Promise<WalletInterface | PublicKey>
           admin?: Promise<PublicKey>
@@ -90,7 +97,8 @@ export function installConfigureConfig(program: Command) {
           epochsToClaimSettlement?: number
           slotsToStartSettlementClaiming?: number
           withdrawLockupEpochs?: number
-          minimumStakeLamports?: number
+          minimumStakeLamports?: BN
+          minBondMaxStakeWanted?: BN
         }
       ) => {
         await manageConfigureConfig({
@@ -103,6 +111,7 @@ export function installConfigureConfig(program: Command) {
           slotsToStartSettlementClaiming,
           withdrawLockupEpochs,
           minimumStakeLamports,
+          minBondMaxStakeWanted,
         })
       }
     )
@@ -118,6 +127,7 @@ async function manageConfigureConfig({
   slotsToStartSettlementClaiming,
   withdrawLockupEpochs,
   minimumStakeLamports,
+  minBondMaxStakeWanted,
 }: {
   address?: PublicKey
   adminAuthority?: WalletInterface | PublicKey
@@ -127,7 +137,8 @@ async function manageConfigureConfig({
   epochsToClaimSettlement?: number
   slotsToStartSettlementClaiming?: number
   withdrawLockupEpochs?: number
-  minimumStakeLamports?: number
+  minimumStakeLamports?: BN
+  minBondMaxStakeWanted?: BN
 }) {
   const {
     program,
@@ -171,6 +182,7 @@ async function manageConfigureConfig({
     newSlotsToStartSettlementClaiming: slotsToStartSettlementClaiming,
     newWithdrawLockupEpochs: withdrawLockupEpochs,
     newMinimumStakeLamports: minimumStakeLamports,
+    newMinBondMaxStakeWanted: minBondMaxStakeWanted,
   })
   tx.add(instruction)
 

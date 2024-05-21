@@ -15,6 +15,7 @@ import {
 import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { initTest } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
 import {
+  executeConfigureConfigInstruction,
   executeInitBondInstruction,
   executeInitConfigInstruction,
   executeInitWithdrawRequestInstruction,
@@ -91,7 +92,8 @@ describe('Show command using CLI', () => {
           pauseAuthority: admin.toBase58(),
           paused: false,
           slotsToStartSettlementClaiming: 102,
-          reserved: [471],
+          minBondMaxStakeWanted: 0,
+          reserved: [463],
         },
         bondsWithdrawerAuthority: bondsWithdrawerAuthority(
           configPubkey,
@@ -138,7 +140,8 @@ describe('Show command using CLI', () => {
             pauseAuthority: admin.toBase58(),
             paused: false,
             slotsToStartSettlementClaiming: 102,
-            reserved: [471],
+            minBondMaxStakeWanted: 0,
+            reserved: [463],
           },
           bondsWithdrawerAuthority: bondsWithdrawerAuthority(
             configPubkey,
@@ -209,7 +212,8 @@ describe('Show command using CLI', () => {
             pauseAuthority: admin.toBase58(),
             paused: false,
             slotsToStartSettlementClaiming: 102,
-            reserved: [471],
+            minBondMaxStakeWanted: 0,
+            reserved: [463],
           },
           bondsWithdrawerAuthority: bondsWithdrawerAuthority(
             configPubkey,
@@ -221,11 +225,19 @@ describe('Show command using CLI', () => {
   })
 
   it('show bond', async () => {
-    const { configAccount } = await executeInitConfigInstruction({
+    const { configAccount, adminAuthority } =
+      await executeInitConfigInstruction({
+        program,
+        provider,
+        epochsToClaimSettlement: 1,
+        withdrawLockupEpochs: 2,
+      })
+    await executeConfigureConfigInstruction({
       program,
       provider,
-      epochsToClaimSettlement: 1,
-      withdrawLockupEpochs: 2,
+      configAccount,
+      adminAuthority,
+      newMinBondMaxStakeWanted: 1000,
     })
     expect(
       provider.connection.getAccountInfo(configAccount)
@@ -242,6 +254,7 @@ describe('Show command using CLI', () => {
       voteAccount,
       validatorIdentity,
       cpmpe: 222,
+      maxStakeWanted: 2000,
     })
 
     const expectedDataNoFunding = {
@@ -251,6 +264,8 @@ describe('Show command using CLI', () => {
         config: configAccount.toBase58(),
         voteAccount: voteAccount.toBase58(),
         authority: bondAuthority.publicKey.toBase58(),
+        costPerMillePerEpoch: 222,
+        maxStakeWanted: 2000,
       },
     }
     const expectedData = {
@@ -486,6 +501,8 @@ describe('Show command using CLI', () => {
         config: configAccount,
         voteAccount: voteAccount,
         authority: bondAuthority.publicKey,
+        costPerMillePerEpoch: 1,
+        maxStakeWanted: 0,
       },
     }
     const expectedData = {

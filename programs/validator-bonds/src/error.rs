@@ -193,4 +193,7 @@ pub enum ErrorCode {
 
     #[msg("Unsupported vote account type to deserialize")]
     InvalidVoteAccountType, // 6062 0x17ae
+
+    #[msg("Max stake wanted value is lower to minimum configured value")]
+    MaxStakeWantedTooLow, // 6063 0x17af
 }

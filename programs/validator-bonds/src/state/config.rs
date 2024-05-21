@@ -25,8 +25,10 @@ pub struct Config {
     pub paused: bool,
     /// How many slots to wait before settlement is permitted to be claimed
     pub slots_to_start_settlement_claiming: u64,
+    /// Minimum value of max_stake_wanted to be configured by vote account owners at bond.
+    pub min_bond_max_stake_wanted: u64,
     /// reserved space for future changes
-    pub reserved: [u8; 471],
+    pub reserved: [u8; 463],
 }
 
 impl Config {

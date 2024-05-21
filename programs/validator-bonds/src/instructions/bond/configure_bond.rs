@@ -1,6 +1,7 @@
 use crate::checks::check_bond_authority;
 use crate::error::ErrorCode;
 use crate::events::{bond::ConfigureBondEvent, PubkeyValueChange, U64ValueChange};
+use crate::instructions::verify_max_stake_wanted;
 use crate::state::bond::Bond;
 use crate::state::config::Config;
 use anchor_lang::prelude::*;
@@ -8,8 +9,14 @@ use anchor_lang::solana_program::vote::program::ID as vote_program_id;
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct ConfigureBondArgs {
+    /// New bond authority that can manage the bond account.
     pub bond_authority: Option<Pubkey>,
+    /// New `cpmpe` value (cost per mille per epoch).
+    /// It defines the bid for the validator to get delegated up to `max_stake_wanted` lamports.
     pub cpmpe: Option<u64>,
+    /// New `max_stake_wanted` value that the vote account owner declares
+    /// as the maximum delegated stake desired.
+    pub max_stake_wanted: Option<u64>,
 }
 
 /// Change parameters of validator bond account
@@ -57,22 +64,37 @@ impl<'info> ConfigureBond<'info> {
             ErrorCode::BondChangeNotPermitted
         );
 
-        let (bond_authority_change, cpmpe_change) =
-            configure_bond(&mut ctx.accounts.bond, configure_bond_args);
+        let ConfigureBondChanges {
+            bond_authority_change,
+            cpmpe_change,
+            max_stake_wanted_change,
+        } = configure_bond(
+            &mut ctx.accounts.bond,
+            ctx.accounts.config.min_bond_max_stake_wanted,
+            configure_bond_args,
+        )?;
 
         emit_cpi!(ConfigureBondEvent {
             bond_authority: bond_authority_change,
             cpmpe: cpmpe_change,
+            max_stake_wanted: max_stake_wanted_change,
         });
 
         Ok(())
     }
 }
 
+pub struct ConfigureBondChanges {
+    pub bond_authority_change: Option<PubkeyValueChange>,
+    pub cpmpe_change: Option<U64ValueChange>,
+    pub max_stake_wanted_change: Option<U64ValueChange>,
+}
+
 pub(crate) fn configure_bond(
     bond: &mut Bond,
+    min_bond_max_stake_wanted: u64,
     configure_args: ConfigureBondArgs,
-) -> (Option<PubkeyValueChange>, Option<U64ValueChange>) {
+) -> Result<ConfigureBondChanges> {
     let bond_authority_change = configure_args.bond_authority.map(|authority| {
         let old = bond.authority;
         bond.authority = authority;
@@ -89,5 +111,19 @@ pub(crate) fn configure_bond(
             new: new_cpmpe,
         }
     });
-    (bond_authority_change, cpmpe_change)
+    let max_stake_wanted_change = configure_args.max_stake_wanted.map(|new_max_stake_wanted| {
+        let old = bond.max_stake_wanted;
+        bond.max_stake_wanted = new_max_stake_wanted;
+        U64ValueChange {
+            old,
+            new: new_max_stake_wanted,
+        }
+    });
+    verify_max_stake_wanted(bond.max_stake_wanted, min_bond_max_stake_wanted)?;
+
+    Ok(ConfigureBondChanges {
+        bond_authority_change,
+        cpmpe_change,
+        max_stake_wanted_change,
+    })
 }

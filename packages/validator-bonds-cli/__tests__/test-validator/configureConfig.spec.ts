@@ -102,6 +102,8 @@ describe('Configure config account using CLI', () => {
           112,
           '--minimum-stake-lamports',
           134,
+          '--min-bond-max-stake-wanted',
+          111,
           '--confirmation-finality',
           'confirmed',
           '-v',
@@ -122,6 +124,7 @@ describe('Configure config account using CLI', () => {
     expect(configData.slotsToStartSettlementClaiming).toEqual(143)
     expect(configData.withdrawLockupEpochs).toEqual(112)
     expect(configData.minimumStakeLamports).toEqual(134)
+    expect(configData.minBondMaxStakeWanted).toEqual(111)
   })
 
   it('configure config in print-only mode', async () => {

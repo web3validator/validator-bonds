@@ -27,6 +27,7 @@ import {
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { getBondFromAddress } from './utils'
+import { BN } from 'bn.js'
 
 export type ProgramAccountWithProgramId<T> = ProgramAccount<T> & {
   programId: PublicKey
@@ -469,7 +470,24 @@ function reformatBond(key: string, value: any): ReformatAction {
   ) {
     return { type: 'Remove' }
   }
-  if (key.toLowerCase() === 'cpmpe' || key.toLowerCase().includes('bump')) {
+  if (key.toLowerCase().includes('cpmpe')) {
+    let formattedValue
+    try {
+      formattedValue = new BN(value).toNumber()
+    } catch (e) {
+      formattedValue = new BN(value).toString()
+    }
+    return {
+      type: 'UseExclusively',
+      records: [
+        {
+          key: 'costPerMillePerEpoch',
+          value: formattedValue,
+        },
+      ],
+    }
+  }
+  if (key.toLowerCase().includes('bump')) {
     return { type: 'Remove' }
   }
   if (key.toLocaleLowerCase() === 'withdrawrequest' && value === undefined) {
