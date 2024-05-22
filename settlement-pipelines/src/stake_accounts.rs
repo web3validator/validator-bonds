@@ -6,6 +6,9 @@ use solana_sdk::stake::state::StakeStateV2;
 use solana_sdk::stake_history::StakeHistory;
 use validator_bonds_common::stake_accounts::{is_locked, CollectedStakeAccounts};
 
+// TODO: better to be loaded from chain
+pub const STAKE_ACCOUNT_RENT_EXEMPTION: u64 = 2282880;
+
 /// processed provided stake accounts and pick the one with the best priority for claiming
 pub fn pick_stake_for_claiming(
     stake_accounts: &CollectedStakeAccounts,
@@ -79,4 +82,21 @@ fn get_non_locked_priority_key(
     } else {
         255
     }
+}
+
+pub fn filter_settlement_funded(
+    stake_accounts: CollectedStakeAccounts,
+    clock: &Clock,
+) -> CollectedStakeAccounts {
+    stake_accounts
+        .into_iter()
+        .filter(|(_, _, state)| {
+            let is_settlement_funded = if let Some(authorized) = state.authorized() {
+                authorized.staker != authorized.withdrawer
+            } else {
+                false
+            };
+            is_settlement_funded && !is_locked(state, clock)
+        })
+        .collect()
 }
