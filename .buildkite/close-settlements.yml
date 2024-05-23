@@ -73,7 +73,7 @@ steps:
       ./target/release/close-settlement \
         --rpc-url $$RPC_URL \
         --operator-authority "$$VALIDATOR_BONDS_OPERATOR_AUTHORITY" \
-        --fee-payer "$$VALIDATOR_BONDS_FUNDING_WALLET" \
+        --fee-payer "$$VALIDATOR_BONDS_SETTLEMENTS_WALLET" \
         --marinade-wallet "$$VALIDATOR_BONDS_FUNDING_WALLET" \
         --past-settlements ./past-settlements.json | tee close-settlement-report.txt
     artifact_paths:

@@ -76,6 +76,10 @@ struct Args {
     #[clap(flatten)]
     tip_policy_opts: TipPolicyOpts,
 
+    /// Marinade wallet that pays for Marinade type Settlements
+    #[clap(long)]
+    marinade_wallet: Option<String>,
+
     /// keypair payer for rent of accounts, if not provided, fee payer keypair is used
     #[arg(long)]
     rent_payer: Option<String>,
@@ -100,6 +104,11 @@ async fn main() -> anyhow::Result<()> {
     )?;
     let rent_keypair = if let Some(rent_payer) = args.rent_payer.clone() {
         load_keypair(&rent_payer)?
+    } else {
+        fee_payer.clone()
+    };
+    let marinade_wallet = if let Some(marinade_wallet) = args.marinade_wallet.clone() {
+        load_keypair(&marinade_wallet)?
     } else {
         fee_payer.clone()
     };
@@ -520,6 +529,7 @@ async fn main() -> anyhow::Result<()> {
     let mut transaction_builder = TransactionBuilder::limited(fee_payer.clone());
     transaction_builder.add_signer_checked(&operator_authority.clone());
     transaction_builder.add_signer_checked(&rent_keypair);
+    transaction_builder.add_signer_checked(&marinade_wallet);
 
     // Funding settlements
     let mut funded_settlements_overall = 0u32;
@@ -538,7 +548,7 @@ async fn main() -> anyhow::Result<()> {
                     new_stake_account_keypair.pubkey()
                 );
                 let instructions = create_stake_account(
-                    &fee_payer.pubkey(),
+                    &marinade_wallet.pubkey(),
                     &new_stake_account_keypair.pubkey(),
                     &Authorized {
                         withdrawer: withdrawer_authority,
