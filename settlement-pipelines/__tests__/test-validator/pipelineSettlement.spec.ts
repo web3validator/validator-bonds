@@ -38,6 +38,7 @@ import {
   getRentExemptStake,
 } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
 import BN from 'bn.js'
+import assert from 'assert'
 
 const JEST_TIMEOUT_MS = 3000_000
 jest.setTimeout(JEST_TIMEOUT_MS)
@@ -87,6 +88,16 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
   let currentEpoch: number
   let stakeAccountsCreationFuture: Promise<void>
   let stakeAccountsNumber: number
+
+  // The test flow is pretty heavy and one part depends on the other.
+  // The tests are run in order and the previous test is checked to be run.
+  enum TestNames {
+    None,
+    InitSettlement,
+    ListClaimableEpoch,
+    ClaimSettlement,
+  }
+  let previousTest = TestNames.None
 
   beforeAll(async () => {
     shellMatchers()
@@ -182,7 +193,8 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     await operatorAuthorityCleanup()
   })
 
-  it('pipeline settlement', async () => {
+  it('init settlements', async () => {
+    assert(previousTest === TestNames.None)
     await // build the rust before running the tests
     (
       expect([
@@ -225,7 +237,7 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
       settlementAddresses.length -
         1 +
         ' executed successfully(.|\n|\r)*' +
-        'Stake accounts management instructions 0(.|\n|\r)*FundSettlement instructions 2'
+        'Stake accounts management txes 0(.|\n|\r)*FundSettlements: txes 1'
     )
     await (
       expect([
@@ -253,7 +265,7 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
     ).toHaveMatchingSpawnOutput({
-      code: 1,
+      code: 2,
       stderr: executionResultRegex,
       stdout: /Cannot find stake account to fund settlement/,
     })
@@ -284,9 +296,9 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
     ).toHaveMatchingSpawnOutput({
-      code: 1,
+      code: 2,
       stderr:
-        /InitSettlement instructions 0(.|\n|\r)*already funded(.|\n|\r)*Stake accounts management instructions 0(.|\n|\r)*FundSettlement instructions 0/,
+        /InitSettlement ... txes 0(.|\n|\r)*already funded(.|\n|\r)*Stake accounts management txes 0(.|\n|\r)*FundSettlements: txes 0/,
       stdout: /Cannot find stake account to fund settlement/,
     })
 
@@ -338,6 +350,8 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     // activating stake accounts
     await waitForNextEpoch(provider.connection, 15)
 
+    const stdoutRegExp = RegExp(settlementAddresses.length + ' settlements')
+
     await (
       expect([
         'cargo',
@@ -364,7 +378,8 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     ).toHaveMatchingSpawnOutput({
       code: 0,
       stderr:
-        /InitSettlement instructions 0(.|\n|\r)*Stake accounts management instructions [2-9](.|\n|\r)*FundSettlement instructions 9/,
+        /InitSettlement ... txes 0(.|\n|\r)*Stake accounts management txes 1(.|\n|\r)*FundSettlements:.*ixes 9 executed/,
+      stdout: stdoutRegExp,
     })
 
     const allConfigStakeAccounts = await findConfigStakeAccounts({
@@ -376,9 +391,6 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     )
     expect(fundedStakeAccounts.length).toEqual(settlementAddresses.length)
 
-    const stdoutRegExp = RegExp(
-      'JSON loaded ' + settlementAddresses.length + ' settlements'
-    )
     await (
       expect([
         'cargo',
@@ -405,12 +417,14 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     ).toHaveMatchingSpawnOutput({
       code: 0,
       stderr:
-        /InitSettlement instructions 0(.|\n|\r)*already funded(.|\n|\r)*Stake accounts management instructions 0(.|\n|\r)*FundSettlement instructions 0/,
+        /InitSettlement ... txes 0(.|\n|\r)*already funded(.|\n|\r)*Stake accounts management txes 0(.|\n|\r)*FundSettlements: txes 0/,
       stdout: stdoutRegExp,
     })
+    previousTest = TestNames.InitSettlement
   })
 
   it('list claimable epochs', async () => {
+    assert(previousTest === TestNames.InitSettlement)
     const epochRegexp = new RegExp('[' + currentEpoch + ']')
     await (
       expect([
@@ -431,9 +445,11 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
       code: 0,
       stdout: epochRegexp,
     })
+    previousTest = TestNames.ListClaimableEpoch
   })
 
   it('claim settlements', async () => {
+    assert(previousTest === TestNames.ListClaimableEpoch)
     const feePayer = await createUserAndFund({
       provider,
       lamports: LAMPORTS_PER_SOL * 100_000,
@@ -471,7 +487,7 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
     // }
 
     // expecting some error as we have not fully funded settlements
-    // the number of executed instructions is not clear here as some fails
+    // the number of executed instructions is not clear, as some fails
     await (
       expect([
         'cargo',
@@ -495,10 +511,9 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
     ).toHaveMatchingSpawnOutput({
-      code: 1,
-      stderr: /All stake accounts are locked/,
-      stdout:
-        /instructions 12[0-9][0-9][0-9] executed(.|\n|\r)*No stake account found with enough SOL/,
+      code: 2,
+      stderr: /All stake accounts are locked for claiming/,
+      stdout: /created 12[0-9][0-9][0-9] ClaimSettlement accounts/,
     })
 
     // still expecting some error as we have not fully funded settlements
@@ -524,9 +539,11 @@ describe.skip('Cargo CLI: Pipeline Settlement', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ]) as any
     ).toHaveMatchingSpawnOutput({
-      code: 1,
-      stdout: /0 executed(.|\n|\r)*No stake account found with enough SOL/,
+      code: 2,
+      stdout:
+        /created 0 ClaimSettlement accounts(.|\n|\r)*No stake account found with enough SOL/,
     })
+    previousTest = TestNames.ClaimSettlement
   })
 })
 
@@ -556,7 +573,7 @@ export async function chunkedCreateInitializedStakeAccounts({
   let counter = 0
   let futures: Promise<void>[] = []
   const lockedAccounts = Array.from(
-    { length: 10 },
+    { length: 20 },
     () => Math.floor(Math.random() * combined.length) + 1
   )
   for (const { staker, withdrawer, keypair } of combined) {

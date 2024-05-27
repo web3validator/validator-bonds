@@ -9,34 +9,19 @@ use validator_bonds_common::stake_accounts::{is_locked, CollectedStakeAccounts};
 // TODO: better to be loaded from chain
 pub const STAKE_ACCOUNT_RENT_EXEMPTION: u64 = 2282880;
 
-/// processed provided stake accounts and pick the one with the best priority for claiming
-pub fn pick_stake_for_claiming(
-    stake_accounts: &CollectedStakeAccounts,
-    clock: &Clock,
-    stake_history: &StakeHistory,
-) -> anyhow::Result<Option<Pubkey>> {
-    prioritize_for_claiming(stake_accounts, clock, stake_history).map_or_else(
-        |e| {
-            let error_msg = format!("No available stake account for claiming: {}", e);
-            Err(anyhow!("{}", error_msg))
-        },
-        |v| Ok(Some(v)),
-    )
-}
-
 // prioritize collected stake accounts by:
 // - 1. initialized, non-delegated
 // - 2. deactivating
 // - 3. any non-locked
 // - error if all are locked or no stake accounts
-fn prioritize_for_claiming(
+pub fn prioritize_for_claiming(
     stake_accounts: &CollectedStakeAccounts,
     clock: &Clock,
     stake_history: &StakeHistory,
 ) -> anyhow::Result<Pubkey> {
     let mut non_locked_stake_accounts = stake_accounts
         .iter()
-        .filter(|(_pubkey, _, stake)| !is_locked(stake, clock))
+        .filter(|(_, _, stake)| !is_locked(stake, clock))
         .collect::<Vec<_>>();
     non_locked_stake_accounts.sort_by_cached_key(|(_, _, stake_account)| {
         get_non_locked_priority_key(stake_account, clock, stake_history)
@@ -44,13 +29,13 @@ fn prioritize_for_claiming(
     return if let Some((pubkey, _, _)) = non_locked_stake_accounts.first() {
         Ok(*pubkey)
     } else if !stake_accounts.is_empty() {
-        // there is no non-locked stake accounts but there are some available, i.e., all locked
+        // NO non-locked stake accounts but(!) some exists, i.e., all available locked
         Err(anyhow!(
-            "All stake accounts are locked ({})",
+            "All stake accounts are locked for claiming ({})",
             stake_accounts.len()
         ))
     } else {
-        Err(anyhow!("No stake accounts"))
+        Err(anyhow!("No stake accounts for claiming"))
     };
 }
 
