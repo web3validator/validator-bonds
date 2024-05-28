@@ -33,7 +33,7 @@
     "@marinade.finance/ts-common": "^2.4.3",
     "@marinade.finance/web3js-common": "^2.4.3",
     "@marinade.finance/umi-utils": "^2.4.3",
-    "@marinade.finance/bankrun-utils": "^2.4.3",
+    "@marinade.finance/bankrun-utils": "file:/home/chalda/marinade/marinade-ts-cli/build/packages/lib/bankrun-utils/",
     "bs58": "^5.0.0",
     "@solana/web3.js": "^1.91.1",
     "crypto-js": "^4.2.0",

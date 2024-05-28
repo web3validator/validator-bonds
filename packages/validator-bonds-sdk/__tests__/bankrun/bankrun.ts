@@ -20,7 +20,16 @@ export async function initBankrunTest(programId?: PublicKey): Promise<{
   program: ValidatorBondsProgram
   provider: BankrunExtendedProvider
 }> {
-  const provider = await testInit(['./fixtures/accounts/'])
+  const provider = await testInit({
+    accountDirs: ['./fixtures/accounts/'],
+    programs: [
+      {
+        // https://github.com/solana-labs/solana-program-library/blob/master/account-compression/programs/account-compression/src/lib.rs
+        pubkey: new PublicKey('cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK'),
+        path: './fixtures/programs/account-compression.so',
+      },
+    ],
+  })
   return {
     program: getProgram({ connection: provider, programId }),
     provider,
@@ -97,4 +106,24 @@ export async function delegateAndFund({
     voteAccount: voteAccountDelegated,
     validatorIdentity,
   }
+}
+
+// https://github.com/solana-labs/solana/blob/v1.17.7/sdk/program/src/epoch_schedule.rs#L29C1-L29C45
+// https://github.com/solana-labs/solana/blob/v1.17.7/sdk/program/src/epoch_schedule.rs#L167
+export async function getFirstSlotOfEpoch(
+  provider: BankrunExtendedProvider,
+  epoch: number
+): Promise<bigint> {
+  const epochBigInt = BigInt(epoch)
+  const { slotsPerEpoch, firstNormalEpoch, firstNormalSlot } =
+    provider.context.genesisConfig.epochSchedule
+  let firstEpochSlot: bigint
+  const MINIMUM_SLOTS_PER_EPOCH = 32
+  if (epochBigInt <= firstNormalEpoch) {
+    firstEpochSlot = BigInt((2 ** epoch - 1) * MINIMUM_SLOTS_PER_EPOCH)
+  } else {
+    firstEpochSlot =
+      (epochBigInt - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
+  }
+  return firstEpochSlot
 }

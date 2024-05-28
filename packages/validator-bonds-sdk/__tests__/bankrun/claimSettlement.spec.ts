@@ -668,23 +668,3 @@ describe('Validator Bonds claim settlement', () => {
       .instruction()
   }
 })
-
-// https://github.com/solana-labs/solana/blob/v1.17.7/sdk/program/src/epoch_schedule.rs#L29C1-L29C45
-// https://github.com/solana-labs/solana/blob/v1.17.7/sdk/program/src/epoch_schedule.rs#L167
-async function getFirstSlotOfEpoch(
-  provider: BankrunExtendedProvider,
-  epoch: number
-): Promise<bigint> {
-  const epochBigInt = BigInt(epoch)
-  const { slotsPerEpoch, firstNormalEpoch, firstNormalSlot } =
-    provider.context.genesisConfig.epochSchedule
-  let firstEpochSlot: bigint
-  const MINIMUM_SLOTS_PER_EPOCH = 32
-  if (epochBigInt <= firstNormalEpoch) {
-    firstEpochSlot = BigInt((2 ** epoch - 1) * MINIMUM_SLOTS_PER_EPOCH)
-  } else {
-    firstEpochSlot =
-      (epochBigInt - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
-  }
-  return firstEpochSlot
-}

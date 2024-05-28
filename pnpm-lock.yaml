@@ -100,8 +100,8 @@ importers:
         specifier: ^2.4.3
         version: 2.4.3(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.3)(@marinade.finance/web3js-common@2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
       '@marinade.finance/bankrun-utils':
-        specifier: ^2.4.3
-        version: 2.4.3(@marinade.finance/web3js-common@2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        specifier: file:/home/chalda/marinade/marinade-ts-cli/build/packages/lib/bankrun-utils/
+        version: file:../marinade-ts-cli/build/packages/lib/bankrun-utils(@marinade.finance/web3js-common@2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@marinade.finance/marinade-ts-sdk':
         specifier: ^5.0.10
         version: 5.0.10(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(jsbi@4.3.0)(utf-8-validate@5.0.10)
@@ -574,8 +574,8 @@ packages:
       '@solana/web3.js': ^1.91.1
       bn.js: ^5.2.1
 
-  '@marinade.finance/bankrun-utils@2.4.3':
-    resolution: {integrity: sha512-wgtSbFAtRkl1A026xlsYnQA/n6eleY6TzDx/zc46rKvWW0cB4wIR8WblOx1BQMUepLFigDPpJlm6l/4akvFEOA==}
+  '@marinade.finance/bankrun-utils@file:../marinade-ts-cli/build/packages/lib/bankrun-utils':
+    resolution: {directory: ../marinade-ts-cli/build/packages/lib/bankrun-utils, type: directory}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@marinade.finance/web3js-common': 2.4.3
@@ -3404,7 +3404,7 @@ snapshots:
       '@solana/web3.js': 1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
 
-  '@marinade.finance/bankrun-utils@2.4.3(@marinade.finance/web3js-common@2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+  '@marinade.finance/bankrun-utils@file:../marinade-ts-cli/build/packages/lib/bankrun-utils(@marinade.finance/web3js-common@2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
       '@marinade.finance/web3js-common': 2.4.3(@marinade.finance/ts-common@2.4.3)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js': 1.91.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
