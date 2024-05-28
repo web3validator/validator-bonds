@@ -171,6 +171,8 @@ validator-bonds -um configure-bond <bond-or-vote-account-address> \
 
 ### Funding Bond Account
 
+**! NEVER fund a bond with a SOL transfer. Bond funding happens by assigning a stake account to the `Bond`.** 
+
 The bond account exists to be funded, where the funds may be used to cover a protected event
 when a validator under-performs or experiences a serious issue.
 "Funding the bond" consists of two steps:
