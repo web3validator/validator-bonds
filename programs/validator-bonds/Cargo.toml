@@ -27,3 +27,4 @@ solana-security-txt = { workspace = true }
 default-env = { workspace = true }
 merkle-tree = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+spl-account-compression = { workspace = true, features = ["cpi"] }

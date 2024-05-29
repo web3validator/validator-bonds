@@ -1953,6 +1953,21 @@ export type ValidatorBonds = {
           "isSigner": false
         },
         {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false,
@@ -3058,6 +3073,12 @@ export type ValidatorBonds = {
               "claim amount; merkle root verification"
             ],
             "type": "u64"
+          },
+          {
+            "name": "merkleTreeSize",
+            "type": {
+              "defined": "usize"
+            }
           }
         ]
       }
@@ -6332,6 +6353,21 @@ export const IDL: ValidatorBonds = {
           "isSigner": false
         },
         {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "noopProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "eventAuthority",
           "isMut": false,
           "isSigner": false,
@@ -7437,6 +7473,12 @@ export const IDL: ValidatorBonds = {
               "claim amount; merkle root verification"
             ],
             "type": "u64"
+          },
+          {
+            "name": "merkleTreeSize",
+            "type": {
+              "defined": "usize"
+            }
           }
         ]
       }

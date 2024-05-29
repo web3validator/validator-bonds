@@ -14,8 +14,11 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::hash::hashv;
 use anchor_lang::solana_program::sysvar::stake_history;
 use anchor_spl::stake::{withdraw, Stake, StakeAccount, Withdraw};
+use spl_account_compression::cpi::accounts::Initialize;
+use spl_account_compression::Noop;
 use merkle_tree::psr_claim::TreeNode;
 use merkle_tree::{hash_leaf, LEAF_PREFIX};
+
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct ClaimSettlementArgs {
@@ -29,6 +32,7 @@ pub struct ClaimSettlementArgs {
     pub stake_account_withdrawer: Pubkey,
     /// claim amount; merkle root verification
     pub claim: u64,
+    pub merkle_tree_size: usize,
 }
 
 /// Claims a settlement by withdrawing settlement funded stake account
@@ -118,6 +122,18 @@ pub struct ClaimSettlement<'info> {
     pub clock: Sysvar<'info, Clock>,
 
     pub stake_program: Program<'info, Stake>,
+
+    /// CHECK: toto later
+    #[account(
+        init,
+        payer = rent_payer,
+        space = params.merkle_tree_size,
+    )]
+    pub merkle_tree: UncheckedAccount<'info>,
+
+    pub compression_program: Program<'info, spl_account_compression::program::SplAccountCompression>,
+
+    pub noop_program: Program<'info, Noop>,
 }
 
 impl<'info> ClaimSettlement<'info> {
@@ -129,6 +145,7 @@ impl<'info> ClaimSettlement<'info> {
             claim,
             stake_account_staker,
             stake_account_withdrawer,
+            ..
         }: ClaimSettlementArgs,
     ) -> Result<()> {
         require!(!ctx.accounts.config.paused, ErrorCode::ProgramIsPaused);
@@ -179,6 +196,16 @@ impl<'info> ClaimSettlement<'info> {
                     ),
                 )));
         }
+
+        // HERE!
+        let cpi_program = ctx.accounts.compression_program.to_account_info();
+        let cpi_accounts = Initialize {
+            merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
+            authority: ctx.accounts.rent_payer.to_account_info(),
+            noop: ctx.accounts.noop_program.to_account_info(),
+        };
+        let cpi_context = CpiContext::new(cpi_program, cpi_accounts);
+        spl_account_compression::cpi::init_empty_merkle_tree(cpi_context, 3, 8)?;
 
         // stake account is managed by bonds program
         let stake_from_meta = check_stake_is_initialized_with_withdrawer_authority(
