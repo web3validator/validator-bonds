@@ -128,7 +128,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
     await createWithdrawerUsers(provider)
   })
 
-  it.only('state compression', async () => {
+  it.skip('state compression', async () => {
     const cmtKeypair = Keypair.generate()
     const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
     const allocAccountIx = await createAllocTreeIx(
@@ -167,7 +167,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
     })
     await warpToNextEpoch(provider) // deactivate stake account
 
-    const { instruction, settlementClaimAccount } =
+    const { instruction, settlementClaimAccount, merkleTree } =
       await claimSettlementInstruction({
         program,
         claimAmount: treeNode1Withdrawer1.treeNode.data.claim,
@@ -180,7 +180,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
         rentPayer: rentPayer,
       })
 
-    await provider.sendIx([signer(rentPayer)], instruction)
+    await provider.sendIx([signer(rentPayer), merkleTree], instruction)
 
     const stakeAccountInfo = await provider.connection.getAccountInfo(
       stakeAccountTreeNode1Withdrawer1

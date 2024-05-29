@@ -128,6 +128,7 @@ pub struct ClaimSettlement<'info> {
         init,
         payer = rent_payer,
         space = params.merkle_tree_size as usize,
+        owner = compression_program.key(),
     )]
     pub merkle_tree: UncheckedAccount<'info>,
 
@@ -198,6 +199,7 @@ impl<'info> ClaimSettlement<'info> {
         }
 
         // HERE!
+        msg!("Compression program {}", ctx.accounts.compression_program.key);
         let cpi_program = ctx.accounts.compression_program.to_account_info();
         let cpi_accounts = Initialize {
             merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
