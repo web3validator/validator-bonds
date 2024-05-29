@@ -3076,9 +3076,7 @@ export type ValidatorBonds = {
           },
           {
             "name": "merkleTreeSize",
-            "type": {
-              "defined": "usize"
-            }
+            "type": "u64"
           }
         ]
       }
@@ -7476,9 +7474,7 @@ export const IDL: ValidatorBonds = {
           },
           {
             "name": "merkleTreeSize",
-            "type": {
-              "defined": "usize"
-            }
+            "type": "u64"
           }
         ]
       }

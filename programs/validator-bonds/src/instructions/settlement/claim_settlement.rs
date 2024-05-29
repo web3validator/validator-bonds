@@ -32,7 +32,7 @@ pub struct ClaimSettlementArgs {
     pub stake_account_withdrawer: Pubkey,
     /// claim amount; merkle root verification
     pub claim: u64,
-    pub merkle_tree_size: usize,
+    pub merkle_tree_size: u64,
 }
 
 /// Claims a settlement by withdrawing settlement funded stake account
@@ -127,7 +127,7 @@ pub struct ClaimSettlement<'info> {
     #[account(
         init,
         payer = rent_payer,
-        space = params.merkle_tree_size,
+        space = params.merkle_tree_size as usize,
     )]
     pub merkle_tree: UncheckedAccount<'info>,
 
