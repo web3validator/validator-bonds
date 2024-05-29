@@ -33,6 +33,12 @@ import {
   withdrawer1,
 } from '../utils/merkleTreeTestData'
 import { getFirstSlotOfEpoch, initBankrunTest } from './bankrun'
+import {
+  createAllocTreeIx,
+  createAppendIx,
+  createInitEmptyMerkleTreeIx,
+  ValidDepthSizePair,
+} from '@solana/spl-account-compression'
 
 describe('Validator Bonds claim settlement testing compression', () => {
   const epochsToClaimSettlement = 4
@@ -120,6 +126,28 @@ describe('Validator Bonds claim settlement testing compression', () => {
       })
     await provider.sendIx([signer(split1), operatorAuthority], fundIx1)
     await createWithdrawerUsers(provider)
+  })
+
+  it.only('state compression', async () => {
+    const cmtKeypair = Keypair.generate()
+    const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
+    const allocAccountIx = await createAllocTreeIx(
+      provider.connection,
+      cmtKeypair.publicKey,
+      provider.walletPubkey,
+      depthSizePair,
+      // canopyDepth
+      0
+    )
+    const ixs = [
+      allocAccountIx,
+      createInitEmptyMerkleTreeIx(
+        cmtKeypair.publicKey,
+        provider.walletPubkey,
+        depthSizePair
+      ),
+    ]
+    await provider.sendIx([cmtKeypair], ...ixs)
   })
 
   it('claim settlement with state compression', async () => {
