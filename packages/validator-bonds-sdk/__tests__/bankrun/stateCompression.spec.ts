@@ -34,11 +34,14 @@ import {
 } from '../utils/merkleTreeTestData'
 import { getFirstSlotOfEpoch, initBankrunTest } from './bankrun'
 import {
+  ALL_DEPTH_SIZE_PAIRS,
   createAllocTreeIx,
   createAppendIx,
   createInitEmptyMerkleTreeIx,
+  MerkleTree,
   ValidDepthSizePair,
 } from '@solana/spl-account-compression'
+import { concurrentMerkleTreeBeetFactory } from '@solana/spl-account-compression/src/types'
 
 describe('Validator Bonds claim settlement testing compression', () => {
   const epochsToClaimSettlement = 4
@@ -128,26 +131,47 @@ describe('Validator Bonds claim settlement testing compression', () => {
     await createWithdrawerUsers(provider)
   })
 
-  it.skip('state compression', async () => {
+  it.only('state compression', async () => {
     const cmtKeypair = Keypair.generate()
     const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
-    const allocAccountIx = await createAllocTreeIx(
-      provider.connection,
-      cmtKeypair.publicKey,
-      provider.walletPubkey,
-      depthSizePair,
-      // canopyDepth
-      0
-    )
-    const ixs = [
-      allocAccountIx,
-      createInitEmptyMerkleTreeIx(
-        cmtKeypair.publicKey,
-        provider.walletPubkey,
-        depthSizePair
-      ),
-    ]
-    await provider.sendIx([cmtKeypair], ...ixs)
+
+    // const concurrentTree = concurrentMerkleTreeBeetFactory(3, 8);
+
+    const pubkeys = Array.from({ length: 200 }, () => Keypair.generate().publicKey)
+    const possibleDepth = Math.ceil(Math.log2(pubkeys.length));
+    let pair = ALL_DEPTH_SIZE_PAIRS.filter(pair => pair.maxDepth >= possibleDepth)
+      .sort((a, b) => a.maxDepth - b.maxDepth)
+    if (pair.length == 0) {
+      throw new Error('No valid depth for concurrent merkle tree')
+    }
+    const maxDepth = pair[0].maxDepth;
+    const maxBufferSize = pair[0].maxBufferSize;
+    let merkleTree = MerkleTree.sparseMerkleTreeFromLeaves(pubkeys.map(pk => pk.toBuffer()), maxDepth);
+    if (pair.length != 1) {
+      throw new Error('Invalid depth for concurrent merkle tree')
+    }
+    const merkleTreeAccount = concurrentMerkleTreeBeetFactory(maxDepth, maxBufferSize);
+    // merkleTreeAccount.serialize(merkleTree);
+    ConcurrentMerkleTreeAccount.deserialize(merkleTreeAccount.serialize(merkleTree));
+
+
+    // const allocAccountIx = await createAllocTreeIx(
+    //   provider.connection,
+    //   cmtKeypair.publicKey,
+    //   provider.walletPubkey,
+    //   depthSizePair,
+    //   // canopyDepth
+    //   0
+    // )
+    // const ixs = [
+    //   allocAccountIx,
+    //   createInitEmptyMerkleTreeIx(
+    //     cmtKeypair.publicKey,
+    //     provider.walletPubkey,
+    //     depthSizePair
+    //   ),
+    // ]
+    // await provider.sendIx([cmtKeypair], ...ixs)
   })
 
   it('claim settlement with state compression', async () => {
