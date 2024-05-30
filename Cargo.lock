@@ -5916,7 +5916,7 @@ dependencies = [
 [[package]]
 name = "solana-transaction-builder"
 version = "0.1.0"
-source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#ee7fa5de9aceedc0ccd3fe0cf53b65bdecff95ae"
+source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#05b471e70d6ea44acf560ad98e1ce7289b002045"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -5931,7 +5931,7 @@ dependencies = [
 [[package]]
 name = "solana-transaction-builder-executor"
 version = "0.1.0"
-source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#ee7fa5de9aceedc0ccd3fe0cf53b65bdecff95ae"
+source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#05b471e70d6ea44acf560ad98e1ce7289b002045"
 dependencies = [
  "anyhow",
  "async-stream",
