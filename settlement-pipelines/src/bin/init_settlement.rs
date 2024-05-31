@@ -965,7 +965,7 @@ impl PrintReportable for InitSettlementReport {
                     lamports_to_sol(self.funded_overall),
                     lamports_to_sol(self.json_settlements_max_claim_sum),
                     self.funded_settlements_already,
-                    self.funded_already,
+                    lamports_to_sol(self.funded_already),
                 ),
                 format!("InitSettlement number of loaded settlements merkle nodes {}, expected rent for settlement claims {} SOLs",
                     self.json_max_merkle_nodes_sum,
