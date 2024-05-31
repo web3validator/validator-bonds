@@ -22,7 +22,10 @@ import { Wallet as WalletInterface } from '@coral-xyz/anchor/dist/cjs/provider'
 import { getBond, getSettlement } from '../api'
 import { getStakeAccount } from '../web3.js'
 import { MerkleTreeNode } from '../merkleTree'
-import {getConcurrentMerkleTreeAccountSize, PROGRAM_ID as spl_account_compression_program_id} from '@solana/spl-account-compression'
+import {
+  getConcurrentMerkleTreeAccountSize,
+  PROGRAM_ID as spl_account_compression_program_id,
+} from '@solana/spl-account-compression'
 import { Key } from 'readline'
 
 /**
@@ -153,10 +156,7 @@ export async function claimSettlementInstruction({
     claim: claimAmount,
   }).words
 
-  const requiredSpace = getConcurrentMerkleTreeAccountSize(
-    3,8,
-    0,
-  );
+  const requiredSpace = getConcurrentMerkleTreeAccountSize(3, 8, 0)
   const merkleTree = Keypair.generate()
 
   const instruction = await program.methods
@@ -181,7 +181,7 @@ export async function claimSettlementInstruction({
       clock: SYSVAR_CLOCK_PUBKEY,
       stakeProgram: StakeProgram.programId,
       compressionProgram: spl_account_compression_program_id,
-      noopProgram: new PublicKey("noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"),
+      noopProgram: new PublicKey('noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV'),
       merkleTree: merkleTree.publicKey,
     })
     .instruction()
@@ -189,6 +189,6 @@ export async function claimSettlementInstruction({
     instruction,
     settlementClaimAccount,
     settlementAccount,
-    merkleTree
+    merkleTree,
   }
 }

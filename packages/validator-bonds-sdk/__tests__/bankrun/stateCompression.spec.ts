@@ -16,7 +16,12 @@ import {
   executeInitConfigInstruction,
   executeInitSettlement,
 } from '../utils/testTransactions'
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   createBondsFundedStakeAccount,
   createDelegatedStakeAccount,
@@ -35,13 +40,16 @@ import {
 import { getFirstSlotOfEpoch, initBankrunTest } from './bankrun'
 import {
   ALL_DEPTH_SIZE_PAIRS,
+  ConcurrentMerkleTreeAccount,
   createAllocTreeIx,
   createAppendIx,
   createInitEmptyMerkleTreeIx,
+  emptyNode,
   MerkleTree,
   ValidDepthSizePair,
 } from '@solana/spl-account-compression'
 import { concurrentMerkleTreeBeetFactory } from '@solana/spl-account-compression/src/types'
+import assert from 'assert'
 
 describe('Validator Bonds claim settlement testing compression', () => {
   const epochsToClaimSettlement = 4
@@ -131,29 +139,29 @@ describe('Validator Bonds claim settlement testing compression', () => {
     await createWithdrawerUsers(provider)
   })
 
+  // see doc: https://solana.com/docs/advanced/state-compression#sizing-a-concurrent-merkle-tree
   it.only('state compression', async () => {
-    const cmtKeypair = Keypair.generate()
-    const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
+    // const cmtKeypair = Keypair.generate()
+    // const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
 
-    // const concurrentTree = concurrentMerkleTreeBeetFactory(3, 8);
+    // // const concurrentTree = concurrentMerkleTreeBeetFactory(3, 8);
 
-    const pubkeys = Array.from({ length: 200 }, () => Keypair.generate().publicKey)
-    const possibleDepth = Math.ceil(Math.log2(pubkeys.length));
-    let pair = ALL_DEPTH_SIZE_PAIRS.filter(pair => pair.maxDepth >= possibleDepth)
-      .sort((a, b) => a.maxDepth - b.maxDepth)
-    if (pair.length == 0) {
-      throw new Error('No valid depth for concurrent merkle tree')
-    }
-    const maxDepth = pair[0].maxDepth;
-    const maxBufferSize = pair[0].maxBufferSize;
-    let merkleTree = MerkleTree.sparseMerkleTreeFromLeaves(pubkeys.map(pk => pk.toBuffer()), maxDepth);
-    if (pair.length != 1) {
-      throw new Error('Invalid depth for concurrent merkle tree')
-    }
-    const merkleTreeAccount = concurrentMerkleTreeBeetFactory(maxDepth, maxBufferSize);
+    // const pubkeys = Array.from({ length: 200 }, () => Keypair.generate().publicKey)
+    // const possibleDepth = Math.ceil(Math.log2(pubkeys.length));
+    // let pair = ALL_DEPTH_SIZE_PAIRS.filter(pair => pair.maxDepth >= possibleDepth)
+    //   .sort((a, b) => a.maxDepth - b.maxDepth)
+    // if (pair.length == 0) {
+    //   throw new Error('No valid depth for concurrent merkle tree')
+    // }
+    // const maxDepth = pair[0].maxDepth;
+    // const maxBufferSize = pair[0].maxBufferSize;
+    // let merkleTree = MerkleTree.sparseMerkleTreeFromLeaves(pubkeys.map(pk => pk.toBuffer()), maxDepth);
+    // if (pair.length != 1) {
+    //   throw new Error('Invalid depth for concurrent merkle tree')
+    // }
+    // const merkleTreeAccount = concurrentMerkleTreeBeetFactory(maxDepth, maxBufferSize);
     // merkleTreeAccount.serialize(merkleTree);
-    ConcurrentMerkleTreeAccount.deserialize(merkleTreeAccount.serialize(merkleTree));
-
+    // ConcurrentMerkleTreeAccount.deserialize(merkleTreeAccount.serialize(merkleTree));
 
     // const allocAccountIx = await createAllocTreeIx(
     //   provider.connection,
@@ -172,7 +180,116 @@ describe('Validator Bonds claim settlement testing compression', () => {
     //   ),
     // ]
     // await provider.sendIx([cmtKeypair], ...ixs)
+
+    // const depthSizePair: ValidDepthSizePair = { maxDepth: 3, maxBufferSize: 8 }
+    // // const concurrentTree = concurrentMerkleTreeBeetFactory(3, 8);
+    const pubkeys = Array.from(
+      { length: 200 },
+      () => Keypair.generate().publicKey
+    )
+    const possibleDepth = Math.ceil(Math.log2(pubkeys.length))
+    const pair = ALL_DEPTH_SIZE_PAIRS.filter(
+      pair => pair.maxDepth >= possibleDepth
+    ).sort((a, b) => a.maxDepth - b.maxDepth)
+    if (pair.length == 0) {
+      throw new Error('No valid depth for concurrent merkle tree')
+    }
+
+    // see  https://github.com/solana-labs/solana-program-library/blob/8f50c6fabc6ec87ada229e923030381f573e0aed/account-compression/sdk/tests/utils.ts#L52
+    const cmtKeypair = Keypair.generate()
+    // const offChainTree = new MerkleTree(pubkeys.map(pk => pk.toBuffer()));
+    const canopyDepth = 0 // let's say 0 and we will see :-)
+
+    // the first the lowest depthSizePair that can fit the tree
+    const depthSizePair = pair[0]
+
+    const allocAccountIx = await createAllocTreeIx(
+      provider.connection,
+      cmtKeypair.publicKey,
+      provider.walletPubkey,
+      depthSizePair,
+      canopyDepth
+    )
+    const ixs = [
+      allocAccountIx,
+      createInitEmptyMerkleTreeIx(
+        cmtKeypair.publicKey,
+        provider.walletPubkey,
+        depthSizePair
+      ),
+    ]
+
+    await provider.sendIx([cmtKeypair], ...ixs)
+
+    let appendedPubkeys: PublicKey[] = []
+    const batchSize = 5
+    for (let i = 0; i < pubkeys.length; i += batchSize) {
+      const pubkeyBatch = pubkeys.slice(i, i + batchSize)
+      const appendIxs: TransactionInstruction[] = pubkeyBatch
+        .map(pk => pk.toBuffer())
+        .map(leaf => {
+          return createAppendIx(
+            cmtKeypair.publicKey,
+            provider.walletPubkey,
+            leaf
+          )
+        })
+      appendedPubkeys = appendedPubkeys.concat(pubkeyBatch)
+      await provider.sendIx([], ...appendIxs)
+
+      const offChainTree = MerkleTree.sparseMerkleTreeFromLeaves(
+        appendedPubkeys.map(pk => pk.toBuffer()),
+        depthSizePair.maxDepth
+      )
+      const cmt = await ConcurrentMerkleTreeAccount.fromAccountAddress(
+        provider.connection,
+        cmtKeypair.publicKey,
+        'confirmed'
+      )
+      console.log(">>> i", JSON.stringify(cmt, null, 2))
+      console.log("merkle tree", offChainTree.getRoot())
+      console.log("-------------------------")
+      assertCMTProperties(
+        cmt,
+        depthSizePair.maxDepth,
+        depthSizePair.maxBufferSize,
+        provider.walletPubkey,
+        offChainTree.getRoot(),
+      )
+    }
   })
+
+  function assertCMTProperties(
+    onChainCMT: ConcurrentMerkleTreeAccount,
+    expectedMaxDepth: number,
+    expectedMaxBufferSize: number,
+    expectedAuthority: PublicKey,
+    expectedRoot: Buffer,
+    expectedCanopyDepth?: number
+  ) {
+    assert(
+      onChainCMT.getMaxDepth() === expectedMaxDepth,
+      `Max depth does not match ${onChainCMT.getMaxDepth()}, expected ${expectedMaxDepth}`
+    )
+    assert(
+      onChainCMT.getMaxBufferSize() === expectedMaxBufferSize,
+      `Max buffer size does not match ${onChainCMT.getMaxBufferSize()}, expected ${expectedMaxBufferSize}`
+    )
+    assert(
+      onChainCMT.getAuthority().equals(expectedAuthority),
+      'Failed to write auth pubkey'
+    )
+    assert(
+      onChainCMT.getCurrentRoot().equals(expectedRoot),
+      'On chain root does not match root passed in instruction'
+    )
+    if (expectedCanopyDepth) {
+      assert(
+        onChainCMT.getCanopyDepth() === expectedCanopyDepth,
+        'On chain canopy depth does not match expected canopy depth'
+      )
+    }
+  }
 
   it('claim settlement with state compression', async () => {
     const treeNode1Withdrawer1 = treeNodeBy(voteAccount1, withdrawer1)

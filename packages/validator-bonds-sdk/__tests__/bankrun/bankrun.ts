@@ -15,29 +15,30 @@ import {
   executeInitBondInstruction,
 } from '../utils/testTransactions'
 import 'reflect-metadata'
-import {PROGRAM_ID as SPL_ACCOUNT_COMPRESSION_PROGRAM_ID} from '@solana/spl-account-compression'
+import { PROGRAM_ID as SPL_ACCOUNT_COMPRESSION_PROGRAM_ID } from '@solana/spl-account-compression'
 
 export async function initBankrunTest(programId?: PublicKey): Promise<{
   program: ValidatorBondsProgram
   provider: BankrunExtendedProvider
 }> {
+  const programs = [
+    {
+      // https://github.com/solana-labs/solana-program-library/blob/master/account-compression/programs/account-compression/src/lib.rs
+      // cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
+      pubkey: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+      // https://github.com/solana-labs/solana/blob/v1.18.14/program-test/src/lib.rs#L428
+      name: 'spl_account_compression',
+      path: './fixtures/programs/spl_account_compression.so',
+    },
+    {
+      pubkey: new PublicKey('noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV'),
+      name: 'spl_noop',
+      path: './fixtures/programs/spl_noop.so',
+    },
+  ]
   const provider = await testInit({
     accountDirs: ['./fixtures/accounts/'],
-    programs: [
-      {
-        // https://github.com/solana-labs/solana-program-library/blob/master/account-compression/programs/account-compression/src/lib.rs
-        // cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK
-        pubkey: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        // https://github.com/solana-labs/solana/blob/v1.18.14/program-test/src/lib.rs#L428
-        name: 'spl_account_compression',
-        path: './fixtures/programs/spl_account_compression.so'
-      },
-      {
-        pubkey: new PublicKey("noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"),
-        name: 'spl_noop',
-        path: './fixtures/programs/spl_noop.so'
-      }
-    ],
+    programs
   })
   return {
     program: getProgram({ connection: provider, programId }),
