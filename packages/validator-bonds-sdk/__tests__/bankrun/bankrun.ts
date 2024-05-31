@@ -38,7 +38,7 @@ export async function initBankrunTest(programId?: PublicKey): Promise<{
   ]
   const provider = await testInit({
     accountDirs: ['./fixtures/accounts/'],
-    programs
+    programs,
   })
   return {
     program: getProgram({ connection: provider, programId }),

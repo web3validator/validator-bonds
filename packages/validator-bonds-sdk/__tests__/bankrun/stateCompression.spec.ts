@@ -27,7 +27,11 @@ import {
   createDelegatedStakeAccount,
   createVoteAccount,
 } from '../utils/staking'
-import { signer, createUserAndFund } from '@marinade.finance/web3js-common'
+import {
+  signer,
+  createUserAndFund,
+  publicKey,
+} from '@marinade.finance/web3js-common'
 import {
   MERKLE_ROOT_VOTE_ACCOUNT_1_BUF,
   configAccountKeypair,
@@ -44,6 +48,7 @@ import {
   createAllocTreeIx,
   createAppendIx,
   createInitEmptyMerkleTreeIx,
+  createVerifyLeafIx,
   emptyNode,
   MerkleTree,
   ValidDepthSizePair,
@@ -187,6 +192,12 @@ describe('Validator Bonds claim settlement testing compression', () => {
       { length: 200 },
       () => Keypair.generate().publicKey
     )
+    // just some, but static public key to easier check
+    pubkeys[0] = new PublicKey([
+      217, 216, 212, 72, 68, 213, 78, 169, 193, 177, 56, 43, 160, 250, 225, 136,
+      36, 95, 13, 209, 119, 52, 31, 175, 159, 69, 89, 208, 36, 169, 123, 21,
+    ])
+
     const possibleDepth = Math.ceil(Math.log2(pubkeys.length))
     const pair = ALL_DEPTH_SIZE_PAIRS.filter(
       pair => pair.maxDepth >= possibleDepth
@@ -198,7 +209,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
     // see  https://github.com/solana-labs/solana-program-library/blob/8f50c6fabc6ec87ada229e923030381f573e0aed/account-compression/sdk/tests/utils.ts#L52
     const cmtKeypair = Keypair.generate()
     // const offChainTree = new MerkleTree(pubkeys.map(pk => pk.toBuffer()));
-    const canopyDepth = 0 // let's say 0 and we will see :-)
+    const canopyDepth = 30 // let's say 0 and we will see :-)
 
     // the first the lowest depthSizePair that can fit the tree
     const depthSizePair = pair[0]
@@ -221,6 +232,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
 
     await provider.sendIx([cmtKeypair], ...ixs)
 
+    console.log(`Consulting ${pubkeys.length} pubkeys`)
     let appendedPubkeys: PublicKey[] = []
     const batchSize = 5
     for (let i = 0; i < pubkeys.length; i += batchSize) {
@@ -246,17 +258,63 @@ describe('Validator Bonds claim settlement testing compression', () => {
         cmtKeypair.publicKey,
         'confirmed'
       )
-      console.log(">>> i", JSON.stringify(cmt, null, 2))
-      console.log("merkle tree", offChainTree.getRoot())
-      console.log("-------------------------")
+      const accountInfo = await provider.connection.getAccountInfo(
+        cmtKeypair.publicKey
+      )
+      // printing concurrent merkle tree:
+      // console.log(`>>> ${i}:`, JSON.stringify(cmt))
+      // printing account info:
+      // console.log(
+      //   `>>> accountInfo RUN: ${i}, size: ${accountInfo?.data.length}, lamports: ${accountInfo?.lamports}:`,
+      //   accountInfo?.data.map(x => x).join(",")
+      // )
+
+      console.log('-------------------------')
       assertCMTProperties(
         cmt,
         depthSizePair.maxDepth,
         depthSizePair.maxBufferSize,
         provider.walletPubkey,
-        offChainTree.getRoot(),
+        offChainTree.getRoot()
       )
     }
+
+    const offChainTree = MerkleTree.sparseMerkleTreeFromLeaves(
+      pubkeys.map(pk => pk.toBuffer()),
+      depthSizePair.maxDepth
+    )
+    const firstPubkey = pubkeys[0]
+    const possibleIndexes = offChainTree.leaves
+      .filter(leaf => {
+        // console.log('|', leaf.node.join(","), pubkeys[0].toBuffer().join(","), leaf.node.equals(pubkeys[0].toBuffer()))
+        return leaf.node.equals(firstPubkey.toBuffer())
+      })
+      .map(l => l.id)
+    assert(
+      possibleIndexes.length === 1,
+      'First pubkey not found in offChainTree'
+    )
+    const firstIndex = possibleIndexes[0]
+    console.log(
+      'first key, index:',
+      firstIndex,
+      'first pubkey',
+      firstPubkey.toBase58(),
+      firstPubkey.toBuffer().join(',')
+    )
+
+    const verifyIx = createVerifyLeafIx(
+      cmtKeypair.publicKey,
+      offChainTree.getProof(firstIndex)
+      // to fail
+      // {
+      //   leafIndex: 2,
+      //   leaf: firstPubkey.toBuffer(),
+      //   root: offChainTree.getRoot(),
+      //   proof: offChainTree.getProof(firstIndex).proof,
+      // }
+    )
+    await provider.sendIx([], verifyIx)
   })
 
   function assertCMTProperties(
