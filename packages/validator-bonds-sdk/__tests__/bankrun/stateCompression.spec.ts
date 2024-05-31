@@ -10,6 +10,7 @@ import {
   BankrunExtendedProvider,
   currentEpoch,
   warpToNextEpoch,
+  warpToNextSlot,
 } from '@marinade.finance/bankrun-utils'
 import {
   executeInitBondInstruction,
@@ -48,6 +49,7 @@ import {
   createAllocTreeIx,
   createAppendIx,
   createInitEmptyMerkleTreeIx,
+  createReplaceIx,
   createVerifyLeafIx,
   emptyNode,
   MerkleTree,
@@ -214,6 +216,8 @@ describe('Validator Bonds claim settlement testing compression', () => {
     // the first the lowest depthSizePair that can fit the tree
     const depthSizePair = pair[0]
 
+    const authorityGuy = Keypair.generate()
+
     const allocAccountIx = await createAllocTreeIx(
       provider.connection,
       cmtKeypair.publicKey,
@@ -225,29 +229,33 @@ describe('Validator Bonds claim settlement testing compression', () => {
       allocAccountIx,
       createInitEmptyMerkleTreeIx(
         cmtKeypair.publicKey,
-        provider.walletPubkey,
+        authorityGuy.publicKey,
         depthSizePair
       ),
     ]
 
-    await provider.sendIx([cmtKeypair], ...ixs)
+    await provider.sendIx([cmtKeypair, authorityGuy], ...ixs)
 
     console.log(`Consulting ${pubkeys.length} pubkeys`)
     let appendedPubkeys: PublicKey[] = []
     const batchSize = 5
-    for (let i = 0; i < pubkeys.length; i += batchSize) {
-      const pubkeyBatch = pubkeys.slice(i, i + batchSize)
+    // for (let i = 0; i < pubkeys.length; i += batchSize) {
+    for (let i = pubkeys.length - 1; i > -5; i -= batchSize) {
+      const pubkeyBatch = pubkeys.slice(i, i + batchSize > 0 ? i + batchSize : 0)
+      if (pubkeyBatch.length === 0) {
+        break
+      }
       const appendIxs: TransactionInstruction[] = pubkeyBatch
         .map(pk => pk.toBuffer())
         .map(leaf => {
           return createAppendIx(
             cmtKeypair.publicKey,
-            provider.walletPubkey,
+            authorityGuy.publicKey,
             leaf
           )
         })
       appendedPubkeys = appendedPubkeys.concat(pubkeyBatch)
-      await provider.sendIx([], ...appendIxs)
+      await provider.sendIx([authorityGuy], ...appendIxs)
 
       const offChainTree = MerkleTree.sparseMerkleTreeFromLeaves(
         appendedPubkeys.map(pk => pk.toBuffer()),
@@ -274,7 +282,7 @@ describe('Validator Bonds claim settlement testing compression', () => {
         cmt,
         depthSizePair.maxDepth,
         depthSizePair.maxBufferSize,
-        provider.walletPubkey,
+        authorityGuy.publicKey,
         offChainTree.getRoot()
       )
     }
@@ -314,7 +322,33 @@ describe('Validator Bonds claim settlement testing compression', () => {
       //   proof: offChainTree.getProof(firstIndex).proof,
       // }
     )
+    console.log('Verification of index:', firstIndex)
     await provider.sendIx([], verifyIx)
+    const verify2Ix = createVerifyLeafIx(
+      cmtKeypair.publicKey,
+      offChainTree.getProof(pubkeys.length - 1)
+    )
+    console.log('Verification of index:', pubkeys.length - 1)
+    await provider.sendIx([], verify2Ix)
+
+    const replaceIx = createReplaceIx(
+      cmtKeypair.publicKey,
+      authorityGuy.publicKey,
+      Buffer.alloc(32),
+      offChainTree.getProof(firstIndex)
+    )
+    await provider.sendIx([authorityGuy], replaceIx)
+
+    await warpToNextSlot(provider)
+    try {
+      await provider.sendIx([], verifyIx)
+      throw new Error('Should have failed as the leaf was replaced')
+    } catch (e) {
+      // Error: Failed to process transaction: transport transaction error: Error processing Instruction 0: custom program error: 0x1771
+      expect((e as Error).message).toContain('0x1771')
+    }
+    // still possible to verify the leaf despite the root has changed after replace ix
+    await provider.sendIx([], verify2Ix)
   })
 
   function assertCMTProperties(
