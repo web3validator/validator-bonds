@@ -513,7 +513,7 @@ describe('Cargo CLI: Pipeline Settlement', () => {
     ).toHaveMatchingSpawnOutput({
       code: 2,
       stderr: /All stake accounts are locked for claiming/,
-      stdout: /created 12[0-9][0-9][0-9] ClaimSettlement accounts/,
+      stdout: /created 12[0-9][0-9][0-9] claim accounts/,
     })
 
     // still expecting some error as we have not fully funded settlements
@@ -541,7 +541,7 @@ describe('Cargo CLI: Pipeline Settlement', () => {
     ).toHaveMatchingSpawnOutput({
       code: 2,
       stdout:
-        /created 0 ClaimSettlement accounts(.|\n|\r)*No stake account found with enough SOL/,
+        /created 0 claim accounts(.|\n|\r)*No stake account found with enough SOL/,
     })
     previousTest = TestNames.ClaimSettlement
   })
