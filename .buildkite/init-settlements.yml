@@ -32,6 +32,8 @@ steps:
           }
         ]
       }'
+
+  - wait: ~
     
   - label: ":hammer_and_wrench: :rust: Build"
     commands:
