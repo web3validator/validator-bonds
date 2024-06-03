@@ -738,7 +738,7 @@ impl PrintReportable for ClaimSettlementReport {
                                 );
                             claim_settlements_accounts_created += claim_accounts_count_diff;
                             epoch_report.push(format!(
-                                "  Settlement {} in sum claimed SOLs {}/{} SOLs, ClaimSettlement accounts {}/{}. \n    This time claimed SOLs {}, ClaimSettlement accounts {} (not claimed reason: no target {}, no source: {})",
+                                "  Settlement {} in sum claimed SOLs {}/{} SOLs, claim accounts {}/{}. \n    This time claimed SOLs {}, ClaimSettlement accounts {} (not claimed reason: no target {}, no source: {})",
                                 settlement_address,
                                 lamports_to_sol(claimed_after),
                                 lamports_to_sol(max_claimed),
@@ -751,10 +751,12 @@ impl PrintReportable for ClaimSettlementReport {
                             ));
                         }
                         report.push(format!(
-                            "Epoch {}, this time created {} ClaimSettlement accounts in sum of rent {} SOL",
+                            "Epoch {}, this time created {} claim accounts in sum of rent {} SOL",
                             epoch,
                             claim_settlements_accounts_created,
-                            lamports_to_sol(settlement_claim_rent * claim_settlements_accounts_created)
+                            lamports_to_sol(
+                                settlement_claim_rent * claim_settlements_accounts_created
+                            )
                         ));
                         report.extend(epoch_report);
                     }
