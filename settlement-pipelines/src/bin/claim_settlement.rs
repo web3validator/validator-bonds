@@ -678,8 +678,8 @@ impl PrintReportable for ClaimSettlementReport {
                             .push((pubkey, settlement));
                     }
                     let mut report: Vec<String> = vec![];
-                    let mut claim_settlements_accounts_created: u64 = 0;
                     for epoch in grouped_by_epoch.keys() {
+                        let mut claim_settlements_accounts_created: u64 = 0;
                         let settlements_claimable_after_group = grouped_by_epoch
                             .get(epoch)
                             .expect("Epoch key expected to exist when iterating over keys");
