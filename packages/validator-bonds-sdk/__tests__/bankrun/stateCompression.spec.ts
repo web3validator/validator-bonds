@@ -54,6 +54,7 @@ import {
   emptyNode,
   MerkleTree,
   ValidDepthSizePair,
+  getConcurrentMerkleTreeAccountSize,
 } from '@solana/spl-account-compression'
 import { concurrentMerkleTreeBeetFactory } from '@solana/spl-account-compression/src/types'
 import assert from 'assert'
@@ -214,7 +215,24 @@ describe('Validator Bonds claim settlement testing compression', () => {
     const canopyDepth = 30 // let's say 0 and we will see :-)
 
     // the first the lowest depthSizePair that can fit the tree
-    const depthSizePair = pair[0]
+    const depthSizePair: ValidDepthSizePair = pair[0]
+    const merkleTreeAccountSize = getConcurrentMerkleTreeAccountSize(
+      depthSizePair.maxDepth,
+      depthSizePair.maxBufferSize,
+      canopyDepth
+    )
+    console.log(
+      `Merkle tree account size: ${merkleTreeAccountSize} for depthSizePair: ${depthSizePair.maxDepth}, ${depthSizePair.maxBufferSize} and canopyDepth: ${canopyDepth}`
+    )
+    // testing purpose
+    const lastPair = ALL_DEPTH_SIZE_PAIRS[ALL_DEPTH_SIZE_PAIRS.length - 1]
+    const lastPairCanopy = 25
+    // const lastPairSize = getConcurrentMerkleTreeAccountSize(lastPair.maxDepth, lastPair.maxBufferSize, lastPairCanopy)
+    const lastPairSize = getConcurrentMerkleTreeAccountSize(12, 32, 7)
+    console.log(
+      `Last pair size: ${lastPairSize} for depthSizePair: ${lastPair.maxDepth}, ${lastPair.maxBufferSize} and canopyDepth: ${lastPairCanopy}`
+    )
+    if (1 === 1) throw new Error('stop here')
 
     const authorityGuy = Keypair.generate()
 
@@ -241,7 +259,10 @@ describe('Validator Bonds claim settlement testing compression', () => {
     const batchSize = 5
     // for (let i = 0; i < pubkeys.length; i += batchSize) {
     for (let i = pubkeys.length - 1; i > -5; i -= batchSize) {
-      const pubkeyBatch = pubkeys.slice(i, i + batchSize > 0 ? i + batchSize : 0)
+      const pubkeyBatch = pubkeys.slice(
+        i,
+        i + batchSize > 0 ? i + batchSize : 0
+      )
       if (pubkeyBatch.length === 0) {
         break
       }
