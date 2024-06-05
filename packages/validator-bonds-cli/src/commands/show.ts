@@ -9,7 +9,7 @@ import {
   reformatReserved,
   ReformatAction,
 } from '@marinade.finance/cli-common'
-import { PublicKey } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { Command } from 'commander'
 import { getCliContext, setProgramIdByOwner } from '../context'
 import {
@@ -27,7 +27,7 @@ import {
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { getBondFromAddress } from './utils'
-import { BN } from 'bn.js'
+import BN from 'bn.js'
 
 export type ProgramAccountWithProgramId<T> = ProgramAccount<T> & {
   programId: PublicKey
@@ -471,24 +471,32 @@ function reformatBond(key: string, value: any): ReformatAction {
     return { type: 'Remove' }
   }
   if (key.toLowerCase().includes('cpmpe')) {
-    let formattedValue
-    try {
-      formattedValue = new BN(value).toNumber()
-    } catch (e) {
-      formattedValue = new BN(value).toString()
-    }
     return {
       type: 'UseExclusively',
       records: [
         {
           key: 'costPerMillePerEpoch',
-          value: formattedValue,
+          value: new BN(value).toString() + ' ' + format_unit(value, 'lamport'),
         },
       ],
     }
   }
-  if (key.toLowerCase().includes('bump')) {
-    return { type: 'Remove' }
+  if (key.toLocaleLowerCase().startsWith('maxstake')) {
+    return {
+      type: 'UseExclusively',
+      records: [
+        {
+          key,
+          value:
+            new BN(value).divRound(new BN(LAMPORTS_PER_SOL)).toString() +
+            ' ' +
+            format_unit(value, 'SOL'),
+        },
+      ],
+    }
+  }
+  if (key.startsWith('amount') || key.includes('Amount')) {
+    return format_sol_exclusive(key, value)
   }
   if (key.toLocaleLowerCase() === 'withdrawrequest' && value === undefined) {
     return {
@@ -496,10 +504,39 @@ function reformatBond(key: string, value: any): ReformatAction {
       records: [{ key, value: '<NOT EXISTING>' }],
     }
   }
+  if (key.toLowerCase().includes('bump')) {
+    return { type: 'Remove' }
+  }
   if (value === undefined) {
     return { type: 'Remove' }
   }
   return { type: 'UsePassThrough' }
+}
+
+function format_unit(value: BN, unit: string): string {
+  if (value.eq(new BN(0)) || value.eq(new BN(1))) {
+    return unit
+  } else {
+    return unit + 's'
+  }
+}
+
+function format_sol_exclusive(key: string, value: BN): ReformatAction {
+  const { div, mod } = new BN(value).divmod(new BN(LAMPORTS_PER_SOL))
+  return {
+    type: 'UseExclusively',
+    records: [
+      {
+        key,
+        value: `${div.toString()}.${mod
+          .toString()
+          .padEnd(Math.log10(LAMPORTS_PER_SOL), '0')} ${format_unit(
+          value,
+          'SOL'
+        )}`,
+      },
+    ],
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

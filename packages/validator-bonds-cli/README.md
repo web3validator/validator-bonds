@@ -38,9 +38,43 @@ validator-bonds --help
 
 * [creating a bond](#creating-a-bond)
 * [funding the bond](#funding-bond-account)
-# TODO: bidding requires more detailed description
 * [bidding for the stake](#bond-account-configuration)
-* [during the time of tracking, the bond is sufficiently funded](#show-the-bond-account)
+* [track that the bond is sufficiently funded](#show-the-bond-account)
+
+
+In terms of CLI commands in the most simplistic way:
+
+```sh
+# initializing the bond account for vote-account
+validator-bonds init-bond --vote-account <vote-account-address> \
+  --validator-identity ./validator-identity.json
+> Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc of config vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 successfully created
+
+# optional: grind stake account keypair, used to remind that the key is for a bond
+solana-keygen grind --starts-with bnd:1
+> Wrote keypair to bndozK6C9zuCqjrdaWoJpX9AQeU1jm8BNdmKC85LotQ.json
+
+# Creating a stake account. The SOLs will be funded to the Bond
+solana create-stake-account <stake-account-keypair> <Amount of SOL 1 for every 10,000 staked>
+
+# To couple the created stake account with the vote account
+solana delegate-stake <stake-account-pubkey> <vote-account-address>
+
+<Wait for the stake to activate in the next epoch>
+
+# Funding Bond by assigning the stake account with the SOL amount in it
+validator-bonds fund-bond <vote-account-address> --stake-account <stake-account-pubkey>
+
+# Bidding the auction
+# --max-stake-wanted defines the maximum stake amount (in SOLs) the validator wants to be delegated to them
+# --cpmpe defines how many lamports the validator is willing to pay for every 1000 SOLs delegated
+validator-bonds configure-bond <vote-account-address> --authority ./validator-identity.json \
+  --cpmpe <lamports> --max-stake-wanted <SOLs>
+> Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc successfully configured
+
+# Check the new configuration and track the funding
+validator-bonds show-bond <vote-account-address>
+```
 
 
 ### Creating a bond
@@ -90,18 +124,17 @@ The parameters and their meanings are explained in detail below:
 * `--bond-authority`: Refers to any public key with ownership rights. It is recommended to use a ledger or multisig. This key does not necessarily need to correspond to an existing on-chain account (SOL preloading is unnecessary).
 * `--rent-payer`: This account covers the creation cost of the Solana bond account, and it is expected to be the same as the fee payer (default).
    The rent cost is `0.00270048` SOL. Note that the `--rent-payer` is unrelated to bond security or "funding," which is addressed through a separate instruction. The bond's security is established by providing a stake account. The lamports in the stake account then corresponds to the SOL amount added to the security of the bond account. There is no direct payment of SOLs to the bond; it is accomplished solely by allocating stake accounts.
-* `--cpmpe`: cost per mille per epoch. In lamports. It configures the bid that the `Bond` owner
-  wish to pay for receiving delegated stake. The maximum provided delegated stake is defined
-  by `max-stake-wanted`. The actual amount of delegated stake is influenced by constraints defined by
+* `--cpmpe`: Cost per mille per epoch, in lamports. How many lamports the validator is willing to pay
+  for every 1000 SOLs delegated.
+  The property configures the bid the `Bond` owner wishes to pay for receiving delegated stake. The maximum delegated stake is defined by `max-stake-wanted`.
+  The actual amount of delegated stake is influenced by constraints defined by the
   [delegation strategy](https://docs.marinade.finance/marinade-protocol/validators).
-  The value of of `cpmpe` goes into the auction and based on the other
-  bids the delegation strategy then delegates the actual amount of stake to the vote account
-  coupled with the `Bond` account.
-  The funded bond is charged only for amount of stake that was really delegated.
-  When nothing is delegated to the vote account, then nothing is charged from the `Bond` account.
-* `--max-stake-wanted`: In lamports. The maximum number of stake the `Bond` owner desires
-  to get delegated from
-  [delegation strategy](https://docs.marinade.finance/marinade-protocol/validators).
+  The `cpmpe` value goes into the auction where compared with other bids the delegation strategy determines
+  the actual amount of stake delegated to the vote account linked to the `Bond` account.
+* `--max-stake-wanted`: The maximum stake, in SOLs, that the `Bond` owner desires to get delegated
+  from the [delegation strategy](https://docs.marinade.finance/marinade-protocol/validators).
+  The funded bond is charged only for the amount of stake that was actually delegated
+  (if nothing is delegated, nothing is charged).
 
 ### Show the bond account
 
@@ -119,13 +152,13 @@ Expected output on created bond is like
     config: 'vbMaRfmTCg92HWGzmd53APkMNpPnGVGZTUHwUJQkXAU',
     voteAccount: '...',
     authority: '...'
-    costPerMillePerEpoch: 0,
-    maxStakeWanted: 0
+    costPerMillePerEpoch: "1000 lamports",
+    maxStakeWanted: "10000 SOLs"
 
   },
-  amountActive: 10024261277,
-  amountAtSettlements: 0,
-  amountToWithdraw: 0,
+  amountActive: "10.024261277 SOLs,
+  amountAtSettlements: "0.000000000 SOL",
+  amountToWithdraw: "0.000000000 SOL",
   numberActiveStakeAccounts: 1,
   numberSettlementStakeAccounts: 0,
   withdrawRequest: '<NOT EXISTING>'
@@ -136,16 +169,15 @@ Expected output on created bond is like
 
 The `Bond` owner may configure following properties of the account:
 
-* `--bond-authority`: authority that when it signs the configuration transaction
-  then it permits to change the `Bond` account configuration and to withdraw funds.
-  The same ability to configure the `Bond` has got the signature 
-  of validator identity keypair of the coupled `vote account`,
-  or owner of the [SPL minted configuration token](#permission-less-mint---configure-workflow).
-* `--cpmpe`: cost per mille per epoch (in lamports). It's a bid used in delegation strategy auction.
-  The `Bond` owner defines his attitude to pay that amount in lamports to get stake delegated
-  to vote account for one epoch.
-* `--max-stake-wanted`: the maximum amount stake that the `Bond` owner desired
-  to get delegated to his vote account.
+* `--bond-authority`: The authority that, when signing the configuration transaction,
+  allows changes to the `Bond` account configuration and withdrawal of funds.
+  The validator identity keypair of the linked `vote account` or the owner of the
+  [SPL minted configuration token](#permission-less-mint---configure-workflow) also has this ability.
+* `--cpmpe`: Cost per mille per epoch (in lamports). It's a bid used in the delegation strategy
+  auction. The Bond owner agrees to pay this amount in lamports to get stake delegated to the vote
+  account for one epoch.
+* `--max-stake-wanted` In SOLs, the maximum amount of stake that the Bond owner desires to get delegated
+  to their vote account. 
 
 #### Permission-ed Configure workflow
 
@@ -197,19 +229,6 @@ validator-bonds -um configure-bond <bond-or-vote-account-address> \
   --with-token
 ```
 
-#### Bond configuration
-
-The `Bond` owner may configure following properties of the account:
-
-* `--bond-authority`: authority that when it signs the configuration transaction
-  then it permits to change the `Bond` account configuration and to withdraw funds.
-  The same ability has got the `vote account` withdraw authority coupled with the `Bond`
-  or owner of the [SPL minted configuration token](#permission-less-mint---configure-workflow).
-* `--cpmpe`: cost per mille per epoch (in lamports). It's a bid used in delegation strategy auction.
-  The `Bond` owner defines his attitude to pay that amount in lamports to get stake delegated
-  to vote account for one epoch.
-* `--max-stake-wanted`: the maximum amount stake that the `Bond` owner desired
-  to get delegated to his vote account.
 
 ### Funding Bond Account
 
@@ -243,27 +262,6 @@ The meanings of parameters are as follows:
 - `--stake-account`: address of the stake account that will be assigned under the bonds program.
 - `--stake-authority`: signature of the stake account authority that permits to change the
   stake account authorities
-
-#### Bond Account initialization and funding SHOWCASE (credits to [Bored King](https://twitter.com/bape_SOL))
-
-```sh
-validator-bonds init-bond --vote-account <vote-account-address> \
-  --validator-identity ./identity.json --keypair ./identity.json
-> Bond account BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc of config vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4 successfully created
-
-solana-keygen grind --starts-with bnd:1
-> Optional: Grind is used to remind the key is for bond a bond.
-> bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json
-
-solana create-stake-account ./bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json <Amount of SOL 1 for every 10,000 staked>
-
-solana delegate-stake ./bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba.json <Vote Pubkey>
-
-<wait for stake to activate in next epoch>
-
-validator-bonds fund-bond BondAddress9iRYo3ZEK6dpmm9jYWX3Kb63Ed7RAFfUc \
-  --stake-account bndk55Q9YntUzpHvnAy9bcbtdHYfFjANUfjsCECF1ba --keypair ./identity.json
-```
 
 #### How to add more funds under the bond?
 
