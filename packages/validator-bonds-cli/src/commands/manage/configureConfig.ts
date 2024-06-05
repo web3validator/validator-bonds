@@ -73,7 +73,7 @@ export function installConfigureConfig(program: Command) {
     )
     .option(
       '--min-bond-max-stake-wanted <number>',
-      'New value of minimum for max-stake-wanted field configured by validators in bond.',
+      'New value of minimum for max-stake-wanted field, in lamports, configured by validators in bond.',
       value => new BN(value, 10)
     )
     .action(

@@ -3,7 +3,12 @@ import {
   parsePubkeyOrPubkeyFromWallet,
   parseWalletOrPubkey,
 } from '@marinade.finance/cli-common'
-import { PublicKey, Signer, TransactionInstruction } from '@solana/web3.js'
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Signer,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { Command } from 'commander'
 import { setProgramIdByOwner } from '../../context'
 import {
@@ -62,12 +67,12 @@ export function installConfigureBond(program: Command) {
     )
     .option(
       '--cpmpe <number>',
-      'Nev value of cost per mille per epoch',
+      'New value of cost per mille per epoch, in lamports. The maximum amount of lamports the validator desires to pay for each 1000 delegated SOLs per epoch. (default: 0)',
       value => new BN(value, 10)
     )
     .option(
       '--max-stake-wanted <number>',
-      'New maximal value of stake for PSR bidding',
+      'New value of maximum stake amount, in SOLs, the validator wants to be delegated to them (default: 0)',
       value => new BN(value, 10)
     )
     .action(
@@ -160,6 +165,7 @@ async function manageConfigureBond({
   let bondAccount: PublicKey
   let instruction: TransactionInstruction
   let computeUnitLimit: number
+  const newMaxStakeWanted = maxStakeWanted?.mul(new BN(LAMPORTS_PER_SOL))
   if (withToken) {
     computeUnitLimit = CONFIGURE_BOND_MINT_LIMIT_UNITS
     ;({ instruction, bondAccount } = await configureBondWithMintInstruction({
@@ -170,7 +176,7 @@ async function manageConfigureBond({
       tokenAuthority: authority,
       newBondAuthority,
       newCpmpe: cpmpe,
-      newMaxStakeWanted: maxStakeWanted,
+      newMaxStakeWanted,
     }))
   } else {
     computeUnitLimit = CONFIGURE_BOND_LIMIT_UNITS
@@ -182,7 +188,7 @@ async function manageConfigureBond({
       authority,
       newBondAuthority,
       newCpmpe: cpmpe,
-      newMaxStakeWanted: maxStakeWanted,
+      newMaxStakeWanted,
     }))
   }
   tx.add(instruction)

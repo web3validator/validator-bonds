@@ -124,7 +124,7 @@ describe('Init bond account using CLI', () => {
     expect(bondsData.voteAccount).toEqual(voteAccount)
     expect(bondsData.authority).toEqual(bondAuthority.publicKey)
     expect(bondsData.cpmpe).toEqual(33)
-    expect(bondsData.maxStakeWanted).toEqual(1000)
+    expect(bondsData.maxStakeWanted).toEqual(1000 * LAMPORTS_PER_SOL)
     expect(bondsData.bump).toEqual(bump)
     await expect(
       provider.connection.getBalance(rentPayerKeypair.publicKey)

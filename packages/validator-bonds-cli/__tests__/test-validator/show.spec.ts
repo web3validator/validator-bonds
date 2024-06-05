@@ -254,7 +254,7 @@ describe('Show command using CLI', () => {
       voteAccount,
       validatorIdentity,
       cpmpe: 222,
-      maxStakeWanted: 2000,
+      maxStakeWanted: 2000 * LAMPORTS_PER_SOL,
     })
 
     const expectedDataNoFunding = {
@@ -264,15 +264,15 @@ describe('Show command using CLI', () => {
         config: configAccount.toBase58(),
         voteAccount: voteAccount.toBase58(),
         authority: bondAuthority.publicKey.toBase58(),
-        costPerMillePerEpoch: 222,
-        maxStakeWanted: 2000,
+        costPerMillePerEpoch: '222 lamports',
+        maxStakeWanted: '2000 SOLs',
       },
     }
     const expectedData = {
       ...expectedDataNoFunding,
-      amountActive: 0,
-      amountAtSettlements: 0,
-      amountToWithdraw: 0,
+      amountActive: '0.000000000 SOL',
+      amountAtSettlements: '0.000000000 SOL',
+      amountToWithdraw: '0.000000000 SOL',
       numberActiveStakeAccounts: 0,
       numberSettlementStakeAccounts: 0,
       withdrawRequest: '<NOT EXISTING>',
@@ -501,15 +501,15 @@ describe('Show command using CLI', () => {
         config: configAccount,
         voteAccount: voteAccount,
         authority: bondAuthority.publicKey,
-        costPerMillePerEpoch: 1,
-        maxStakeWanted: 0,
+        costPerMillePerEpoch: '1 lamport',
+        maxStakeWanted: '0 SOL',
       },
     }
     const expectedData = {
       ...expectedDataNoFunding,
-      amountActive: 0,
-      amountAtSettlements: 0,
-      amountToWithdraw: 0,
+      amountActive: '0.000000000 SOL',
+      amountAtSettlements: '0.000000000 SOL',
+      amountToWithdraw: '0.000000000 SOL',
       numberActiveStakeAccounts: stakeAccountLamports.length,
       numberSettlementStakeAccounts: 0,
       withdrawRequest: '<NOT EXISTING>',
@@ -538,7 +538,7 @@ describe('Show command using CLI', () => {
       // stderr: '',
       stdout: YAML.stringify({
         ...expectedData,
-        amountActive: sumLamports,
+        amountActive: `${sumLamports / LAMPORTS_PER_SOL}.000000000 SOLs`,
       }),
     })
 
@@ -581,16 +581,22 @@ describe('Show command using CLI', () => {
       // stderr: '',
       stdout: YAML.stringify({
         ...expectedData,
-        amountActive: sumLamports - withdrawRequestAmount,
-        amountToWithdraw: withdrawRequestAmount,
+        amountActive: `${
+          (sumLamports - withdrawRequestAmount) / LAMPORTS_PER_SOL
+        }.000000000 SOLs`,
+        amountToWithdraw: `${
+          withdrawRequestAmount / LAMPORTS_PER_SOL
+        }.000000000 SOLs`,
         withdrawRequest: {
           publicKey: withdrawRequestAccount.toBase58(),
           account: {
             voteAccount: withdrawRequestData.voteAccount.toBase58(),
             bond: bondAccount.toBase58(),
             epoch,
-            requestedAmount: withdrawRequestAmount,
-            withdrawnAmount: 0,
+            requestedAmount: `${
+              withdrawRequestAmount / LAMPORTS_PER_SOL
+            }.000000000 SOLs`,
+            withdrawnAmount: '0.000000000 SOL',
           },
         },
       }),
@@ -627,7 +633,9 @@ describe('Show command using CLI', () => {
       // stderr: '',
       stdout: YAML.stringify({
         ...expectedData,
-        amountActive: sumLamports,
+        amountActive: `${sumLamports / LAMPORTS_PER_SOL}.${
+          sumLamports % LAMPORTS_PER_SOL
+        }00000000 SOLs`,
       }),
     })
   })

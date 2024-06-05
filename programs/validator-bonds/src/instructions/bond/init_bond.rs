@@ -84,8 +84,6 @@ impl<'info> InitBond<'info> {
             } else {
                 // permission-less: not possible to configure bond account
                 cpmpe = 0;
-                // TODO: not clear if min_stake == 0 means no bidding or if it's invalid value, maybe min_stake/max_stake should be Optional?
-                //       in the same way it's not clear if the validator may set it up as 0 or not
                 max_stake_wanted = 0;
                 let validator_identity =
                     get_validator_vote_account_validator_identity(&ctx.accounts.vote_account)?;
