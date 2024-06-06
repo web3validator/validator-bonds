@@ -130,11 +130,6 @@ pub mod validator_bonds {
         FundSettlement::process(ctx)
     }
 
-    pub fn close_settlement_claim(ctx: Context<CloseSettlementClaim>) -> Result<()> {
-        check_context(&ctx)?;
-        CloseSettlementClaim::process(ctx)
-    }
-
     pub fn claim_settlement(
         ctx: Context<ClaimSettlement>,
         claim_settlement_args: ClaimSettlementArgs,

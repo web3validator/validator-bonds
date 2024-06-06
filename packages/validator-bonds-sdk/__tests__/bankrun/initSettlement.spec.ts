@@ -4,8 +4,10 @@ import {
   ValidatorBondsProgram,
   getBond,
   getSettlement,
+  getSettlementClaimsBySettlement,
   initSettlementInstruction,
   settlementAddress,
+  settlementClaimsAddress,
   settlementStakerAuthority,
 } from '../../src'
 import {
@@ -22,6 +24,7 @@ import { Keypair, PublicKey } from '@solana/web3.js'
 import { createVoteAccount } from '../utils/staking'
 import { verifyError } from '@marinade.finance/anchor-common'
 import { initBankrunTest } from './bankrun'
+import { HEADER_DATA_SIZE } from '../../src/settlementClaims'
 
 describe('Validator Bonds init settlement', () => {
   let provider: BankrunExtendedProvider
@@ -118,6 +121,24 @@ describe('Validator Bonds init settlement', () => {
     )
     // not account change size expected
     expect(settlementAccountInfo?.data.byteLength).toEqual(328)
+
+    const [settlementClaimsAddr] = settlementClaimsAddress(
+      settlementAccount,
+      program.programId
+    )
+    const settlementClaimsAccountInfo =
+      await provider.connection.getAccountInfo(settlementClaimsAddr)
+    expect(settlementClaimsAccountInfo).not.toBeNull()
+    // the size for bitmap is calculated to be at least 8 bytes
+    expect(settlementClaimsAccountInfo?.data.byteLength).toEqual(
+      HEADER_DATA_SIZE + 8
+    )
+
+    const settlementClaims = await getSettlementClaimsBySettlement(
+      program,
+      settlementAccount
+    )
+    expect(settlementClaims.bitmap.bitmapAsBits().length).toEqual(1)
   })
 
   it('cannot init settlement with wrong buffer size', async () => {

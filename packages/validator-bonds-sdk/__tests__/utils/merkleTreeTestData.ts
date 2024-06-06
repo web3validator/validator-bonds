@@ -262,7 +262,7 @@ export const totalClaimVoteAccount2 = treeNodesVoteAccount2.reduce(
 export function treeNodeBy(
   voteAccount: PublicKey,
   withdrawer: PublicKey
-): MerkleTreeNodeWithProof {
+): [MerkleTreeNodeWithProof, number] {
   if (voteAccount.equals(voteAccount1)) {
     return treeNodeByWithdrawer(ITEMS_VOTE_ACCOUNT_1, withdrawer)
   } else if (voteAccount.equals(voteAccount2)) {
@@ -277,16 +277,18 @@ export function treeNodeBy(
 export function treeNodeByWithdrawer(
   treeNodeList: MerkleTreeNodeWithProof[],
   withdrawer: PublicKey
-): MerkleTreeNodeWithProof {
-  const treeNodesByWithdrawer = treeNodeList.find(item =>
-    item.treeNode.data.withdrawAuthority.equals(withdrawer)
-  )
+): [MerkleTreeNodeWithProof, number] {
+  const treeNodesByWithdrawer = treeNodeList
+    .map((item, index) => {
+      return { item, index }
+    })
+    .find(({ item }) => item.treeNode.data.withdrawAuthority.equals(withdrawer))
   if (!treeNodesByWithdrawer) {
     throw new Error(
       `tree node for withdrawer ${withdrawer.toBase58()} not found`
     )
   }
-  return treeNodesByWithdrawer
+  return [treeNodesByWithdrawer.item, treeNodesByWithdrawer.index]
 }
 
 export async function createWithdrawerUsers(provider: ExtendedProvider) {

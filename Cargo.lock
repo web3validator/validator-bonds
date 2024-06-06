@@ -918,7 +918,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4114279215a005bc675e386011e594e1d9b800918cea18fcadadcce864a2046b"
 dependencies = [
  "borsh-derive 0.10.3",
- "hashbrown 0.12.3",
+ "hashbrown 0.13.2",
 ]
 
 [[package]]
@@ -5916,12 +5916,12 @@ dependencies = [
 [[package]]
 name = "solana-transaction-builder"
 version = "0.1.0"
-source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#05b471e70d6ea44acf560ad98e1ce7289b002045"
+source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=arc-instead-of-rc#ea9fd7997c05e442ac3f1af6cfe29d3a62fff81f"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
  "bincode",
- "borsh 0.9.3",
+ "borsh 0.10.3",
  "log",
  "once_cell",
  "solana-sdk",
@@ -5931,7 +5931,7 @@ dependencies = [
 [[package]]
 name = "solana-transaction-builder-executor"
 version = "0.1.0"
-source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=main#05b471e70d6ea44acf560ad98e1ce7289b002045"
+source = "git+https://github.com/marinade-finance/solana-transaction-builder?branch=arc-instead-of-rc#ea9fd7997c05e442ac3f1af6cfe29d3a62fff81f"
 dependencies = [
  "anyhow",
  "async-stream",

@@ -3,7 +3,7 @@ use anchor_client::anchor_lang::solana_program::stake::state::StakeStateV2;
 use anchor_client::{DynSigner, Program};
 use anyhow::anyhow;
 use clap::Parser;
-use log::{debug, error, info};
+use log::{debug, info};
 use settlement_engine::utils::read_from_json_file;
 use settlement_pipelines::anchor::add_instruction_to_builder;
 use settlement_pipelines::arguments::{
@@ -17,7 +17,6 @@ use settlement_pipelines::json_data::BondSettlement;
 use settlement_pipelines::reporting::{with_reporting, PrintReportable, ReportHandler};
 use settlement_pipelines::settlements::{
     load_expired_settlements, obtain_settlement_closing_refunds, SettlementRefundPubkeys,
-    SETTLEMENT_CLAIM_ACCOUNT_SIZE,
 };
 use settlement_pipelines::stake_accounts::filter_settlement_funded;
 use solana_client::nonblocking::rpc_client::RpcClient;
@@ -36,15 +35,15 @@ use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
-use tokio::time::sleep;
 use validator_bonds::state::bond::Bond;
 use validator_bonds::state::config::{find_bonds_withdrawer_authority, Config};
-use validator_bonds::state::settlement::{find_settlement_staker_authority, Settlement};
+use validator_bonds::state::settlement::{
+    find_settlement_claims_address, find_settlement_staker_authority, Settlement,
+};
 use validator_bonds::ID as validator_bonds_id;
 use validator_bonds_common::bonds::get_bonds_for_pubkeys;
 use validator_bonds_common::config::get_config;
 use validator_bonds_common::constants::find_event_authority;
-use validator_bonds_common::settlement_claims::get_settlement_claims;
 use validator_bonds_common::settlements::get_settlements;
 use validator_bonds_common::stake_accounts::{collect_stake_accounts, get_clock};
 
@@ -142,17 +141,6 @@ async fn real_main(reporting: &mut ReportHandler<CloseSettlementReport>) -> anyh
         })
         .collect::<HashMap<Pubkey, Pubkey>>();
 
-    close_settlement_claims(
-        &program,
-        rpc_client.clone(),
-        &mut transaction_builder,
-        transaction_executor.clone(),
-        &mapping_settlements_to_staker_authority,
-        &priority_fee_policy,
-        reporting,
-    )
-    .await?;
-
     reset_stake_accounts(
         &program,
         rpc_client.clone(),
@@ -210,6 +198,7 @@ async fn close_settlements(
                 config: *config_address,
                 bond: settlement.bond,
                 settlement: *settlement_address,
+                settlement_claims: find_settlement_claims_address(settlement_address).0,
                 bonds_withdrawer_authority,
                 rent_collector: settlement.rent_collector,
                 split_rent_collector,
@@ -245,60 +234,6 @@ async fn close_settlements(
         format!("CloseSettlements [{settlements_list}]").as_str(),
     );
 
-    Ok(())
-}
-
-async fn close_settlement_claims(
-    program: &Program<Arc<DynSigner>>,
-    rpc_client: Arc<RpcClient>,
-    transaction_builder: &mut TransactionBuilder,
-    transaction_executor: Arc<TransactionExecutor>,
-    mapping_settlements_to_staker_authority: &HashMap<Pubkey, Pubkey>,
-    priority_fee_policy: &PriorityFeePolicy,
-    reporting: &mut ReportHandler<CloseSettlementReport>,
-) -> anyhow::Result<()> {
-    // Search for Settlement Claims that points to non-existing Settlements
-    sleep(std::time::Duration::from_secs(8)).await; // wating for data finalization on-chain
-    let settlement_claim_records = get_settlement_claims(rpc_client.clone())
-        .await
-        .map_err(CliError::retry_able)?;
-    for (settlement_claim_address, settlement_claim) in settlement_claim_records {
-        if mapping_settlements_to_staker_authority
-            .get(&settlement_claim.settlement)
-            .is_none()
-        {
-            let req = program
-                .request()
-                .accounts(validator_bonds::accounts::CloseSettlementClaim {
-                    settlement: settlement_claim.settlement,
-                    settlement_claim: settlement_claim_address,
-                    rent_collector: settlement_claim.rent_collector,
-                    program: validator_bonds_id,
-                    event_authority: find_event_authority().0,
-                })
-                .args(validator_bonds::instruction::CloseSettlementClaim {});
-            add_instruction_to_builder(
-                transaction_builder,
-                &req,
-                format!(
-                    "Close Settlement Claim {settlement_claim_address} of settlement {}",
-                    settlement_claim.settlement
-                ),
-            )?;
-            reporting
-                .reportable
-                .add_settlement_claim(settlement_claim_address);
-        }
-    }
-
-    let execution_result = execute_parallel(
-        rpc_client.clone(),
-        transaction_executor.clone(),
-        transaction_builder,
-        priority_fee_policy,
-    )
-    .await;
-    reporting.add_tx_execution_result(execution_result, "CloseSettlementClaim");
     Ok(())
 }
 
@@ -532,7 +467,6 @@ struct CloseSettlementReport {
     withdraw_wallet: Pubkey,
     /// settlement pubkey, bond account pubkey
     closed_settlements: Vec<(Pubkey, Pubkey)>,
-    closed_settlement_claims: Vec<Pubkey>,
     reset_stake: Vec<(Pubkey, u64)>,
     withdraw_stake: Vec<(Pubkey, u64)>,
 }
@@ -540,33 +474,10 @@ struct CloseSettlementReport {
 impl PrintReportable for CloseSettlementReport {
     fn get_report(&self) -> Pin<Box<dyn Future<Output = Vec<String>> + '_>> {
         Box::pin(async {
-            let rpc_client = if let Some(rpc_client) = &self.rpc_client {
-                rpc_client
-            } else {
-                // not initialized, no reporting
-                return vec![];
-            };
-            let settlement_claim_rent = rpc_client
-                .get_minimum_balance_for_rent_exemption(SETTLEMENT_CLAIM_ACCOUNT_SIZE)
-                .await
-                .map_or_else(
-                    |e| {
-                        error!("Error fetching SettlementClaim account rent: {:?}", e);
-                        0_u64
-                    },
-                    |v| v,
-                );
             vec![
                 format!(
                     "Number of closed settlements: {}",
                     self.closed_settlements.len()
-                ),
-                format!(
-                    "Number of closed settlement claims: {}, sum of returned rent {} SOLs",
-                    self.closed_settlement_claims.len(),
-                    lamports_to_sol(
-                        self.closed_settlement_claims.len() as u64 * settlement_claim_rent
-                    )
                 ),
                 format!(
                     "Number of reset stake accounts: {}, sum of reset SOL: {}",
@@ -590,7 +501,6 @@ impl CloseSettlementReport {
             rpc_client: None,
             withdraw_wallet: Pubkey::default(),
             closed_settlements: vec![],
-            closed_settlement_claims: vec![],
             reset_stake: vec![],
             withdraw_stake: vec![],
         };
@@ -615,10 +525,6 @@ impl CloseSettlementReport {
             .map(|(p, _)| p.to_string())
             .collect::<Vec<String>>()
             .join(",")
-    }
-
-    fn add_settlement_claim(&mut self, settlement_claim: Pubkey) {
-        self.closed_settlement_claims.push(settlement_claim);
     }
 
     fn add_reset_stake(&mut self, stake_pubkey: Pubkey, lamports: u64) {
