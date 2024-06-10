@@ -39,6 +39,8 @@ use solana_sdk::sysvar::{
 use solana_transaction_builder::TransactionBuilder;
 use solana_transaction_executor::{PriorityFeePolicy, TransactionExecutor};
 use std::collections::{HashMap, HashSet};
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
@@ -329,20 +331,15 @@ async fn init_settlements(
     transaction_builder.add_signer_checked(&rent_payer);
 
     for settlement_record in settlement_records {
-        if settlement_record.bond_account.is_none() && settlement_record.funder.is_marinade() {
-            info!(
-                "No bond for vote account {} but the Settlement {} is to be funded by Marinade by {} SOLs",
-                settlement_record.vote_account_address,
-                settlement_record.settlement_address,
-                lamports_to_sol(settlement_record.max_total_claim)
-            );
-        } else if settlement_record.bond_account.is_none() {
+        if settlement_record.bond_account.is_none() {
             reporting.add_error_string(format!(
-                "Cannot find bond account {} for vote account {}, claim amount {} SOLs",
+                "Cannot find bond account {} for vote account {}, funder {}, claim amount {} SOLs",
                 settlement_record.bond_address,
                 settlement_record.vote_account_address,
+                settlement_record.funder,
                 lamports_to_sol(settlement_record.max_total_claim)
             ));
+            settlement_record.state = SettlementRecordState::NoBond;
             continue;
         }
 
@@ -476,7 +473,8 @@ async fn merge_settlement_stake_accounts(
                 lamports_to_sol(settlement_amount_funded),
             );
             settlement_record.state = SettlementRecordState::AlreadyFunded;
-            reporting.reportable.funded_already += settlement_record.max_total_claim;
+            reporting.reportable.already_funded_settlements_count += 1;
+            reporting.reportable.already_funded_amount += settlement_record.max_total_claim;
             continue;
         }
 
@@ -492,7 +490,7 @@ async fn merge_settlement_stake_accounts(
                     SettlementFunderType::Marinade(Some(SettlementFunderMarinade {
                         amount_to_fund,
                     }));
-                reporting.reportable.funded_overall += amount_to_fund;
+                reporting.reportable.current_funded_amount += amount_to_fund;
             }
             SettlementFunderType::ValidatorBond(validator_bonds_funders) => {
                 let mut empty_vec: Vec<FundBondStakeAccount> = vec![];
@@ -578,7 +576,7 @@ async fn merge_settlement_stake_accounts(
                                 lamports_to_sol(lamports_available)
                             );
                         reporting.add_error_string(err_msg);
-                        reporting.reportable.funded_overall += lamports_available;
+                        reporting.reportable.current_funded_amount += lamports_available;
                     } else if lamports_available > amount_to_fund + minimal_stake_lamports {
                         // we are in situation that the stake account has got (or it will have after merging)
                         // more lamports than needed for funding the settlement in current loop iteration,
@@ -597,7 +595,7 @@ async fn merge_settlement_stake_accounts(
                             split_stake_account: Arc::new(Keypair::new()),
                             state: destination_stake_state,
                         });
-                        reporting.reportable.funded_overall += amount_to_fund;
+                        reporting.reportable.current_funded_amount += amount_to_fund;
                     }
                 } else {
                     let err_msg = format!(
@@ -607,7 +605,7 @@ async fn merge_settlement_stake_accounts(
                         );
                     reporting.add_error_string(err_msg);
                 }
-                reporting.reportable.funded_already += settlement_record
+                reporting.reportable.already_funded_amount += settlement_record
                     .max_total_claim
                     .saturating_sub(amount_to_fund);
             }
@@ -745,7 +743,7 @@ async fn fund_settlements(
                 transaction_builder.finish_instruction_pack();
                 reporting
                     .reportable
-                    .funded_settlements_overall
+                    .current_funded_settlements_count
                     .insert(settlement_record.settlement_address);
             }
             SettlementFunderType::ValidatorBond(validator_bonds_funders) => {
@@ -789,7 +787,7 @@ async fn fund_settlements(
                     )?;
                     reporting
                         .reportable
-                        .funded_settlements_overall
+                        .current_funded_settlements_count
                         .insert(settlement_record.settlement_address);
                 }
             }
@@ -892,9 +890,14 @@ impl SettlementFunderType {
             SettlementFunder::ValidatorBond => SettlementFunderType::ValidatorBond(vec![]),
         }
     }
+}
 
-    fn is_marinade(&self) -> bool {
-        matches!(self, SettlementFunderType::Marinade(_))
+impl Display for SettlementFunderType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            SettlementFunderType::Marinade(_) => write!(f, "Marinade"),
+            SettlementFunderType::ValidatorBond(_) => write!(f, "ValidatorBond"),
+        }
     }
 }
 
@@ -902,17 +905,12 @@ impl SettlementFunderType {
 enum SettlementRecordState {
     InProgress,
     AlreadyFunded,
+    NoBond,
 }
 
 impl SettlementRecordState {
-    fn is_in_progress(&self, reporting: &mut ReportHandler<InitSettlementReport>) -> bool {
-        match self {
-            SettlementRecordState::InProgress => true,
-            SettlementRecordState::AlreadyFunded => {
-                reporting.reportable.funded_settlements_already += 1;
-                false
-            }
-        }
+    fn is_in_progress(&self, _reporting: &mut ReportHandler<InitSettlementReport>) -> bool {
+        matches!(self, SettlementRecordState::InProgress)
     }
 }
 
@@ -939,10 +937,10 @@ struct InitSettlementReport {
     // settlement_address, vote_account_address
     created_settlements: Vec<(Pubkey, Pubkey)>,
     epoch: u64,
-    funded_overall: u64,
-    funded_already: u64,
-    funded_settlements_overall: HashSet<Pubkey>,
-    funded_settlements_already: u64,
+    current_funded_amount: u64,
+    current_funded_settlements_count: HashSet<Pubkey>,
+    already_funded_amount: u64,
+    already_funded_settlements_count: u64,
 }
 
 impl PrintReportable for InitSettlementReport {
@@ -972,12 +970,12 @@ impl PrintReportable for InitSettlementReport {
                     self.json_settlements_count
                 ),
                 format!("InitSettlement funded {}/{} settlements with {}/{} SOLs (before this already funded {} settlements with {} SOLs)",
-                    self.funded_settlements_overall.len(),
-                    self.json_settlements_count,
-                    lamports_to_sol(self.funded_overall),
-                    lamports_to_sol(self.json_settlements_max_claim_sum),
-                    self.funded_settlements_already,
-                    lamports_to_sol(self.funded_already),
+                        self.current_funded_settlements_count.len(),
+                        self.json_settlements_count,
+                        lamports_to_sol(self.current_funded_amount),
+                        lamports_to_sol(self.json_settlements_max_claim_sum),
+                        self.already_funded_settlements_count,
+                        lamports_to_sol(self.already_funded_amount),
                 ),
                 format!("InitSettlement number of loaded settlements merkle nodes {}, expected rent for settlement claims {} SOLs",
                     self.json_max_merkle_nodes_sum,
@@ -997,10 +995,10 @@ impl InitSettlementReport {
             json_settlements_max_claim_sum: 0,
             json_max_merkle_nodes_sum: 0,
             epoch: 0,
-            funded_overall: 0,
-            funded_already: 0,
-            funded_settlements_overall: HashSet::new(),
-            funded_settlements_already: 0,
+            current_funded_amount: 0,
+            already_funded_amount: 0,
+            current_funded_settlements_count: HashSet::new(),
+            already_funded_settlements_count: 0,
         };
         ReportHandler::new(init_settlement_report)
     }
