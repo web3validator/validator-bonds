@@ -332,6 +332,7 @@ async fn init_settlements(
 
     for settlement_record in settlement_records {
         if settlement_record.bond_account.is_none() {
+            // this is correct for Marinade funder as the existence of the Bond is required for any init Settlement
             reporting.add_error_string(format!(
                 "Cannot find bond account {} for vote account {}, funder {}, claim amount {} SOLs",
                 settlement_record.bond_address,
