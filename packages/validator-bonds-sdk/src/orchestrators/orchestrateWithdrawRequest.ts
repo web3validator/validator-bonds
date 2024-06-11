@@ -121,8 +121,8 @@ export async function orchestrateWithdrawDeposit({
       x.account.lamports > y.account.lamports
         ? 1
         : x.account.lamports < y.account.lamports
-        ? -1
-        : 0
+          ? -1
+          : 0
     )
     .reduce<{
       stakesAmount: BN

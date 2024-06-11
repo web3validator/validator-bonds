@@ -6,6 +6,15 @@ on:
   # pull_request:
   #   branches: [ main ]
 
+env:
+  # Not needed in CI, should make things a bit faster
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  # Remove unnecessary WASM build artifacts
+  WASM_BUILD_CLEAN_TARGET: 1
+  # stripping symbols and optimizing for binary size
+  RUSTFLAGS: -C strip=symbols -C opt-level=s
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
@@ -19,21 +28,22 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install libudev-dev
 
-      - name: Install Node.js
+      - name: 👨‍🔧 Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install pnpm
+      - name: 👩‍🔧 Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
-      - uses: dtolnay/rust-toolchain@1.73.0
+      - name: 🦿 Install Rust tookchain
+        uses: dtolnay/rust-toolchain@1.73.0
         with:
           components: rustfmt, clippy
 
-      - name: Set up cargo cache
+      - name: 🦴 Set up cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -48,4 +58,4 @@ jobs:
 
       - run: pnpm install
       - run: pnpm lint
-      - run: pnpm test:cargo
+      - run: cargo test --release --features no-entrypoint -- --nocapture
