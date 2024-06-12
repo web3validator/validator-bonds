@@ -58,4 +58,4 @@ jobs:
 
       - run: pnpm install
       - run: pnpm lint
-      - run: cargo test --release --features no-entrypoint -- --nocapture
+      - run: cargo test --release -- --nocapture
