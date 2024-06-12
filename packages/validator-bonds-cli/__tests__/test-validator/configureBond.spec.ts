@@ -82,6 +82,7 @@ describe('Configure bond account using CLI', () => {
       voteAccount,
       validatorIdentity,
       cpmpe: 33,
+      maxStakeWanted: 55,
     }))
   })
 
@@ -121,6 +122,7 @@ describe('Configure bond account using CLI', () => {
     expect(bondsData1.voteAccount).toEqual(voteAccount)
     expect(bondsData1.authority).toEqual(bondAuthorityKeypair.publicKey)
     expect(bondsData1.cpmpe).toEqual(33)
+    expect(bondsData1.maxStakeWanted).toEqual(55)
     expect(bondsData1.bump).toEqual(bump)
 
     const newBondAuthority = PublicKey.unique()
