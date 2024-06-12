@@ -1,11 +1,13 @@
 {
   "extends": "./node_modules/gts/",
+  "plugins": ["node"],
   "rules": {
     "semi": ["error", "never"],
     "node/no-extraneous-import": ["error", {
       "allowModules": ["@marinade.finance/jest-utils"]
      }],
-     "@typescript-eslint/no-extra-semi" : "off"
+     "@typescript-eslint/no-extra-semi" : "off",
+     "n/no-process-exit": ["off"]
   },
   "settings": {
     "node": {
