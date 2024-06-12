@@ -11,7 +11,7 @@
         "test:cargo": "cargo test --features no-entrypoint -- --nocapture",
         "test": "pnpm test:cargo && pnpm test:bankrun && pnpm test:validator",
         "cli": "ts-node ./packages/validator-bonds-cli/src/",
-        "lint:cargo": "cargo fmt -- --check && cargo clippy --release",
+        "lint:cargo": "cargo fmt -- --check && cargo clippy --release --features no-entrypoint",
         "lint:cargo-fix": "cargo fmt --all && cargo clippy --fix --allow-staged --allow-dirty",
         "lint:ts": "gts lint",
         "lint:ts-fix": "gts fix",
