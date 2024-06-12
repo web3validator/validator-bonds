@@ -12,14 +12,24 @@ env:
   CARGO_TERM_COLOR: always
   # Remove unnecessary WASM build artifacts
   WASM_BUILD_CLEAN_TARGET: 1
-  # stripping symbols and optimizing for binary size
+  # Stripping symbols and optimizing for binary size
   RUSTFLAGS: -C strip=symbols -C opt-level=s
+  RUSTC_WRAPPER: sccache
+  SCCACHE_GHA_ENABLED: true
 
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
+      - name: 🛀🏼 Maximize build space
+        uses: AdityaGarg8/remove-unwanted-software@v3
+        with:
+          remove-android: 'true'
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
       - name: Checkout project
         uses: actions/checkout@v4
 
@@ -43,19 +53,9 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: 🦴 Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-
+      - name: 🫙 Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.4
+ 
       - run: pnpm install
       - run: pnpm lint
       - run: cargo test --release -- --nocapture
