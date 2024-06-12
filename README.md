@@ -114,11 +114,17 @@ solana program deploy -v -ud \
    ./target/verifiable/validator_bonds.so
 
 # deploy (mainnet, SPL Gov authority multisig, governance 7iUtT...wtBZY)
+# NOTE: solana version 1.18.x; `--with-compute-unit-price` is required to be used as of the congestion of the network
 solana -um -k [fee-payer-keypair] \
-    program write-buffer target/verifiable/validator_bonds.so
+    program write-buffer target/verifiable/validator_bonds.so \
+    --with-compute-unit-price 10
 solana -um -k [fee-payer-keypair] \
     program set-buffer-authority \
     --new-buffer-authority 6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm <BUFFER_PUBKEY>
+
+# mainnet deployment
+# from solana version 1.18.x the `write-buffer` command provides option `--with-compute-unit-price`
+# which is required to be used as of the congestion of the network
 
 
 # 2. IDL UPDATE, idl account Du3XrzTNqhLt9gpui9LUogrLqCDrVC2HrtiNXHSJM58y)
