@@ -13,6 +13,7 @@ import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
 import { VALIDATOR_BONDS_PROGRAM_ID } from '@marinade.finance/validator-bonds-sdk'
 import { ExecutionError } from '@marinade.finance/web3js-common'
+import { compareVersions, fetchLatestVersionInNpmRegistry } from './npmRegistry'
 
 export const logger: Logger = configureLogger()
 const program = new Command()
@@ -111,6 +112,15 @@ program.parseAsync(process.argv).then(
         ? err.messageWithTransactionError()
         : err.message
     )
+    // Check for the latest version to inform user to update
+    fetchLatestVersionInNpmRegistry(logger).then(latestVersion => {
+      if (compareVersions(program.version() ?? '0.0.0', latestVersion) < 0) {
+        logger.error(
+          `Current CLI version ${program.version()} is lower than the latest version: ${latestVersion}. Please update using:\n` +
+            '  npm install -g @marinade.finance/validator-bonds-cli'
+        )
+      }
+    })
     logger.debug({ resolution: 'Failure', err, args: process.argv })
     process.exitCode = 200
   }

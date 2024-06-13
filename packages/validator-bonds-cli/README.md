@@ -7,7 +7,7 @@ CLI for Validator Bonds contract.
 To install the CLI as global npm package
 
 ```sh
-npm i -g @marinade.finance/validator-bonds-cli@latest
+npm install -g @marinade.finance/validator-bonds-cli@latest
 ```
 
 For detailed information on NPM packages installation and
