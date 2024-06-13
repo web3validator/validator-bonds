@@ -65,8 +65,8 @@ export async function getBondFromAddress({
         await program.provider.connection.getAccountInfo(address)
       if (bondAccountInfo === null) {
         throw new CliCommandError({
-          valueName: '[withdraw request address]:[bond account address]',
-          value: withdrawRequestAddress.toBase58() + ':' + address.toBase58(),
+          valueName: '[withdraw request address]|[bond address]',
+          value: `${withdrawRequestAddress.toBase58()}|${address.toBase58()}`,
           msg: 'Bond account address taken from provided withdraw request was not found',
         })
       }
@@ -85,8 +85,8 @@ export async function getBondFromAddress({
       await program.provider.connection.getAccountInfo(address)
     if (bondAccountInfo === null) {
       throw new CliCommandError({
-        valueName: '[vote account address]:[bond account address]',
-        value: voteAccountAddress.toBase58() + ':' + address.toBase58(),
+        valueName: '[vote account address]|[bond address]',
+        value: `${voteAccountAddress.toBase58()}|${address.toBase58()}`,
         msg: 'Bond account address derived from provided vote account was not found',
       })
     }

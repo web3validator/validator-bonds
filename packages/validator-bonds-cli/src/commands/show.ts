@@ -9,7 +9,7 @@ import {
   reformatReserved,
   ReformatAction,
 } from '@marinade.finance/cli-common'
-import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+import { AccountInfo, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { Command } from 'commander'
 import { getCliContext, setProgramIdByOwner } from '../context'
 import {
@@ -28,6 +28,12 @@ import {
 import { ProgramAccount } from '@coral-xyz/anchor'
 import { getBondFromAddress } from './utils'
 import BN from 'bn.js'
+import {
+  ProgramAccountInfoNullable,
+  VoteAccount,
+  getMultipleAccounts,
+  getVoteAccountFromData,
+} from '@marinade.finance/web3js-common'
 
 export type ProgramAccountWithProgramId<T> = ProgramAccount<T> & {
   programId: PublicKey
@@ -265,8 +271,9 @@ async function showConfig({
   print_data(reformatted, format)
 }
 
-export type BondShow<T> = ProgramAccountWithProgramId<T> &
-  Partial<Omit<BondDataWithFunding, 'voteAccount' | 'bondAccount'>>
+export type BondShow<T> = ProgramAccountWithProgramId<T> & {
+  voteAccount?: VoteAccount
+} & Partial<Omit<BondDataWithFunding, 'voteAccount' | 'bondAccount'>>
 
 async function showBond({
   address,
@@ -306,16 +313,25 @@ async function showBond({
     })
     if (bondFunding.length !== 1) {
       throw new CliCommandError({
-        valueName: '[address]',
-        value: address.toBase58(),
-        msg: 'Failed to fetch bond account funding data',
+        valueName: '[vote account address]|[bond address]',
+        value: `${bondData.account.data.voteAccount}|${address.toBase58()}`,
+        msg: 'Failed to fetch stake accounts to check bond funding',
       })
+    }
+
+    let voteAccount: VoteAccount | undefined = undefined
+    const voteAccounts = await loadVoteAccounts([
+      bondData.account.data.voteAccount,
+    ])
+    if (voteAccounts !== undefined && voteAccounts.length > 0) {
+      voteAccount = voteAccounts[0].account?.data
     }
 
     data = {
       programId: program.programId,
       publicKey: address,
       account: bondData.account.data,
+      voteAccount,
       amountActive: bondFunding[0].amountActive,
       amountAtSettlements: bondFunding[0].amountAtSettlements,
       amountToWithdraw: bondFunding[0].amountToWithdraw,
@@ -549,5 +565,31 @@ function reformatConfig(key: string, value: any): ReformatAction {
     return { type: 'UsePassThrough' }
   } else {
     return reserveReformatted
+  }
+}
+
+async function loadVoteAccounts(
+  addresses: PublicKey[]
+): Promise<ProgramAccountInfoNullable<VoteAccount>[] | undefined> {
+  const { provider, logger } = getCliContext()
+  try {
+    const voteAccounts: Promise<
+      ProgramAccount<AccountInfo<VoteAccount> | null>
+    >[] = (
+      await getMultipleAccounts({ connection: provider.connection, addresses })
+    ).map(async ({ publicKey, account }) => {
+      if (account === null) {
+        return {
+          publicKey,
+          account: null,
+        } as ProgramAccountInfoNullable<VoteAccount>
+      } else {
+        return await getVoteAccountFromData(publicKey, account)
+      }
+    })
+    return Promise.all(voteAccounts)
+  } catch (e) {
+    logger.debug(`Failed to fetch vote account data: ${e}`)
+    return undefined
   }
 }
