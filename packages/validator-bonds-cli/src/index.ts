@@ -12,6 +12,7 @@ import { installCommands } from './commands'
 import { Logger } from 'pino'
 import { setValidatorBondsCliContext } from './context'
 import { VALIDATOR_BONDS_PROGRAM_ID } from '@marinade.finance/validator-bonds-sdk'
+import { ExecutionError } from '@marinade.finance/web3js-common'
 
 export const logger: Logger = configureLogger()
 const program = new Command()
@@ -104,8 +105,13 @@ program.parseAsync(process.argv).then(
   () => {
     logger.debug({ resolution: 'Success', args: process.argv })
   },
-  (err: unknown) => {
-    logger.error({ resolution: 'Failure', err, args: process.argv })
-    process.exit(200)
+  (err: Error) => {
+    logger.error(
+      err instanceof ExecutionError
+        ? err.messageWithTransactionError()
+        : err.message
+    )
+    logger.debug({ resolution: 'Failure', err, args: process.argv })
+    process.exitCode = 200
   }
 )

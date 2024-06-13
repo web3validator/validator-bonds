@@ -6,8 +6,7 @@
     "node/no-extraneous-import": ["error", {
       "allowModules": ["@marinade.finance/jest-utils"]
      }],
-     "@typescript-eslint/no-extra-semi" : "off",
-     "n/no-process-exit": ["off"]
+     "@typescript-eslint/no-extra-semi" : "off"
   },
   "settings": {
     "node": {

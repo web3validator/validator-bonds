@@ -112,7 +112,7 @@ export async function getBondFromAddress({
     throw new CliCommandError({
       valueName: '[address]',
       value: address.toBase58(),
-      msg: 'Failed to fetch bond account data',
+      msg: 'Failed to decode the address as bond account data. It is not a bond, vote, or withdraw account.',
       cause: e as Error,
     })
   }
@@ -180,7 +180,7 @@ export async function getWithdrawRequestFromAddress({
   let accountInfo: AccountInfo<Buffer> = await checkAccountExistence(
     program.provider.connection,
     address,
-    'Account of type withdrawRequest or bond or voteAccount was not found'
+    'type of voteAccount or bond or withdrawRequest'
   )
 
   try {
@@ -214,7 +214,7 @@ export async function getWithdrawRequestFromAddress({
   accountInfo = await checkAccountExistence(
     program.provider.connection,
     address,
-    'Account of type withdrawRequest was not found'
+    'type of withdrawRequest'
   )
 
   // final decoding of withdraw request account from account info
@@ -245,7 +245,7 @@ async function checkAccountExistence(
     throw new CliCommandError({
       valueName: '[address]',
       value: address.toBase58(),
-      msg: errorMsg,
+      msg: `Address does not exist at ${connection.rpcEndpoint}: ` + errorMsg,
     })
   }
   return accountInfo

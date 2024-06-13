@@ -151,7 +151,6 @@ async function manageConfigureBond({
     authority = authority.publicKey
   }
 
-  console.log('address', address.toBase58())
   const bondAccountData = await getBondFromAddress({
     program,
     address,
