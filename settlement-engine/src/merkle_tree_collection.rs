@@ -33,18 +33,20 @@ pub fn generate_merkle_tree_meta(settlement: &Settlement) -> anyhow::Result<Merk
         .claims
         .iter()
         .cloned()
+        .enumerate()
         .map(
-            |SettlementClaim {
+            |(index, SettlementClaim {
                  withdraw_authority,
                  stake_authority,
                  claim_amount,
                  ..
-             }| TreeNode {
+             })| TreeNode {
                 stake_authority,
                 withdraw_authority,
                 claim: claim_amount,
-                ..Default::default()
-            },
+                order: index as u64,
+                proof: None,
+            }
         )
         .collect();
 
@@ -119,17 +121,18 @@ mod tests {
             withdraw_authority: Pubkey::from_str("BT6Y2kX5RLhQ6DDzbjbiHNDyyWJgn9jp7g5rCFn8stqy")
                 .unwrap(),
             claim: 444,
+            order: 222,
             proof: None,
         }
         .hash();
         let leaf_hash = hashv(&[&[0], tree_node_hash.as_ref()]).to_bytes();
         assert_eq!(
             tree_node_hash.to_string(),
-            "A2grPmDuPXWQK2Qch7b2pj97SunPw3xjpxDV8efAtAZD"
+            "74QRV6rf48VigmAn2LFhVLYNY9xUZUJHtUuYaNAUsbQs"
         );
         assert_eq!(
             bs58::encode(leaf_hash).into_string(),
-            "CRZSudMd4t7FWQnnpd8scbtrZepB7mMZa9HgBv2pkZRN"
+            "TTeK2Zkr8dXvw3njmKjvCqB6CiELB2L2wUKxQkaVbUR"
         );
     }
 
@@ -145,6 +148,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 1234,
+                order: 0,
                 proof: None,
             },
             TreeNode {
@@ -155,6 +159,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 99999,
+                order: 1,
                 proof: None,
             },
             TreeNode {
@@ -165,6 +170,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 212121,
+                order: 2,
                 proof: None,
             },
         ];
@@ -177,6 +183,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 69,
+                order: 3,
                 proof: None,
             },
             TreeNode {
@@ -187,6 +194,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 111111,
+                order: 4,
                 proof: None,
             },
         ];
@@ -199,6 +207,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 556677,
+                order: 5,
                 proof: None,
             },
             TreeNode {
@@ -209,6 +218,7 @@ mod tests {
                 )
                 .unwrap(),
                 claim: 996677,
+                order: 6,
                 proof: None,
             },
         ];

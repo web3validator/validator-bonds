@@ -417,7 +417,7 @@ async fn claim_settlement<'a>(
                     stake_account_withdrawer: tree_node.withdraw_authority,
                     claim: tree_node.claim,
                     index: 0, // TODO: !!! this has to be loaded from JSON !!!
-                    tree_node_hash: get_tree_node_hash(tree_node),
+                    tree_node_hash: tree_node.hash().to_bytes(),
                 },
             });
         add_instruction_to_builder(
@@ -450,12 +450,6 @@ async fn claim_settlement<'a>(
     );
 
     Ok(())
-}
-
-fn get_tree_node_hash(tree_node: &TreeNode) -> [u8; 32] {
-    let mut no_proof_tree_node = tree_node.clone();
-    no_proof_tree_node.proof = None;
-    no_proof_tree_node.hash().to_bytes()
 }
 
 struct MerkleTreeLoadedData {

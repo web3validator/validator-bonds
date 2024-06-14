@@ -135,8 +135,9 @@ impl<'info> ClaimSettlement<'info> {
             index,
             settlement_claims.debug_string()
         );
-        require!(
-            index < ctx.accounts.settlement.max_merkle_nodes,
+        require_gt!(
+            ctx.accounts.settlement.max_merkle_nodes,
+            index,
             ErrorCode::ClaimingIndexOutOfBounds
         );
         require!(
@@ -149,6 +150,7 @@ impl<'info> ClaimSettlement<'info> {
             stake_authority: stake_account_staker,
             withdraw_authority: stake_account_withdrawer,
             claim,
+            order: index,
             proof: None,
         };
         let tree_node_bytes = tree_node.hash().to_bytes();

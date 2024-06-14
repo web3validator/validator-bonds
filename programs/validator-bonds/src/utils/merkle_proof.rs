@@ -89,7 +89,9 @@ mod tests {
             stake_authority: staker_authority,
             withdraw_authority: withdrawer_authority,
             claim,
-            ..TreeNode::default()
+            // TODO: need to get some order from real data
+            order: 0,
+            proof: None,
         }
         .hash();
         assert!(verify(
