@@ -12,8 +12,8 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0
       '@marinade.finance/jest-utils':
-        specifier: ^2.4.5
-        version: 2.4.5(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
+        specifier: ^2.4.7
+        version: 2.4.7(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
       '@types/bn.js':
         specifier: ^5.1.5
         version: 5.1.5
@@ -51,23 +51,23 @@ importers:
         specifier: ^0.29.0
         version: 0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@marinade.finance/anchor-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
+        specifier: ^2.4.7
+        version: 2.4.7(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
       '@marinade.finance/cli-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)
       '@marinade.finance/ledger-utils':
         specifier: ^3.0.1
-        version: 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        version: 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@marinade.finance/ts-common':
-        specifier: ^2.4.5
-        version: 2.4.5
+        specifier: ^2.4.7
+        version: 2.4.7
       '@marinade.finance/validator-bonds-sdk':
         specifier: 'workspace: ^1.5.0'
         version: link:../validator-bonds-sdk
       '@marinade.finance/web3js-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js':
         specifier: ^1.93.0
         version: 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -94,8 +94,8 @@ importers:
         version: 2.4.5
     devDependencies:
       '@marinade.finance/jest-utils':
-        specifier: ^2.4.5
-        version: 2.4.5(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
+        specifier: ^2.4.7
+        version: 2.4.7(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
 
   packages/validator-bonds-sdk:
     devDependencies:
@@ -103,23 +103,23 @@ importers:
         specifier: ^0.29.0
         version: 0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@marinade.finance/anchor-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
+        specifier: ^2.4.7
+        version: 2.4.7(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
       '@marinade.finance/bankrun-utils':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@marinade.finance/marinade-ts-sdk':
         specifier: ^5.0.10
         version: 5.0.10(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(jsbi@4.3.0)(utf-8-validate@5.0.10)
       '@marinade.finance/ts-common':
-        specifier: ^2.4.5
-        version: 2.4.5
+        specifier: ^2.4.7
+        version: 2.4.7
       '@marinade.finance/umi-utils':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@metaplex-foundation/umi-bundle-defaults@0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@metaplex-foundation/umi-bundle-defaults@0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@marinade.finance/web3js-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@metaplex-foundation/mpl-token-metadata':
         specifier: ^3.2.0
         version: 3.2.0(@metaplex-foundation/umi@0.9.1)
@@ -133,8 +133,8 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1
       anchor-bankrun:
-        specifier: ^0.3.0
-        version: 0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        specifier: ^0.2.0
+        version: 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js:
         specifier: ^5.2.1
         version: 5.2.1
@@ -157,8 +157,8 @@ importers:
         specifier: ^0.2.1
         version: 0.2.1
       solana-bankrun:
-        specifier: ^0.3.0
-        version: 0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.2.0
+        version: 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       solana-spl-token-modern:
         specifier: npm:@solana/spl-token@^0.3.11
         version: '@solana/spl-token@0.3.11(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)'
@@ -169,26 +169,26 @@ importers:
         specifier: ^0.29.0
         version: 0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@marinade.finance/anchor-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
+        specifier: ^2.4.7
+        version: 2.4.7(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)
       '@marinade.finance/cli-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)
       '@marinade.finance/jest-utils':
-        specifier: ^2.4.5
-        version: 2.4.5(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
+        specifier: ^2.4.7
+        version: 2.4.7(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))
       '@marinade.finance/ledger-utils':
         specifier: ^3.0.1
-        version: 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+        version: 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@marinade.finance/ts-common':
-        specifier: ^2.4.5
-        version: 2.4.5
+        specifier: ^2.4.7
+        version: 2.4.7
       '@marinade.finance/validator-bonds-sdk':
         specifier: 'workspace: ^1.5.0'
         version: link:../packages/validator-bonds-sdk
       '@marinade.finance/web3js-common':
-        specifier: ^2.4.5
-        version: 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+        specifier: ^2.4.7
+        version: 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js':
         specifier: ^1.93.0
         version: 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -581,32 +581,33 @@ packages:
   '@ledgerhq/logs@6.12.0':
     resolution: {integrity: sha512-ExDoj1QV5eC6TEbMdLUMMk9cfvNKhhv5gXol4SmULRVCx/3iyCPhJ74nsb3S0Vb+/f+XujBEj3vQn5+cwS0fNA==}
 
-  '@marinade.finance/anchor-common@2.4.5':
-    resolution: {integrity: sha512-Ni3EYMkYCCbFSAy9NmwPnXvsXeIC0iqyOE1St3h7dorWcDXeBYWe1lgL4BN0z0VwLNzS44lDfrpMco9aFkg+1Q==}
+  '@marinade.finance/anchor-common@2.4.7':
+    resolution: {integrity: sha512-B+DKM1Pdn0kbrk3dmAo/aNi8g+1cBejK5AwrVRTJWfq5eEXoFxJnRIuQU2vAbNFpFb8Gmv7gAa+Po72wfz3ZWg==}
+    engines: {node: '>=16'}
     peerDependencies:
       '@coral-xyz/anchor': ^0.29.0
-      '@marinade.finance/ts-common': 2.4.5
-      '@marinade.finance/web3js-common': 2.4.5
+      '@marinade.finance/ts-common': 2.4.7
+      '@marinade.finance/web3js-common': 2.4.7
       '@solana/web3.js': ^1.93.0
       bn.js: ^5.2.1
 
-  '@marinade.finance/bankrun-utils@2.4.5':
-    resolution: {integrity: sha512-fmvwE5nlrA/v1YRJ2Lzfc6HsCbXji+OyOZt9mP/R5foTClKR6iirByTjm2yU/IbNs2qBzvgeLuUy3DUUhKlBPQ==}
+  '@marinade.finance/bankrun-utils@2.4.7':
+    resolution: {integrity: sha512-5ZNd7gP/aTM9N6GsYbVTgGFkZmIslNKtI0pPDNKd8O58GtWOvUT4qD83I0lfYo3ASRfNFPqQecrsP2+o3bRaMw==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      '@marinade.finance/web3js-common': 2.4.5
+      '@marinade.finance/web3js-common': 2.4.7
       '@solana/web3.js': ^1.93.0
-      anchor-bankrun: ^0.3.0
+      anchor-bankrun: ^0.2.0
       class-transformer: ^0.5.1
-      solana-bankrun: ^0.3.0
+      solana-bankrun: ^0.2.0
 
-  '@marinade.finance/cli-common@2.4.5':
-    resolution: {integrity: sha512-nxDm6oP1uTMCEhQZMtffJujyTSwzw1bELURYaXwgyabslf+63FqXJzc/iIQRjR8lqbaJol91lp4/sJ+jxMwW3w==}
+  '@marinade.finance/cli-common@2.4.7':
+    resolution: {integrity: sha512-v+Oh6ybYs4evFl3O0ksaj4FEViOcC50CzsraPvWIstffFx89i2MCfXrhk1vHJj30mA7c0ng6JH3GlE2cIrBAJA==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@marinade.finance/ledger-utils': ^3.0.1
-      '@marinade.finance/ts-common': 2.4.5
-      '@marinade.finance/web3js-common': 2.4.5
+      '@marinade.finance/ts-common': 2.4.7
+      '@marinade.finance/web3js-common': 2.4.7
       '@solana/web3.js': ^1.93.0
       bn.js: ^5.2.1
       borsh: ^0.7.0
@@ -622,8 +623,8 @@ packages:
       bn.js: ^5.2.1
       jsbi: ^4.3.0
 
-  '@marinade.finance/jest-utils@2.4.5':
-    resolution: {integrity: sha512-VJ7MiJ1hSlx0nefpEQIHcDEl6+fB8yMbQX8M1MRNhDaef/BMHjgV1evHWCXeGhd04KxSlnMTI5jtgz8mZn0mBA==}
+  '@marinade.finance/jest-utils@2.4.7':
+    resolution: {integrity: sha512-qFgrCyeMrq9njVVj67B6HqC6DqacnkXd2aS/K1n3h2CRA3+Fl8BTHI24uJ3o6oju1k/Su87KAGtDp/tM+gpRXg==}
     peerDependencies:
       '@jest/globals': ^29.7.0
       '@solana/web3.js': ^1.93.0
@@ -646,23 +647,23 @@ packages:
   '@marinade.finance/native-staking-sdk@1.0.0':
     resolution: {integrity: sha512-Cj2dy3SH9LAgcFBpGEgRHyF/nK+L7SfNIHkGqAZYRDVgn/h7u8bqKNkYqKXgCWbA5WwPmJzugWWm1DxEt7LyPQ==}
 
-  '@marinade.finance/ts-common@2.4.5':
-    resolution: {integrity: sha512-K1Fqc3rvz27ZEy4hBmIm+/jpkIsWAt8ine9idqERb4EtmpNYq3noOpzxzrmgiyDV+p5SV+vTdRmz8FlZwGBODw==}
+  '@marinade.finance/ts-common@2.4.7':
+    resolution: {integrity: sha512-r6Qc5rDUHm3Eum3v453mV8xtv68Ao2ycYPq7gWvHCgkp63OGWAteh2tnySjABNudyKP0+U7jY4T9vUdSFmE1JQ==}
 
-  '@marinade.finance/umi-utils@2.4.5':
-    resolution: {integrity: sha512-lBqfyAqJYJWMj1X4/dZp2+YTW3DPAC2OEkM0c9tRiKN4NK/Bm/7YYCzcY7JP851CVQgrRY/ZCxilPtWLKGs6Yg==}
+  '@marinade.finance/umi-utils@2.4.7':
+    resolution: {integrity: sha512-L0i+CAKSNIcRmEfijL0ihgThmYh5rjExsGQAAU7Rr2JSF0FT5Y333HQzKksGWFDHywHZKRbKoKRfp7AyrHwOhg==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      '@marinade.finance/web3js-common': 2.4.5
+      '@marinade.finance/web3js-common': 2.4.7
       '@metaplex-foundation/umi': 0.9.2
       '@metaplex-foundation/umi-bundle-defaults': 0.9.2
       '@solana/web3.js': ^1.93.0
 
-  '@marinade.finance/web3js-common@2.4.5':
-    resolution: {integrity: sha512-7SZKelyeknKJKFynMZSlQWEXQoqCCbJq+wUOnBXa499AGHpAgfY8Mg034CPb3H1TAsEcYdKP4mXHFvTFz2BxHw==}
+  '@marinade.finance/web3js-common@2.4.7':
+    resolution: {integrity: sha512-gc1yQGCa6Y6BaUKL0IBZCHRmd2JXvHp3l1o4GXkn5gj4qIiKN2CtPU/lib/a6hcGl4eXesJDVdn6zqOi791+JQ==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      '@marinade.finance/ts-common': 2.4.5
+      '@marinade.finance/ts-common': 2.4.7
       '@solana/buffer-layout': ^4.0.1
       '@solana/web3.js': ^1.93.0
       bn.js: ^5.2.1
@@ -1031,13 +1032,9 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  anchor-bankrun@0.3.0:
-    resolution: {integrity: sha512-PYBW5fWX+iGicIS5MIM/omhk1tQPUc0ELAnI/IkLKQJ6d75De/CQRh8MF2bU/TgGyFi6zEel80wUe3uRol9RrQ==}
+  anchor-bankrun@0.2.0:
+    resolution: {integrity: sha512-k/GIiYjkFzj10iluAXPjLjDInZtNNZ2FTcCTrtqgxwm5wofLbD8T0sy13LU9IfQSirj8/6eaTawDo+IvI03KRQ==}
     engines: {node: '>= 10'}
-    peerDependencies:
-      '@coral-xyz/anchor': ^0.28.0
-      '@solana/web3.js': ^1.78.4
-      solana-bankrun: ^0.2.0
 
   ansi-escapes@4.3.2:
     resolution: {integrity: sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==}
@@ -2502,37 +2499,37 @@ packages:
   snake-case@3.0.4:
     resolution: {integrity: sha512-LAOh4z89bGQvl9pFfNF8V146i7o7/CqFPbqzYgP+yYzDIDeS9HaNFtXABamRW+AQzEVODcvE79ljJ+8a9YSdMg==}
 
-  solana-bankrun-darwin-arm64@0.3.0:
-    resolution: {integrity: sha512-+NbDncf0U6l3knuacRBiqpjZ2DSp+5lZaAU518gH7/x6qubbui/d000STaIBK+uNTPBS/AL/bCN+7PkXqmA3lA==}
+  solana-bankrun-darwin-arm64@0.2.0:
+    resolution: {integrity: sha512-ENQ5Z/CYeY8ZVWIc2VutY/gMlBaHi93/kDw9w0iVwewoV+/YpQmP2irwrshIKu6ggRPTF3Ehlh2V6fGVIYWcXw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  solana-bankrun-darwin-universal@0.3.0:
-    resolution: {integrity: sha512-1/F0xdMa4qvc5o6z16FCCbZ5jbdvKvxpx5kyPcMWRiRPwyvi+zltMxciPAYMlg3wslQqGz88uFhrBEzq2eTumQ==}
+  solana-bankrun-darwin-universal@0.2.0:
+    resolution: {integrity: sha512-HE45TvZXzBipm1fMn87+fkHeIuQ/KFAi5G/S29y/TLuBYt4RDI935RkWiT0rEQ7KwnwO6Y1aTsOaQXldY5R7uQ==}
     engines: {node: '>= 10'}
     os: [darwin]
 
-  solana-bankrun-darwin-x64@0.3.0:
-    resolution: {integrity: sha512-U6CANjkmMl+lgNA7UH0GKs5V7LtVIUDzJBZefGGqLfqUNv3EjA/PrrToM0hAOWJgkxSwdz6zW+p5sw5FmnbXtg==}
+  solana-bankrun-darwin-x64@0.2.0:
+    resolution: {integrity: sha512-42UsVrnac2Oo4UaIDo60zfI3Xn1i8W6fmcc9ixJQZNTtdO8o2/sY4mFxcJx9lhLMhda5FPHrQbGYgYdIs0kK0g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  solana-bankrun-linux-x64-gnu@0.3.0:
-    resolution: {integrity: sha512-qJSkCFs0k2n4XtTnyxGMiZsuqO2TiqTYgWjQ+3mZhGNUAMys/Vq8bd7/SyBm6RR7EfVuRXRxZvh+F8oKZ77V4w==}
+  solana-bankrun-linux-x64-gnu@0.2.0:
+    resolution: {integrity: sha512-WnqQjfBBdcI0ZLysjvRStI8gX7vm1c3CI6CC03lgkUztH+Chcq9C4LI9m2M8mXza8Xkn9ryeKAmX36Bx/yoVzg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  solana-bankrun-linux-x64-musl@0.3.0:
-    resolution: {integrity: sha512-xsS2CS2xb1Sw4ivNXM0gPz/qpW9BX0neSvt/pnok5L330Nu9xlTnKAY8FhzzqOP9P9sJlGRM787Y6d0yYwt6xQ==}
+  solana-bankrun-linux-x64-musl@0.2.0:
+    resolution: {integrity: sha512-8mtf14ZBoah30+MIJBUwb5BlGLRZyK5cZhCkYnC/ROqaIDN8RxMM44NL63gTUIaNHsFwWGA9xR0KSeljeh3PKQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  solana-bankrun@0.3.0:
-    resolution: {integrity: sha512-YkH7sa8TB/AoRPzG17CXJtYsRIQHEkEqGLz1Vwc13taXhDBkjO7z6NI5JYw7n0ybRymDHwMYTc7sd+5J40TyVQ==}
+  solana-bankrun@0.2.0:
+    resolution: {integrity: sha512-TS6vYoO/9YJZng7oiLOVyuz8V7yLow5Hp4SLYWW71XM3702v+z9f1fvUBKudRfa4dfpta4tRNufApSiBIALxJQ==}
     engines: {node: '>= 10'}
 
   sonic-boom@3.7.0:
@@ -3459,27 +3456,27 @@ snapshots:
 
   '@ledgerhq/logs@6.12.0': {}
 
-  '@marinade.finance/anchor-common@2.4.5(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)':
+  '@marinade.finance/anchor-common@2.4.7(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)':
     dependencies:
       '@coral-xyz/anchor': 0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@marinade.finance/ts-common': 2.4.5
-      '@marinade.finance/web3js-common': 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+      '@marinade.finance/ts-common': 2.4.7
+      '@marinade.finance/web3js-common': 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
 
-  '@marinade.finance/bankrun-utils@2.4.5(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(class-transformer@0.5.1)(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+  '@marinade.finance/bankrun-utils@2.4.7(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(anchor-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(class-transformer@0.5.1)(solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
-      '@marinade.finance/web3js-common': 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+      '@marinade.finance/web3js-common': 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      anchor-bankrun: 0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      anchor-bankrun: 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       class-transformer: 0.5.1
-      solana-bankrun: 0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      solana-bankrun: 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  '@marinade.finance/cli-common@2.4.5(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.5)(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)':
+  '@marinade.finance/cli-common@2.4.7(@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@marinade.finance/ts-common@2.4.7)(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)(pino@8.21.0)(yaml@2.4.5)':
     dependencies:
-      '@marinade.finance/ledger-utils': 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      '@marinade.finance/ts-common': 2.4.5
-      '@marinade.finance/web3js-common': 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+      '@marinade.finance/ledger-utils': 3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      '@marinade.finance/ts-common': 2.4.7
+      '@marinade.finance/web3js-common': 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       borsh: 0.7.0
@@ -3499,19 +3496,19 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@marinade.finance/jest-utils@2.4.5(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))':
+  '@marinade.finance/jest-utils@2.4.7(@jest/globals@29.7.0)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(jest-shell-matchers@1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5))))':
     dependencies:
       '@jest/globals': 29.7.0
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       jest-shell-matchers: 1.0.2(jest@29.7.0(@types/node@18.19.24)(ts-node@10.9.2(@types/node@18.19.24)(typescript@5.4.5)))
 
-  '@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.5)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+  '@marinade.finance/ledger-utils@3.0.1(@ledgerhq/errors@6.16.2)(@ledgerhq/hw-app-solana@7.1.4)(@ledgerhq/hw-transport-node-hid-noevents@6.29.4)(@marinade.finance/ts-common@2.4.7)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
       '@ledgerhq/errors': 6.16.2
       '@ledgerhq/hw-app-solana': 7.1.4
       '@ledgerhq/hw-transport-node-hid-noevents': 6.29.4
-      '@marinade.finance/ts-common': 2.4.5
+      '@marinade.finance/ts-common': 2.4.7
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
   '@marinade.finance/marinade-ts-sdk@5.0.10(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(jsbi@4.3.0)(utf-8-validate@5.0.10)':
@@ -3542,18 +3539,18 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@marinade.finance/ts-common@2.4.5': {}
+  '@marinade.finance/ts-common@2.4.7': {}
 
-  '@marinade.finance/umi-utils@2.4.5(@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@metaplex-foundation/umi-bundle-defaults@0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
+  '@marinade.finance/umi-utils@2.4.7(@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0))(@metaplex-foundation/umi-bundle-defaults@0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)))(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
     dependencies:
-      '@marinade.finance/web3js-common': 2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
+      '@marinade.finance/web3js-common': 2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)
       '@metaplex-foundation/umi': 0.9.1
       '@metaplex-foundation/umi-bundle-defaults': 0.9.1(@metaplex-foundation/umi@0.9.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  '@marinade.finance/web3js-common@2.4.5(@marinade.finance/ts-common@2.4.5)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)':
+  '@marinade.finance/web3js-common@2.4.7(@marinade.finance/ts-common@2.4.7)(@solana/buffer-layout@4.0.1)(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bn.js@5.2.1)(borsh@0.7.0)(bs58@5.0.0)':
     dependencies:
-      '@marinade.finance/ts-common': 2.4.5
+      '@marinade.finance/ts-common': 2.4.7
       '@solana/buffer-layout': 4.0.1
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
@@ -4027,11 +4024,14 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  anchor-bankrun@0.3.0(@coral-xyz/anchor@0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@solana/web3.js@1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
+  anchor-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
-      '@coral-xyz/anchor': 0.29.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      solana-bankrun: 0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@coral-xyz/anchor': 0.28.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      solana-bankrun: 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
 
   ansi-escapes@4.3.2:
     dependencies:
@@ -5748,31 +5748,31 @@ snapshots:
       dot-case: 3.0.4
       tslib: 2.6.2
 
-  solana-bankrun-darwin-arm64@0.3.0:
+  solana-bankrun-darwin-arm64@0.2.0:
     optional: true
 
-  solana-bankrun-darwin-universal@0.3.0:
+  solana-bankrun-darwin-universal@0.2.0:
     optional: true
 
-  solana-bankrun-darwin-x64@0.3.0:
+  solana-bankrun-darwin-x64@0.2.0:
     optional: true
 
-  solana-bankrun-linux-x64-gnu@0.3.0:
+  solana-bankrun-linux-x64-gnu@0.2.0:
     optional: true
 
-  solana-bankrun-linux-x64-musl@0.3.0:
+  solana-bankrun-linux-x64-musl@0.2.0:
     optional: true
 
-  solana-bankrun@0.3.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+  solana-bankrun@0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@solana/web3.js': 1.93.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       bs58: 4.0.1
     optionalDependencies:
-      solana-bankrun-darwin-arm64: 0.3.0
-      solana-bankrun-darwin-universal: 0.3.0
-      solana-bankrun-darwin-x64: 0.3.0
-      solana-bankrun-linux-x64-gnu: 0.3.0
-      solana-bankrun-linux-x64-musl: 0.3.0
+      solana-bankrun-darwin-arm64: 0.2.0
+      solana-bankrun-darwin-universal: 0.2.0
+      solana-bankrun-darwin-x64: 0.2.0
+      solana-bankrun-linux-x64-gnu: 0.2.0
+      solana-bankrun-linux-x64-musl: 0.2.0
     transitivePeerDependencies:
       - bufferutil
       - encoding
