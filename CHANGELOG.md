@@ -14,6 +14,25 @@ All notable changes to this project will be documented in this file. See [standa
     --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.5.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
   ```
 
+## TS CLI&SDK [1.5.0](https://github.com/marinade-finance/validator-bonds/compare/v1.3.6...v1.5.0) (2024-06-14)
+
+Versioning skips one major version from 1.4.0 to align with the contract update version.
+
+### Updates
+
+* `configure-config` adds option `--min-bond-max-stake-wanted`, a minimum value for max-stake-wanted field (in lamports) in `Bond` account
+* `configure-bond` adds option `--max-stake-wanted`, the maximum stake amount (in SOLs) to be delegated to them
+* updates of `show-bond` to provide info on `cpmpe` and `max-stake-wanted` field, listing content of `vote account`
+* default CLI error reporting does not print whole exception, to get it printed use `--debug`
+* CLI show information about latest available version in the NPM registry when an error occurs
+
+## TS CLI&SDK [1.3.6](https://github.com/marinade-finance/validator-bonds/compare/v1.3.5...v1.3.6) (2024-05-13)
+
+### Updates
+
+* `show-bond` accepts `withdraw request` as address argument
+* `init-withdraw-request` accepts parameter `"ALL"` for `--amount`
+
 ## TS CLI&SDK [1.3.5](https://github.com/marinade-finance/validator-bonds/compare/v1.3.3...v1.3.5) (2024-05-06)
 
 ### Fixes

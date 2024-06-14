@@ -23,7 +23,7 @@ added 165 packages in 35s
 
 # to verify installed version
 validator-bonds --version
-1.3.6
+1.5.0
 ```
 
 To get info on available commands
@@ -443,7 +443,7 @@ To check where NPM packages are and will be installed:
 # Get npm global installation folder
 npm list -g
 > /usr/lib
-> +-- @marinade.finance/validator-bonds-cli@1.3.6
+> +-- @marinade.finance/validator-bonds-cli@1.5.0
 > ...
 # In this case, the `bin` folder is located at /usr/bin
 ```
@@ -469,7 +469,7 @@ With this configuration, NPM packages will be installed under the `prefix` direc
 npm i -g @marinade.finance/validator-bonds-cli@latest
 npm list -g
 > ~/.local/share/npm/lib
-> `-- @marinade.finance/validator-bonds-cli@1.3.6
+> `-- @marinade.finance/validator-bonds-cli@1.5.0
 ```
 
 To execute the installed packages from any location,
@@ -540,6 +540,11 @@ Commands:
   show-settlement [options] [address]             Showing data of settlement account(s)
   help [command]                                  display help for command
 ```
+
+## Troubleshooting
+
+* Verify using the latest available version: https://www.npmjs.com/package/@marinade.finance/validator-bonds-cli
+* Try running with `--verbose` to get more details on the CLI run
 
 ## FAQ and issues
 
@@ -615,7 +620,7 @@ Commands:
   # Get npm global installation folder
   npm list -g
   > ~/.local/share/npm/lib
-  > `-- @marinade.finance/validator-bonds-cli@1.3.6
+  > `-- @marinade.finance/validator-bonds-cli@1.5.0
   # In this case, the 'bin' folder is located at ~/.local/share/npm/bin
 
   # Get validator-bonds binary folder
