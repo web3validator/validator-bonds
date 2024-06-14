@@ -2,17 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## contract release v1.5.0 (2024-06-X)
+## contract release v1.5.0 (2024-06-14)
 
 * address: [`vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4`](https://explorer.solana.com/address/vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4)
-* tag: [`contract-v1.5.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.5.0), commit: [`TODO`](https://github.com/marinade-finance/validator-bonds/commit/TODO),
-* tx: [`TODO`](https://explorer.solana.com/tx/TODO)
+* tag: [`contract-v1.5.0`](https://github.com/marinade-finance/validator-bonds/releases/tag/contract-v1.5.0), commit: [`776e0f0`](https://github.com/marinade-finance/validator-bonds/commit/776e0f0),
+* tx: [`4hEUA7nz6ysDJ686F3kRgwGpkH3HpiE1jvqvpZ5YeBEEz7ycEA3kkFDZfApV8TqCagFpxXpC9UfSoaXNswH91CGU`](https://explorer.solana.com/tx/4hEUA7nz6ysDJ686F3kRgwGpkH3HpiE1jvqvpZ5YeBEEz7ycEA3kkFDZfApV8TqCagFpxXpC9UfSoaXNswH91CGU)
 * anchor verify command:
   ```
-  git checkout TODO &&\
+  git checkout 776e0f0 &&\
   anchor verify  --provider.cluster mainnet -p validator_bonds \
     --env "GIT_REV=`git rev-parse --short HEAD`" --env 'GIT_REV_NAME=v1.5.0' vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
   ```
+
+### Updates
+
+* changes in `Config` and `Bond` account, and related instructions, to be possible to configure fields `cpmpe` and `max_stake_wanted`
 
 ## TS CLI&SDK [1.5.0](https://github.com/marinade-finance/validator-bonds/compare/v1.3.6...v1.5.0) (2024-06-14)
 
