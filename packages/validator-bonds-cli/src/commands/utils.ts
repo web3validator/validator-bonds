@@ -133,7 +133,7 @@ async function isVoteAccount({
   // Check if the address is a vote account
   let voteAccountAddress = null
   try {
-    const voteAccount = await getVoteAccountFromData(address, accountInfo)
+    const voteAccount = getVoteAccountFromData(address, accountInfo)
     voteAccountAddress = voteAccount.publicKey
   } catch (e) {
     // Ignore error, we will try to fetch the address as the bond account data

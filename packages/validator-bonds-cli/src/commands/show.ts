@@ -584,7 +584,7 @@ async function loadVoteAccounts(
           account: null,
         } as ProgramAccountInfoNullable<VoteAccount>
       } else {
-        return await getVoteAccountFromData(publicKey, account)
+        return getVoteAccountFromData(publicKey, account)
       }
     })
     return Promise.all(voteAccounts)

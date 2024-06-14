@@ -9,6 +9,7 @@ import {
 } from '@marinade.finance/validator-bonds-sdk'
 import {
   executeTxSimple,
+  getVoteAccountFromData,
   signerWithPubkey,
   transaction,
 } from '@marinade.finance/web3js-common'
@@ -257,6 +258,13 @@ describe('Show command using CLI', () => {
       maxStakeWanted: 2000 * LAMPORTS_PER_SOL,
     })
 
+    const voteAccountInfo =
+      await provider.connection.getAccountInfo(voteAccount)
+    expect(voteAccountInfo).not.toBeNull()
+    const voteAccountData = getVoteAccountFromData(
+      voteAccount,
+      voteAccountInfo!
+    )
     const expectedDataNoFunding = {
       programId: program.programId,
       publicKey: bondAccount.toBase58(),
@@ -268,7 +276,17 @@ describe('Show command using CLI', () => {
         maxStakeWanted: '2000 SOLs',
       },
     }
-    const expectedData = {
+    const expectedDataFundingSingleItem = {
+      ...expectedDataNoFunding,
+      voteAccount: voteAccountData.account.data,
+      amountActive: '0.000000000 SOL',
+      amountAtSettlements: '0.000000000 SOL',
+      amountToWithdraw: '0.000000000 SOL',
+      numberActiveStakeAccounts: 0,
+      numberSettlementStakeAccounts: 0,
+      withdrawRequest: '<NOT EXISTING>',
+    }
+    const expectedDataFundingMultipleItems = {
       ...expectedDataNoFunding,
       amountActive: '0.000000000 SOL',
       amountAtSettlements: '0.000000000 SOL',
@@ -299,7 +317,7 @@ describe('Show command using CLI', () => {
       code: 0,
       signal: '',
       // stderr: '',
-      stdout: YAML.stringify(expectedData),
+      stdout: YAML.stringify(expectedDataFundingSingleItem),
     })
     await (
       expect([
@@ -324,7 +342,7 @@ describe('Show command using CLI', () => {
       code: 0,
       signal: '',
       // stderr: '',
-      stdout: YAML.stringify(expectedData),
+      stdout: YAML.stringify(expectedDataFundingSingleItem),
     })
 
     await (
@@ -375,7 +393,7 @@ describe('Show command using CLI', () => {
       code: 0,
       signal: '',
       // stderr: '',
-      stdout: YAML.stringify([expectedData]),
+      stdout: YAML.stringify([expectedDataFundingMultipleItems]),
     })
 
     await (
@@ -428,7 +446,7 @@ describe('Show command using CLI', () => {
       code: 0,
       signal: '',
       // stderr: '',
-      stdout: YAML.stringify([expectedData]),
+      stdout: YAML.stringify([expectedDataFundingMultipleItems]),
     })
 
     await (
@@ -505,8 +523,16 @@ describe('Show command using CLI', () => {
         maxStakeWanted: '0 SOL',
       },
     }
+    const voteAccountInfo =
+      await provider.connection.getAccountInfo(voteAccount)
+    expect(voteAccountInfo).not.toBeNull()
+    const voteAccountData = getVoteAccountFromData(
+      voteAccount,
+      voteAccountInfo!
+    )
     const expectedData = {
       ...expectedDataNoFunding,
+      voteAccount: voteAccountData.account.data,
       amountActive: '0.000000000 SOL',
       amountAtSettlements: '0.000000000 SOL',
       amountToWithdraw: '0.000000000 SOL',
