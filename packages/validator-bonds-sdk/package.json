@@ -42,7 +42,7 @@
     "bn.js": "^5.2.1",
     "borsh": "^0.7.0",
     "jsbi": "^4.3.0",
-    "solana-bankrun": "^0.2.0",
+    "solana-bankrun": "^0.3.0",
     "solana-spl-token-modern": "npm:@solana/spl-token@^0.3.11",
     "@metaplex-foundation/mpl-token-metadata": "^3.2.0",
     "@metaplex-foundation/umi-options": "0.8.9",
