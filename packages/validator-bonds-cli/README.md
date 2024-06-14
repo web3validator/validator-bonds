@@ -181,7 +181,9 @@ The `Bond` owner may configure following properties of the account:
 
 #### Permission-ed Configure workflow
 
-When creating the bond account in a permission-ed manner (as described in [section Creating a Bond](#creating-a-bond)), the authority can be defined upfront. If one prefers not to sign the CLI transaction with the validator `identity key`, they can utilize the [*mint-configure*](#permission-less-mint---configure-workflow) workflow.
+When creating the bond account in a permission-ed manner (as described in [section Creating a Bond](#creating-a-bond)), the authority is defined upfront. This authority is then used
+for changing `Bond` account configuration.
+(_If one prefers not to sign the CLI transaction with the validator `identity key`, they can utilize the [*mint-configure*](#permission-less-mint---configure-workflow) workflow._)
 
 When `authority` is configure then use
 
@@ -290,8 +292,8 @@ To initialize the withdrawal request, one needs to define the maximum number of 
 that are requested to be withdrawn upon claiming.
 The amount defined on creating withdraw request can be _bigger_ than amount funded to bond.
 
-**IMPORTANT:** If you want to withdraw all SOLs from the funded bond **ALL**
-               as value for `--amount` argument.
+**IMPORTANT:** If you want to withdraw all SOLs from the funded bond,
+               use **ALL** as value for `--amount` argument.
 
 For claiming, one may define `--withdrawer` as the public key where the claimed
 stake accounts will be assigned (by withdrawer and staker authorities) to.
