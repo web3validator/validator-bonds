@@ -28,3 +28,8 @@ docker-target/
 .coderrect/
 .idea/
 .vscode/
+
+# Fuzz
+hfuzz_target/
+hfuzz_workspace/
+

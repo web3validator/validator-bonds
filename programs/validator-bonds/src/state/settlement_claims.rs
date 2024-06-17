@@ -4,8 +4,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::Discriminator;
 use std::fmt::Debug;
 
-const BITS_PER_BYTE: u8 = 8;
-
 // 8 + mem::size_of::<SettlementClaims>(): 8 + 32 + 1 + 8 = 49 bytes
 // Anchor aligns to 8 bytes, so the size is 56 bytes
 // TODO: place into constants
@@ -27,6 +25,12 @@ pub struct SettlementClaims {
     // https://github.com/solana-developers/anchor-zero-copy-example/tree/main?tab=readme-ov-file#explanation-of-solana-memory-and-zero-copy
     // data: &mut [u8],
 }
+
+pub struct SettlementClaimsWrapped<'info> {
+    account: &'info Account<'info, SettlementClaims>,
+}
+
+
 
 pub struct SettlementClaimsWithData<'a> {
     pub max_records: u64,
@@ -172,17 +176,5 @@ pub fn settlement_claims_account_size(max_records: u64) -> usize {
     SETTLEMENT_CLAIMS_HEADER_SIZE + settlement_claims_bitmap_size(max_records)
 }
 
-/// number of bytes required for the bitmap to store the given number of records
-fn settlement_claims_bitmap_size(max_records: u64) -> usize {
-    let byte_number = max_records / BITS_PER_BYTE as u64;
-    let byte_modulo = max_records % BITS_PER_BYTE as u64;
-    if byte_modulo == 0 {
-        // msg!("bitmap size records: {}, modulo 0: {}", max_records, byte_number);
-        byte_number as usize
-    } else {
-        // msg!("bitmap size records: {}, modulo >0: {}", max_records, byte_number + 1);
-        byte_number as usize + 1
-    }
-}
 
 // TODO: add some tests on bitmap operations

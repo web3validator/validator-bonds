@@ -197,12 +197,18 @@ pub enum ErrorCode {
     #[msg("Max stake wanted value is lower to minimum configured value")]
     MaxStakeWantedTooLow, // 6063 0x17af
 
-    #[msg("Claim settlement index out of bound")]
-    ClaimingIndexOutOfBounds, // 6064 0x17b0
+    #[msg("Data size mismatch for the bitmap")]
+    BitmapSizeMismatch, // 6064 0x17b0
 
-    #[msg("Fail to create program address for SettlementClaimDeduplication")]
-    InvalidSettlementClaimDeduplicationAddress, // 6065 0x17b1
+    #[msg("Bitmap index out of bounds")]
+    BitmapIndexOutOfBonds, // 6065 0x17b1
 
-    #[msg("Settlement has been already claimed")]
-    SettlementAlreadyClaimed, // 6066 0x17b2
+    // #[msg("Claim settlement index out of bound")]
+    // ClaimingIndexOutOfBounds, // 6065 0x17b1
+    //
+    // #[msg("Fail to create program address for SettlementClaimDeduplication")]
+    // InvalidSettlementClaimDeduplicationAddress, // 6066 0x17b2
+    //
+    // #[msg("Settlement has been already claimed")]
+    // SettlementAlreadyClaimed, // 6067 0x17b3
 }
