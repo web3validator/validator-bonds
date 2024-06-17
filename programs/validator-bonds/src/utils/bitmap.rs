@@ -1,6 +1,6 @@
-use std::fmt::Debug;
-use anchor_lang::prelude::*;
 use crate::error::ErrorCode;
+use anchor_lang::prelude::*;
+use std::fmt::Debug;
 
 const BITS_PER_BYTE: u8 = 8;
 
@@ -26,9 +26,9 @@ impl<'a> Bitmap<'a> {
 
     pub fn is_set(&self, index: u64) -> Result<bool> {
         self.verify_index(index)?;
-        let (byte_index, bit_index) = Self::bitmap_byte_and_bit(index);
+        let (byte_index, bit_mod) = Self::bitmap_byte_index_and_bit_mod(index);
         let bitmap_byte = self.bitmap_byte(byte_index);
-        Ok(bitmap_byte & (1 << bit_index) != 0)
+        Ok(bitmap_byte & (1 << bit_mod) != 0)
     }
 
     pub fn set(&mut self, index: u64) -> Result<()> {
@@ -46,72 +46,42 @@ impl<'a> Bitmap<'a> {
         }
     }
 
-    pub fn number_of_set_bits(&self) -> Result<u64> {
-        self.assert_initialized()?;
-        let bitmap_bytes = &self.data[SETTLEMENT_CLAIMS_HEADER_SIZE..self.account_size()];
-        // calculating number of bits(!) that are set to 1 in the bitmap_bytes slice
-        // TODO: would be possible to somehow work with u8 and then only for summing things together works with u64?
-        Ok(bitmap_bytes
+    /// calculating number of bits(!) that are set to 1 in the bitmap_bytes slice
+    pub fn number_of_bits(&self) -> Result<u64> {
+        Ok(self
+            .data
             .iter()
             .map(|byte| byte.count_ones() as u64)
             .sum::<u64>())
-    }
-
-    pub fn number_of_set_bits(&self) -> Result<u64> {
-        self.assert_initialized()?;
-        let bitmap_bytes = &self.data[SETTLEMENT_CLAIMS_HEADER_SIZE..self.account_size()];
-        // calculating number of bits(!) that are set to 1 in the bitmap_bytes slice
-        // TODO: would be possible to somehow work with u8 and then only for summing things together works with u64?
-        Ok(bitmap_bytes
-            .iter()
-            .map(|byte| byte.count_ones() as u64)
-            .sum::<u64>())
-    }
-
-    /// required size of bytes of Solana account with bitmap of particular size
-    fn account_size(&self) -> usize {
-        settlement_claims_account_size(self.max_records)
     }
 
     fn set_inner(&mut self, index: u64) -> Result<()> {
-        let (byte_index, bit_index) = Self::bitmap_byte_and_bit(index);
-        msg!(
-            "set inner, index: {}, byte_index: {}, bit_index: {}",
-            index,
-            byte_index,
-            bit_index
-        );
+        let (byte_index, bit_mod) = Self::bitmap_byte_index_and_bit_mod(index);
         let old_byte = self.bitmap_byte_mut(byte_index);
-        let new_byte = *old_byte | 1_u8 << bit_index;
+        let new_byte = *old_byte | 1_u8 << bit_mod;
         *old_byte = new_byte;
-
-        msg!(
-            "set inner, new value: {}, new byte: {}",
-            self.debug_string(),
-            format!("{:08b},", new_byte.reverse_bits())
-        );
         Ok(())
     }
 
     fn bitmap_byte(&self, byte_index: usize) -> &u8 {
-        &self.data[SETTLEMENT_CLAIMS_HEADER_SIZE + byte_index]
+        &self.data[byte_index]
     }
 
     fn bitmap_byte_mut(&mut self, byte_index: usize) -> &mut u8 {
-        &mut self.data[SETTLEMENT_CLAIMS_HEADER_SIZE + byte_index]
+        &mut self.data[byte_index]
     }
 
-    fn bitmap_byte_and_bit(index: u64) -> (usize, u8) {
+    fn bitmap_byte_index_and_bit_mod(index: u64) -> (usize, u8) {
         let byte_index = index / BITS_PER_BYTE as u64;
-        let bit_index = index % BITS_PER_BYTE as u64;
-        (byte_index as usize, bit_index as u8)
+        let bit_mod = index % BITS_PER_BYTE as u64;
+        (byte_index as usize, bit_mod as u8)
     }
 
     /// number of bytes required for the bitmap to store the given number of records
     /// every record consumes 1 bit in the bitmap
     fn bitmap_size_in_bytes(max_records: u64) -> usize {
-        let(byte_index, bit_index) = Self::bitmap_byte_and_bit(max_records);
-        if byte_index == 0 {
+        let (byte_index, bit_mod) = Self::bitmap_byte_index_and_bit_mod(max_records);
+        if bit_mod == 0 {
             byte_index
         } else {
             byte_index + 1_usize
@@ -119,25 +89,24 @@ impl<'a> Bitmap<'a> {
     }
 
     fn verify_index(&self, index: u64) -> Result<()> {
-        require_gt!(
-            self.max_records,
-            index,
-            ErrorCode::BitmapIndexOutOfBonds
-        );
+        require_gt!(self.max_records, index, ErrorCode::BitmapIndexOutOfBonds);
         Ok(())
     }
 }
 
 impl Debug for Bitmap<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let formatted_data = self.data
+        let (last_byte_index, last_bit) = Self::bitmap_byte_index_and_bit_mod(self.max_records);
+        let mut formatted_data = self
+            // stripping last byte only to include the bitmap data limited by max_records
+            .data[..last_byte_index +1]
             .iter()
-            // using reverse bits to not format byte as "00000001" but as "10000000"
-            .map(|b| format!("{:08b},", b.reverse_bits()))
+            // using reverse bits to format byte as "00000001" but as "10000000"
+            .map(|b| format!("{:08b}", b.reverse_bits()))
             .collect::<Vec<String>>();
-        // stripping last byte only to include the bitmap data limited by max_records
-        let (last_byte_index, last_bit_index) = Self::bitmap_byte_and_bit(self.max_records);
-        formatted_data.join(",")
+        formatted_data[last_byte_index] =
+            (&formatted_data[last_byte_index][..last_bit as usize]).to_string();
+        write!(f, "{}", formatted_data.join(","))
     }
 }
 
@@ -155,6 +124,6 @@ mod tests {
         assert_eq!(Bitmap::bitmap_size_in_bytes(15), 2);
         assert_eq!(Bitmap::bitmap_size_in_bytes(16), 2);
         assert_eq!(Bitmap::bitmap_size_in_bytes(17), 3);
-        assert_eq!(Bitmap::bitmap_size_in_bytes(u64::MAX), u64::MAX / 8 + 1);
+        assert_eq!(Bitmap::bitmap_size_in_bytes(u64::MAX), (u64::MAX / 8 + 1) as usize);
     }
 }

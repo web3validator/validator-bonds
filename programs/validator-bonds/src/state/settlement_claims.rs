@@ -30,8 +30,6 @@ pub struct SettlementClaimsWrapped<'info> {
     account: &'info Account<'info, SettlementClaims>,
 }
 
-
-
 pub struct SettlementClaimsWithData<'a> {
     pub max_records: u64,
     pub data: &'a mut [u8],
@@ -175,6 +173,5 @@ impl<'a> SettlementClaimsWithData<'a> {
 pub fn settlement_claims_account_size(max_records: u64) -> usize {
     SETTLEMENT_CLAIMS_HEADER_SIZE + settlement_claims_bitmap_size(max_records)
 }
-
 
 // TODO: add some tests on bitmap operations
