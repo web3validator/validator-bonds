@@ -26,7 +26,7 @@ import {
   findSettlements,
 } from '@marinade.finance/validator-bonds-sdk'
 import { ProgramAccount } from '@coral-xyz/anchor'
-import { getBondFromAddress } from './utils'
+import { getBondFromAddress, formatToSol, formatUnit } from './utils'
 import BN from 'bn.js'
 import {
   ProgramAccountInfoNullable,
@@ -506,7 +506,7 @@ function reformatBond(key: string, value: any): ReformatAction {
       records: [
         {
           key: 'costPerMillePerEpoch',
-          value: new BN(value).toString() + ' ' + format_unit(value, 'lamport'),
+          value: new BN(value).toString() + ' ' + formatUnit(value, 'lamport'),
         },
       ],
     }
@@ -520,7 +520,7 @@ function reformatBond(key: string, value: any): ReformatAction {
           value:
             new BN(value).divRound(new BN(LAMPORTS_PER_SOL)).toString() +
             ' ' +
-            format_unit(value, 'SOL'),
+            formatUnit(value, 'SOL'),
         },
       ],
     }
@@ -543,27 +543,13 @@ function reformatBond(key: string, value: any): ReformatAction {
   return { type: 'UsePassThrough' }
 }
 
-function format_unit(value: BN, unit: string): string {
-  if (value.eq(new BN(0)) || value.eq(new BN(1))) {
-    return unit
-  } else {
-    return unit + 's'
-  }
-}
-
 function format_sol_exclusive(key: string, value: BN): ReformatAction {
-  const { div, mod } = new BN(value).divmod(new BN(LAMPORTS_PER_SOL))
   return {
     type: 'UseExclusively',
     records: [
       {
         key,
-        value: `${div.toString()}.${mod
-          .toString()
-          .padEnd(Math.log10(LAMPORTS_PER_SOL), '0')} ${format_unit(
-          value,
-          'SOL'
-        )}`,
+        value: `${formatToSol(value)}`,
       },
     ],
   }

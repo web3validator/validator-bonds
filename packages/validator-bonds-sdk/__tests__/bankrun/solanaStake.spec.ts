@@ -20,14 +20,13 @@ import {
   createVoteAccount,
   delegatedStakeAccount,
   getAndCheckStakeAccount,
-  getRentExemptStake,
-  getRentExemptVote,
   createInitializedStakeAccount,
   nonInitializedStakeAccount,
   setLockup,
 } from '../utils/staking'
 import { executeTxWithError } from '../utils/helpers'
 import { initBankrunTest } from './bankrun'
+import { getRentExemptStake, getRentExemptVote } from '../../src'
 
 describe('Solana stake account behavior verification', () => {
   let provider: BankrunExtendedProvider

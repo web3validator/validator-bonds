@@ -5,6 +5,7 @@ import {
   closeSettlementInstruction,
   fundSettlementInstruction,
   getConfig,
+  getRentExemptStake,
   getSettlement,
 } from '../../src'
 import {
@@ -23,7 +24,6 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import {
   createBondsFundedStakeAccount,
   createVoteAccount,
-  getRentExemptStake,
 } from '../utils/staking'
 import { getRentExempt, executeTxWithError } from '../utils/helpers'
 import assert from 'assert'

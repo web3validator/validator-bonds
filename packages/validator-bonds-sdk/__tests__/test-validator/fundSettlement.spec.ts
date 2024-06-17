@@ -7,6 +7,7 @@ import {
   getConfig,
   parseCpiEvents,
   assertEvent,
+  getRentExemptStake,
 } from '../../src'
 import { initTest } from './testValidator'
 import {
@@ -15,11 +16,7 @@ import {
   executeInitSettlement,
 } from '../utils/testTransactions'
 import { executeTxSimple, transaction } from '@marinade.finance/web3js-common'
-import {
-  authorizeStakeAccount,
-  delegatedStakeAccount,
-  getRentExemptStake,
-} from '../utils/staking'
+import { authorizeStakeAccount, delegatedStakeAccount } from '../utils/staking'
 import {
   createUserAndFund,
   pubkey,

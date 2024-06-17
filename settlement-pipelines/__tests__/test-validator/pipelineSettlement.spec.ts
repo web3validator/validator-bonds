@@ -22,6 +22,7 @@ import {
   findSettlements,
   findStakeAccountNoDataInfos,
   getMultipleSettlements,
+  getRentExemptStake,
   settlementAddress,
 } from '@marinade.finance/validator-bonds-sdk'
 import {
@@ -33,10 +34,7 @@ import { initTest } from '@marinade.finance/validator-bonds-sdk/__tests__/test-v
 import { AnchorExtendedProvider } from '@marinade.finance/anchor-common'
 import fs from 'fs'
 import path from 'path'
-import {
-  createDelegatedStakeAccount,
-  getRentExemptStake,
-} from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
+import { createDelegatedStakeAccount } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
 import BN from 'bn.js'
 import assert from 'assert'
 

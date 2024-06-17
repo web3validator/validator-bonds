@@ -175,6 +175,34 @@ describe('Init withdraw request using CLI', () => {
     )
     expect(withdrawRequestDataAll.bond).toEqual(bondAccount)
     expect(withdrawRequestDataAll.requestedAmount).toEqual(U64_MAX)
+
+    await (
+      expect([
+        'pnpm',
+        [
+          'cli',
+          '-u',
+          provider.connection.rpcEndpoint,
+          '--program-id',
+          program.programId.toBase58(),
+          'init-withdraw-request',
+          bondAccount.toBase58(),
+          '--config',
+          configAccount.toBase58(),
+          '--authority',
+          validatorIdentityPath,
+          '--amount',
+          '100', // lamports
+          '--confirmation-finality',
+          'confirmed',
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ]) as any
+    ).toHaveMatchingSpawnOutput({
+      code: 200,
+      stdout:
+        /100 lamports is less than the minimal amount 1002282880 lamports/,
+    })
   })
 
   it('init withdraw request in print-only mode', async () => {
@@ -201,7 +229,7 @@ describe('Init withdraw request using CLI', () => {
           '--authority',
           validatorIdentityPath,
           '--amount',
-          '1',
+          LAMPORTS_PER_SOL * 3,
           '--print-only',
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

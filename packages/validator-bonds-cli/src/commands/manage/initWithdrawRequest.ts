@@ -1,4 +1,5 @@
 import {
+  CliCommandError,
   parsePubkey,
   parsePubkeyOrPubkeyFromWallet,
   parseWalletOrPubkey,
@@ -13,13 +14,17 @@ import {
   transaction,
 } from '@marinade.finance/web3js-common'
 import {
+  checkAndGetBondAddress,
+  getBond,
+  getConfig,
+  getRentExemptStake,
   initWithdrawRequestInstruction,
   MARINADE_CONFIG_ADDRESS,
 } from '@marinade.finance/validator-bonds-sdk'
 import { Wallet as WalletInterface } from '@marinade.finance/web3js-common'
 import { PublicKey, Signer } from '@solana/web3.js'
 import BN from 'bn.js'
-import { getBondFromAddress } from '../utils'
+import { formatToSol, getBondFromAddress } from '../utils'
 import { INIT_WITHDRAW_REQUEST_LIMIT_UNITS } from '../../computeUnits'
 
 export function installInitWithdrawRequest(program: Command) {
@@ -57,8 +62,8 @@ export function installInitWithdrawRequest(program: Command) {
       parseWalletOrPubkey
     )
     .requiredOption(
-      '--amount <lamports_number | ALL>',
-      'Maximal number of lamports to withdraw from the bond ' +
+      '--amount <lamports | ALL>',
+      'Maximal number of **lamports** to withdraw from the bond ' +
         '(NOTE: consider staking rewards can be added to stake accounts during the time the withdraw request claiming time is elapsing). ' +
         'If the bond should be fully withdrawn, use "ALL" instead of the amount.'
     )
@@ -151,11 +156,41 @@ async function manageInitWithdrawRequest({
     voteAccount = bondAccountData.account.data.voteAccount
   }
 
+  // config account is required
+  bondAccountAddress = checkAndGetBondAddress(
+    bondAccountAddress,
+    config,
+    voteAccount,
+    program.programId
+  )
+  if (voteAccount === undefined || config === undefined) {
+    const bondData = await getBond(program, bondAccountAddress)
+    voteAccount = voteAccount ?? bondData.voteAccount
+    config = config ?? bondData.config
+  }
+
   let amountBN: BN
   if (amount === 'ALL') {
     amountBN = U64_MAX
   } else {
     amountBN = new BN(amount)
+
+    // withdraw request may withdraw only if possible to create a separate stake account,
+    // or when withdrawing whole stake account, the amount is greater to minimal stake account "size"
+    const configData = await getConfig(program, config)
+    const rentExemptStake = await getRentExemptStake(provider)
+    const minimalAmountToWithdraw = configData.minimumStakeLamports.add(
+      new BN(rentExemptStake)
+    )
+    if (amountBN.lt(minimalAmountToWithdraw)) {
+      throw new CliCommandError({
+        valueName: '--amount <lamports>',
+        value: `${amountBN.toString()} (${formatToSol(amountBN)})`,
+        msg:
+          `The requested amount ${amountBN.toString()} lamports is less than the minimal amount ` +
+          `${minimalAmountToWithdraw.toString()} lamports, required to manage a stake account after withdrawal.`,
+      })
+    }
   }
 
   const { instruction, bondAccount, withdrawRequestAccount } =
@@ -171,8 +206,9 @@ async function manageInitWithdrawRequest({
   tx.add(instruction)
 
   logger.info(
-    `Initializing withdraw request account ${withdrawRequestAccount.toBase58()} ` +
-      `for bond account ${bondAccount.toBase58()}`
+    `Initializing withdraw request account ${withdrawRequestAccount.toBase58()} (${formatToSol(
+      amountBN
+    )}) ` + `for bond account ${bondAccount.toBase58()}`
   )
   await executeTx({
     connection: provider.connection,

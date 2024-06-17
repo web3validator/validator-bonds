@@ -12,9 +12,15 @@ import {
   ProgramAccountInfo,
   getVoteAccountFromData,
 } from '@marinade.finance/web3js-common'
-import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
+import {
+  AccountInfo,
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+} from '@solana/web3.js'
 import { Logger } from 'pino'
 import { setProgramIdByOwner } from '../context'
+import BN from 'bn.js'
 
 /**
  * Expecting the provided address is a bond or vote account,
@@ -232,6 +238,27 @@ export async function getWithdrawRequestFromAddress({
       msg: 'Failed to fetch withdraw request account data',
       cause: e as Error,
     })
+  }
+}
+
+export function formatToSol(value: BN | number | BigInt): string {
+  return `${formatLamportsToSol(value)} ${formatUnit(value, 'SOL')}`
+}
+
+function formatLamportsToSol(value: BN | number | BigInt): string {
+  value = new BN(value.toString())
+  const { div, mod } = new BN(value).divmod(new BN(LAMPORTS_PER_SOL))
+  return `${div.toString()}.${mod
+    .toString()
+    .padEnd(Math.log10(LAMPORTS_PER_SOL), '0')}`
+}
+
+export function formatUnit(value: BN | number | BigInt, unit: string): string {
+  value = new BN(value.toString())
+  if (value.eq(new BN(0)) || value.eq(new BN(1))) {
+    return unit
+  } else {
+    return unit + 's'
   }
 }
 

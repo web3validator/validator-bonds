@@ -43,5 +43,8 @@
                 "@coral-xyz/anchor": "0.29"
             }
         }
-    }
+    },
+    "engines": {
+        "node": ">=16"
+      }
 }

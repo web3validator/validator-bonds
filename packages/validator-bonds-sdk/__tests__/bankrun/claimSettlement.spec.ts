@@ -5,6 +5,7 @@ import {
   ValidatorBondsProgram,
   claimSettlementInstruction,
   fundSettlementInstruction,
+  getRentExemptStake,
   getSettlement,
   getSettlementClaim,
   settlementClaimAddress,
@@ -35,7 +36,6 @@ import {
   createSettlementFundedDelegatedStake,
   createDelegatedStakeAccount,
   createVoteAccount,
-  getRentExemptStake,
 } from '../utils/staking'
 import {
   signer,

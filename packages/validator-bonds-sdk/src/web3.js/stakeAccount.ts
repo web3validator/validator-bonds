@@ -259,6 +259,18 @@ export async function findStakeAccounts({
   })
 }
 
+export async function getRentExemptStake(
+  provider: Provider,
+  rentExempt?: number
+): Promise<number> {
+  return (
+    rentExempt ??
+    (await provider.connection.getMinimumBalanceForRentExemption(
+      StakeProgram.space
+    ))
+  )
+}
+
 function pubkeyOrNull(
   value?: ConstructorParameters<typeof PublicKey>[0] | null
 ): PublicKey | null {
