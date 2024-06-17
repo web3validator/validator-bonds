@@ -1,5 +1,4 @@
-use std::cell::RefMut;
-use crate::utils::Bitmap;
+use crate::utils::BitmapProjection;
 use anchor_lang::prelude::Pubkey;
 use anchor_lang::prelude::*;
 use std::fmt::Debug;
@@ -10,7 +9,7 @@ use std::fmt::Debug;
 pub const SETTLEMENT_CLAIMS_HEADER_SIZE: usize = 56;
 
 pub fn account_size(max_records: u64) -> usize {
-    SETTLEMENT_CLAIMS_HEADER_SIZE + Bitmap::bitmap_size_in_bytes(max_records)
+    SETTLEMENT_CLAIMS_HEADER_SIZE + BitmapProjection::bitmap_size_in_bytes(max_records)
 }
 
 /// Simple bitmap to deduplicate settlement claims
@@ -29,21 +28,24 @@ pub struct SettlementClaims {
 pub struct SettlementClaimsWrapped<'info> {
     account: &'info Account<'info, SettlementClaims>,
     account_info: AccountInfo<'info>,
-    // bitmap: &'info Bitmap<'info>,
+    bitmap_projection: BitmapProjection,
 }
 
 impl<'info> SettlementClaimsWrapped<'info> {
     pub fn new(account: &'info Account<'info, SettlementClaims>) -> Result<Self> {
         let account_info = account.to_account_info();
-        Ok(Self { account, account_info})
+        Ok(Self {
+            account,
+            account_info,
+            bitmap_projection: BitmapProjection(account.max_records),
+        })
     }
 
     pub fn try_to_set(&mut self, index: u64) -> Result<bool> {
-        let mut bitmap_projection = Bitmap::new_checked(
-            self.account.max_records,
+        self.bitmap_projection.try_to_set(
+            index,
             &mut self.account_info.data.borrow_mut()[SETTLEMENT_CLAIMS_HEADER_SIZE..],
-        )?;
-        bitmap_projection.try_to_set(index)
+        )
     }
 }
 
@@ -51,7 +53,12 @@ impl Debug for SettlementClaimsWrapped<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SettlementClaimsWrapped")
             .field("account", &self.account)
-            // .field("bitmap", &self.bitmap)
+            .field(
+                "bitmap",
+                &self.bitmap_projection.debug_string(
+                    &self.account_info.data.borrow()[SETTLEMENT_CLAIMS_HEADER_SIZE..],
+                ),
+            )
             .finish()
     }
 }
