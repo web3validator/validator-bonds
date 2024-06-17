@@ -205,16 +205,6 @@ The owner of the `validator identity` key has permission to configure the bond a
 validator-bonds -um mint-bond <bond-or-vote-account-address>
 ```
 
-After execution of this command a Bond program creates a SPL token
-that is transferred to wallet of the `validator identity`.
-The owner of the `validator identity` may transfer the token
-to whatever other account (by standard means).
-Later when she wants to configure the bonds account it's required verify
-ownership of the Bond's SPL token.
-The owner of the token (which can be different to original `validator identity`)
-has to sign the CLI command and the program burns the Bond's SPL token
-and permits configuration of the `authority`.
-
 After executing this command, the Bond program creates an SPL token that
 is transferred to the wallet of the `validator identity`.
 The owner of the `validator identity` keypair may transfer the token
