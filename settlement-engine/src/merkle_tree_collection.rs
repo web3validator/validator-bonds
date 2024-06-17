@@ -35,18 +35,21 @@ pub fn generate_merkle_tree_meta(settlement: &Settlement) -> anyhow::Result<Merk
         .cloned()
         .enumerate()
         .map(
-            |(index, SettlementClaim {
-                 withdraw_authority,
-                 stake_authority,
-                 claim_amount,
-                 ..
-             })| TreeNode {
+            |(
+                index,
+                SettlementClaim {
+                    withdraw_authority,
+                    stake_authority,
+                    claim_amount,
+                    ..
+                },
+            )| TreeNode {
                 stake_authority,
                 withdraw_authority,
                 claim: claim_amount,
                 order: index as u64,
                 proof: None,
-            }
+            },
         )
         .collect();
 
