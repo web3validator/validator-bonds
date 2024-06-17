@@ -8,7 +8,7 @@ use crate::events::U64ValueChange;
 use crate::state::bond::Bond;
 use crate::state::config::Config;
 use crate::state::settlement::Settlement;
-use crate::state::settlement_claims::{SettlementClaims, SettlementClaimsWithData};
+use crate::state::settlement_claims::{SettlementClaims, SettlementClaimsWrapped};
 use crate::utils::{merkle_proof, minimal_size_stake_account};
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::hash::hashv;
@@ -124,16 +124,18 @@ impl<'info> ClaimSettlement<'info> {
     ) -> Result<()> {
         require!(!ctx.accounts.config.paused, ErrorCode::ProgramIsPaused);
 
-        let account_info = ctx.accounts.settlement_claims.to_account_info();
-        let mut settlement_claims_data = account_info.data.as_ref().borrow_mut();
-        let mut settlement_claims = SettlementClaimsWithData::new(
-            ctx.accounts.settlement_claims.max_records,
-            &mut settlement_claims_data,
-        );
+        // ctx.accounts.settlement_claims.as_ref().deref().borrow_mut().d
+        // let account_info = ctx.accounts.settlement_claims.to_account_info();
+        // let mut settlement_claims_data = account_info.data.as_ref().borrow_mut();
+        // let mut settlement_claims = SettlementClaimsWithData::new(
+        //     ctx.accounts.settlement_claims.max_records,
+        //     &mut settlement_claims_data,
+        // );
+        let mut settlement_claims = SettlementClaimsWrapped::new(&ctx.accounts.settlement_claims)?;
         msg!(
-            "Claiming settlement with index: {}, settlement claims: {}",
+            "Claiming settlement with index: {}, settlement claims: {:?}",
             index,
-            settlement_claims.debug_string()
+            settlement_claims
         );
         require_gt!(
             ctx.accounts.settlement.max_merkle_nodes,

@@ -10,9 +10,9 @@ pub struct Bitmap<'a> {
 }
 
 impl<'a> Bitmap<'a> {
-    pub fn new(max_records: u64, data: &mut [u8]) -> Self {
+    pub fn new_checked(max_records: u64, data: &'a mut [u8]) -> Result<Self> {
         Self::check_size(max_records, data)?;
-        Self { max_records, data }
+        Ok(Self { max_records, data })
     }
 
     pub fn check_size(max_records: u64, data: &[u8]) -> Result<()> {
@@ -79,7 +79,7 @@ impl<'a> Bitmap<'a> {
 
     /// number of bytes required for the bitmap to store the given number of records
     /// every record consumes 1 bit in the bitmap
-    fn bitmap_size_in_bytes(max_records: u64) -> usize {
+    pub fn bitmap_size_in_bytes(max_records: u64) -> usize {
         let (byte_index, bit_mod) = Self::bitmap_byte_index_and_bit_mod(max_records);
         if bit_mod == 0 {
             byte_index
@@ -99,7 +99,7 @@ impl Debug for Bitmap<'_> {
         let (last_byte_index, last_bit) = Self::bitmap_byte_index_and_bit_mod(self.max_records);
         let mut formatted_data = self
             // stripping last byte only to include the bitmap data limited by max_records
-            .data[..last_byte_index +1]
+            .data[..last_byte_index + 1]
             .iter()
             // using reverse bits to format byte as "00000001" but as "10000000"
             .map(|b| format!("{:08b}", b.reverse_bits()))
@@ -124,6 +124,9 @@ mod tests {
         assert_eq!(Bitmap::bitmap_size_in_bytes(15), 2);
         assert_eq!(Bitmap::bitmap_size_in_bytes(16), 2);
         assert_eq!(Bitmap::bitmap_size_in_bytes(17), 3);
-        assert_eq!(Bitmap::bitmap_size_in_bytes(u64::MAX), (u64::MAX / 8 + 1) as usize);
+        assert_eq!(
+            Bitmap::bitmap_size_in_bytes(u64::MAX),
+            (u64::MAX / 8 + 1) as usize
+        );
     }
 }

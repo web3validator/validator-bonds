@@ -78,7 +78,7 @@ impl Settlement {
 
     pub fn settlement_claims_address(settlement_address: &Pubkey) -> Result<Pubkey> {
         Pubkey::create_program_address(&[SETTLEMENT_CLAIMS_SEED, &settlement_address.as_ref()], &ID)
-            .map_err(|_| ErrorCode::InvalidSettlementClaimDeduplicationAddress.into())
+            .map_err(|_| ErrorCode::InvalidSettlementClaimAddress.into())
     }
 }
 

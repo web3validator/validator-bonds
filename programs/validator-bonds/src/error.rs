@@ -203,12 +203,9 @@ pub enum ErrorCode {
     #[msg("Bitmap index out of bounds")]
     BitmapIndexOutOfBonds, // 6065 0x17b1
 
-                           // #[msg("Claim settlement index out of bound")]
-                           // ClaimingIndexOutOfBounds, // 6065 0x17b1
-                           //
-                           // #[msg("Fail to create program address for SettlementClaimDeduplication")]
-                           // InvalidSettlementClaimDeduplicationAddress, // 6066 0x17b2
-                           //
-                           // #[msg("Settlement has been already claimed")]
-                           // SettlementAlreadyClaimed, // 6067 0x17b3
+    #[msg("Claim settlement index out of bound")]
+    ClaimingIndexOutOfBounds, // 6066 0x17b2
+
+    #[msg("Settlement has been already claimed")]
+    SettlementAlreadyClaimed, // 6067 0x17b3
 }

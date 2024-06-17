@@ -3,7 +3,9 @@ use crate::events::settlement::InitSettlementEvent;
 use crate::state::bond::Bond;
 use crate::state::config::Config;
 use crate::state::settlement::{find_settlement_staker_authority, Bumps, Settlement};
-use crate::state::settlement_claims::{settlement_claims_account_size, SettlementClaims};
+use crate::state::settlement_claims::{
+    account_size as settlement_claims_account_size, SettlementClaims,
+};
 use anchor_lang::prelude::*;
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
