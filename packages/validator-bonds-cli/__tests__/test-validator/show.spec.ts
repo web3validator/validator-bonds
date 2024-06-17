@@ -13,7 +13,12 @@ import {
   signerWithPubkey,
   transaction,
 } from '@marinade.finance/web3js-common'
-import { Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import {
+  Connection,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+} from '@solana/web3.js'
 import { initTest } from '@marinade.finance/validator-bonds-sdk/__tests__/test-validator/testValidator'
 import {
   executeConfigureConfigInstruction,
@@ -26,6 +31,7 @@ import {
   createVoteAccount,
 } from '@marinade.finance/validator-bonds-sdk/__tests__/utils/staking'
 import { AnchorExtendedProvider } from '@marinade.finance/anchor-common'
+import { VoteAccountShow } from '../../src/commands/show'
 
 beforeAll(() => {
   shellMatchers()
@@ -258,12 +264,9 @@ describe('Show command using CLI', () => {
       maxStakeWanted: 2000 * LAMPORTS_PER_SOL,
     })
 
-    const voteAccountInfo =
-      await provider.connection.getAccountInfo(voteAccount)
-    expect(voteAccountInfo).not.toBeNull()
-    const voteAccountData = getVoteAccountFromData(
-      voteAccount,
-      voteAccountInfo!
+    const voteAccountShow = await loadTestingVoteAccount(
+      provider.connection,
+      voteAccount
     )
     const expectedDataNoFunding = {
       programId: program.programId,
@@ -278,7 +281,7 @@ describe('Show command using CLI', () => {
     }
     const expectedDataFundingSingleItem = {
       ...expectedDataNoFunding,
-      voteAccount: voteAccountData.account.data,
+      voteAccount: voteAccountShow,
       amountActive: '0.000000000 SOL',
       amountAtSettlements: '0.000000000 SOL',
       amountToWithdraw: '0.000000000 SOL',
@@ -523,16 +526,13 @@ describe('Show command using CLI', () => {
         maxStakeWanted: '0 SOL',
       },
     }
-    const voteAccountInfo =
-      await provider.connection.getAccountInfo(voteAccount)
-    expect(voteAccountInfo).not.toBeNull()
-    const voteAccountData = getVoteAccountFromData(
-      voteAccount,
-      voteAccountInfo!
+    const voteAccountShow = await loadTestingVoteAccount(
+      provider.connection,
+      voteAccount
     )
     const expectedData = {
       ...expectedDataNoFunding,
-      voteAccount: voteAccountData.account.data,
+      voteAccount: voteAccountShow,
       amountActive: '0.000000000 SOL',
       amountAtSettlements: '0.000000000 SOL',
       amountToWithdraw: '0.000000000 SOL',
@@ -666,3 +666,20 @@ describe('Show command using CLI', () => {
     })
   })
 })
+
+async function loadTestingVoteAccount(
+  connection: Connection,
+  voteAccount: PublicKey
+): Promise<VoteAccountShow> {
+  const voteAccountInfo = await connection.getAccountInfo(voteAccount)
+  expect(voteAccountInfo).not.toBeNull()
+  const voteAccountData = getVoteAccountFromData(voteAccount, voteAccountInfo!)
+    .account.data
+  return {
+    nodePubkey: voteAccountData.nodePubkey,
+    authorizedWithdrawer: voteAccountData.authorizedWithdrawer,
+    authorizedVoters: voteAccountData.authorizedVoters,
+    commission: voteAccountData.commission,
+    rootSlot: voteAccountData.rootSlot,
+  }
+}

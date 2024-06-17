@@ -271,8 +271,11 @@ async function showConfig({
   print_data(reformatted, format)
 }
 
+export type VoteAccountShow = Partial<
+  Omit<VoteAccount, 'lastTimestamp' | 'epochCredits' | 'priorVoters' | 'votes'>
+>
 export type BondShow<T> = ProgramAccountWithProgramId<T> & {
-  voteAccount?: VoteAccount
+  voteAccount?: VoteAccountShow
 } & Partial<Omit<BondDataWithFunding, 'voteAccount' | 'bondAccount'>>
 
 async function showBond({
@@ -319,12 +322,23 @@ async function showBond({
       })
     }
 
-    let voteAccount: VoteAccount | undefined = undefined
+    let voteAccount: VoteAccountShow | undefined = undefined
     const voteAccounts = await loadVoteAccounts([
       bondData.account.data.voteAccount,
     ])
-    if (voteAccounts !== undefined && voteAccounts.length > 0) {
-      voteAccount = voteAccounts[0].account?.data
+    if (
+      voteAccounts !== undefined &&
+      voteAccounts.length > 0 &&
+      voteAccounts[0].account !== null
+    ) {
+      const voteAccountData = voteAccounts[0].account.data
+      voteAccount = {
+        nodePubkey: voteAccountData.nodePubkey,
+        authorizedWithdrawer: voteAccountData.authorizedWithdrawer,
+        authorizedVoters: voteAccountData.authorizedVoters,
+        commission: voteAccountData.commission,
+        rootSlot: voteAccountData.rootSlot,
+      }
     }
 
     data = {
